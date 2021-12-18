@@ -103,7 +103,8 @@ def plot_r2(comb_r2_df):
     pos = [10, 20, 30, 40, 50]
     avg_diff = pd.DataFrame(columns=["diff", "r2"])
     r2_list = []
-    
+    r2_list_pos = []
+
     for diff in range(max_diff):
         subset_diff = comb_r2_df.loc[comb_r2_df["diff"] == diff]
         r2_mean = subset_diff["r2"].mean()
@@ -114,8 +115,11 @@ def plot_r2(comb_r2_df):
         r2_mean = r2_sub["r2"].mean(skipna=True)
         r2_list.append(r2_mean)
 
+    for k in range(5):
+        r2_list_pos.append(np.mean(r2_list[k * 5: (k + 1) * 5]))
+
     plt.figure(figsize=(12, 10))
-    plt.plot(pos, r2_list, marker='', markersize=14, color='C0', label='Hi-C-LSTM')
+    plt.plot(pos, r2_list_pos, marker='', markersize=14, color='C0', label='Hi-C-LSTM')
     plt.tick_params(axis="x", labelsize=20, length=0)
     plt.tick_params(axis="y", labelsize=20)
     plt.xlabel('Distance between positions in Mbp', fontsize=20)
