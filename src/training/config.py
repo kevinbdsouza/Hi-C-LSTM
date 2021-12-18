@@ -50,7 +50,7 @@ class Config:
         ############ Output Locations ############
         ##########################################
 
-        self.model_dir = '../saved_models/'
+        self.model_dir = '../../saved_models/'
         self.output_directory = self.downstream_dir + "/predictions/"
         self.plot_dir = self.output_directory + 'data_plots/'
         self.processed_data_dir = self.output_directory + 'processed_data/' + self.cell + "/"
