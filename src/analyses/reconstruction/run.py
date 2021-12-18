@@ -22,5 +22,16 @@ if __name__ == '__main__':
     model.load_weights()
 
     for chr in test_chr:
+        # Run test and save the predictions
         test_model(model, cfg, cell, chr)
-        data_ob_hic = HiC_R2(cfg, chr, mode='test')
+
+        # load predictions, compute r2 and save
+        hic_r2_ob = HiC_R2(cfg, chr, mode='test')
+        hic_predictions = pd.read_csv(cfg.output_directory + "shuffle_%s_predictions_chr%s.csv" % (cell, str(chr)),
+                                      sep="\t")
+        hic_predictions = hic_predictions.drop(['Unnamed: 0'], axis=1)
+        r2_frame = hic_r2_ob.hic_r2(hic_predictions)
+        r2_frame.to_csv(cfg.output_directory + "r2frame_%s_chr%s.csv" % (cell, str(chr)), sep="\t")
+
+        # plot r2
+        plot_utils.plot_r2(r2_frame)
