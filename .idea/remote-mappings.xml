@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="RemoteMappingsManager">
+    <list>
+      <list>
+        <remote-mappings server-id="python@sftp://kevindsouza@137.82.57.119:22/usr/bin/python3.8">
+          <settings>
+            <list>
+              <mapping local-root="$PROJECT_DIR$/../../../../.." remote-root="/home/kevindsouza/Documents/projects/PhD/Hi-C-LSTM" />
+            </list>
+          </settings>
+        </remote-mappings>
+      </list>
+    </list>
+  </component>
+</project>
