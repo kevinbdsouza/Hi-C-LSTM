@@ -100,6 +100,7 @@ def plot_euclid_heatmap(embeddings):
 def plot_r2(comb_r2_df):
     max_diff = 9008
     max_mb = 50
+    pos = [10, 20, 30, 40, 50]
     avg_diff = pd.DataFrame(columns=["diff", "r2"])
     r2_list = []
     
@@ -112,6 +113,15 @@ def plot_r2(comb_r2_df):
         r2_sub = avg_diff.loc[i:(i + 1) * 100, :]
         r2_mean = r2_sub["r2"].mean(skipna=True)
         r2_list.append(r2_mean)
+
+    plt.figure(figsize=(12, 10))
+    plt.plot(pos, r2_list, marker='', markersize=14, color='C0', label='Hi-C-LSTM')
+    plt.tick_params(axis="x", labelsize=20, length=0)
+    plt.tick_params(axis="y", labelsize=20)
+    plt.xlabel('Distance between positions in Mbp', fontsize=20)
+    plt.ylabel('R-squared for Replicate-1', fontsize=20)
+    plt.legend(loc='upper right', fontsize=20)
+    plt.show()
 
     pass
 
@@ -127,7 +137,7 @@ if __name__ == '__main__':
         r2_diff = r2_diff.drop(['Unnamed: 0'], axis=1)
         comb_r2_df = comb_r2_df.append(r2_diff, ignore_index=True)
 
-    plot_r2(comb_r2_df)
+        plot_r2(comb_r2_df)
 
     print("done")
 

@@ -23,7 +23,7 @@ if __name__ == '__main__':
 
     for chr in test_chr:
         # Run test and save the predictions
-        test_model(model, cfg, cell, chr)
+        # test_model(model, cfg, cell, chr)
 
         # load predictions, compute r2 and save
         hic_r2_ob = HiC_R2(cfg, chr, mode='test')
