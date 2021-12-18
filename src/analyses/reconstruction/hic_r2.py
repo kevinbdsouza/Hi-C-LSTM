@@ -24,7 +24,7 @@ class HiC_R2():
         self.start_ends = np.load(self.start_end_path, allow_pickle=True).item()
 
     def hic_r2(self, hic_predictions):
-        hic_predictions.columns = ["i", "j", "v", "pred"] + list(np.arange(2 * cfg.pos_embed_size))
+        hic_predictions.columns = ["i", "j", "v", "pred"] + list(np.arange(2 * self.cfg.pos_embed_size))
         hic_predictions["diff"] = np.abs(hic_predictions["i"] - hic_predictions["j"]).astype(int)
         hic_data = hic_predictions.sort_values(by=['i']).reset_index(drop=True)
 
