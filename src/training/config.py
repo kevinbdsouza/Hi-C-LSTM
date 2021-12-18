@@ -50,7 +50,7 @@ class Config:
         ############ Output Locations ############
         ##########################################
 
-        self.proj_dir = "/home/Documents/projects/PhD/Hi-C-LSTM/"
+        self.proj_dir = "/home/kevindsouza/Documents/projects/PhD/Hi-C-LSTM/"
         self.model_dir = self.proj_dir + 'saved_models/'
         self.output_directory = self.downstream_dir + "/predictions/"
         self.plot_dir = self.output_directory + 'data_plots/'
