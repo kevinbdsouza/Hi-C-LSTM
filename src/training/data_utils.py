@@ -215,8 +215,9 @@ def get_data_loader_batch_chr(cfg):
 
     sample_index_list = []
 
-    chr_list = [22, 10, 12, 7, 3, 16, 11, 20, 4, 19, 9, 15, 5, 18, 8, 14, 6, 17, 13, 21]
+    # chr_list = [2, 22, 10, 12, 7, 3, 16, 11, 20, 4, 19, 9, 15, 5, 18, 8, 14, 6, 17, 13, 21]
     # chr_list = [2, 22, 10, 12, 1, 3, 16, 11, 20, 4, 19, 9, 15, 5, 18, 8, 14, 6, 17, 13]
+    chr_list = [19, 22, 20, 21]
 
     for chr in chr_list:
         idx = torch.load(cfg.processed_data_dir + 'input_idx_chr' + str(chr) + '.pth')
