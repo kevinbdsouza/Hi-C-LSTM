@@ -21,6 +21,7 @@ if __name__ == '__main__':
     # load model weights
     model.load_weights()
 
+    comb_r2_df = pd.DataFrame(columns=["diff", "r2"])
     for chr in test_chr:
         # Run test and save the predictions
         # test_model(model, cfg, cell, chr)
@@ -32,6 +33,7 @@ if __name__ == '__main__':
         hic_predictions = hic_predictions.drop(['Unnamed: 0'], axis=1)
         r2_frame = hic_r2_ob.hic_r2(hic_predictions)
         r2_frame.to_csv(cfg.output_directory + "r2frame_%s_chr%s.csv" % (cell, str(chr)), sep="\t")
+        comb_r2_df = comb_r2_df.append(r2_frame, ignore_index=True)
 
-        # plot r2
-        plot_utils.plot_r2(r2_frame)
+    # plot r2
+    plot_utils.plot_r2(comb_r2_df)
