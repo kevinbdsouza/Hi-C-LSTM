@@ -6,7 +6,7 @@ import os
 import torch
 import torch.utils.data
 from torch.nn.utils.rnn import pad_sequence
-import config
+import training.config as config
 import matplotlib
 
 matplotlib.use('pdf')

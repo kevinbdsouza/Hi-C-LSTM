@@ -1,7 +1,7 @@
 import pandas as pd
 import logging
 import re
-from config import Config
+from training.config import Config
 import numpy as np
 import traceback
 import math

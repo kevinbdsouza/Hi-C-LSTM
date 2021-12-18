@@ -5,7 +5,7 @@ import torch
 from torch import nn
 from torch.autograd import Variable
 from torch.nn.utils.clip_grad import clip_grad_norm_
-import lstm
+import training.lstm as lstm
 from captum.attr import LayerIntegratedGradients
 
 

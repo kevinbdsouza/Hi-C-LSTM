@@ -4,10 +4,10 @@ import torch
 import numpy as np
 import os
 import pandas as pd
-import config
-from model import SeqLSTM
-from data_utils import get_data_loader_chr
-from data_utils import get_bin_idx
+import training.config as config
+from training.model import SeqLSTM
+from training.data_utils import get_data_loader_chr
+from training.data_utils import get_bin_idx
 
 device = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
 # device = 'cpu'

@@ -6,9 +6,9 @@ import time
 
 from torch.utils.tensorboard import SummaryWriter
 
-import config
-from model import SeqLSTM
-from data_utils import get_data_loader, get_bedfile, get_data_loader_batch_chr
+import training.config as config
+from training.model import SeqLSTM
+from training.data_utils import get_data_loader, get_bedfile, get_data_loader_batch_chr
 
 device = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
 

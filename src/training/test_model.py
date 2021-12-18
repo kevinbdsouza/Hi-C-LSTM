@@ -2,9 +2,9 @@ import numpy as np
 import pandas as pd
 import torch
 
-import config
-from model import SeqLSTM
-from data_utils import get_data_loader_chr
+import training.config as config
+from training.model import SeqLSTM
+from training.data_utils import get_data_loader_chr
 
 device = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
 
