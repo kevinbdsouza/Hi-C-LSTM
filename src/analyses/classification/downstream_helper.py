@@ -53,12 +53,6 @@ class DownstreamHelper:
             self.embed_path = self.cfg.pca_annotation_path + "encoding_" + str(self.chr) + ".npy"
             self.embed_rows = pd.DataFrame(np.load(self.embed_path))
             self.embed_rows["pos"] = self.embed_rows.index + self.start
-        elif mode == "ig":
-            self.ig_path = self.cfg.model_dir + "/ig_feature_scores.npy"
-            self.ig_rows = np.load(self.ig_path)
-            self.ig_rows = pd.DataFrame(self.ig_rows[self.start:self.stop + 1])
-            self.ig_rows["sum_ig"] = self.ig_rows[list(self.ig_rows.columns)].sum(axis=1)
-            self.ig_rows["pos"] = self.ig_rows.index + self.start
 
     def cat_convert(self, y_test, y_valid, feature_matrix):
 

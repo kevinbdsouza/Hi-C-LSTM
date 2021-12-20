@@ -30,16 +30,13 @@ class DownstreamTasks:
         self.pe_cell_names = ['E116']  # , 'E117', 'E123', 'E017']
         self.loop_cell_names = ['GM12878']  # , 'IMR90', 'HUVEC', 'HMEC', 'K562', 'HeLa']
         self.sbc_cell_names = ['GM12878']
-        self.segway_cell_names = ["GM12878"]
         self.chr_rna = str(chr)
         self.chr_pe = 'chr' + str(chr)
         self.chr_tad = 'chr' + str(chr)
         self.chr_rep = 'chr' + str(chr)
-        self.chr_seg = 'chr' + str(chr)
         self.chr_ctcf = 'chr' + str(chr)
         self.chr_tad = 'chr' + str(chr)
         self.chr_fire = chr
-        self.chr_phylo = chr
         self.saved_model_dir = cfg.model_dir
         self.calculate_map = True
         self.exp = "map"

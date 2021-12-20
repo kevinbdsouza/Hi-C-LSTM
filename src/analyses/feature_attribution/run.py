@@ -1,14 +1,69 @@
+from __future__ import division
+import torch
+import numpy as np
+import training.config as config
+from training.model import SeqLSTM
+from training.data_utils import get_data_loader_chr
 from analyses.feature_attribution.tf import TFChip
+import pandas as pd
+from analyses.feature_attribution.segway import SegWay
+from training.config import Config
+from analyses.classification.run import DownstreamTasks
+from analyses.classification.fires import Fires
+from analyses.classification.loops import Loops
+from analyses.classification.domains import Domains
 
-# ig_pos_df = pd.DataFrame(columns=["sum_ig", "pos", "target"])
-# ig_pos_df = downstream_ob.feature_importance(cfg, ig_pos_df, mode="cohesin")
+device = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
+# device = 'cpu'
+mode = "test"
 
 
-def feature_importance(self, cfg, ig_pos_df, mode):
-    ig_df = self.downstream_helper_ob.ig_rows[['sum_ig', 'pos']]
+def captum_test(cfg, model, cell, chr):
+    torch.manual_seed(123)
+    np.random.seed(123)
+
+    data_loader, samples = get_data_loader_chr(cfg, chr)
+    ig_df = model.get_captum_ig(data_loader)
+
+    np.save(cfg.output_directory + "ig_df_chr" + str(chr) + ".npy", ig_df)
+    return ig_df
+
+
+def captum_analyze_tfs(cfg, chr):
+    prediction_path = "/data2/hic_lstm/downstream/predictions/"
+    columns = ["HGNC symbol", "chromosome", "start"]
+    ig_df = pd.DataFrame(np.load(prediction_path + "ig_df_chr" + str(chr) + ".npy"),
+                         columns=["pos", "ig"])
+    ig_df = ig_df.astype({"pos": int})
+
+    tf_db = pd.read_csv(prediction_path + "/tf_db.csv")
+    tf_db = tf_db.filter(columns, axis=1)
+    tf_db = tf_db.loc[(tf_db['chromosome'] != 'X') & (tf_db['chromosome'] != 'Y')]
+    tf_db = tf_db.astype({"chromosome": int, "start": int})
+    tf_db_chr = tf_db.loc[tf_db["chromosome"] == chr]
+
+    sizes = np.load(cfg.hic_path + cfg.sizes_file, allow_pickle=True).item()
+    chr_start = sizes["chr" + str(chr - 1)]
+    tf_db_chr["start"] = tf_db_chr["start"] + chr_start
+    tf_db_chr = tf_db_chr.rename(columns={'start': 'pos'})
+
+    comb_df = pd.merge(tf_db_chr, ig_df, on="pos")
+    return comb_df
+
+
+def captum_analyze_elements(cfg, chr, ig_pos_df, mode):
+    downstream_ob = DownstreamTasks(cfg, chr, mode='lstm')
+
+    chr_seg = 'chr' + str(chr)
+    segway_cell_names = ["GM12878"]
+    chr_ctcf = 'chr' + str(chr)
+    chr_fire = chr
+    chr_tad = 'chr' + str(chr)
+    fire_cell_names = ['GM12878']
+    fire_path = cfg.downstream_dir + "FIREs"
 
     if mode == "small":
-        seg_ob = SegWay(cfg, self.chr_seg, self.segway_cell_names)
+        seg_ob = SegWay(cfg, chr_seg, segway_cell_names)
         annotations = seg_ob.segway_small_annotations()
         annotations = downstream_ob.downstream_helper_ob.get_window_data(annotations)
         annotations["pos"] = annotations["pos"] + downstream_ob.downstream_helper_ob.start
@@ -17,7 +72,7 @@ def feature_importance(self, cfg, ig_pos_df, mode):
         ig_pos_df = pd.concat([ig_pos_df, ig_pos], sort=True).reset_index(drop=True)
 
     elif mode == "gbr":
-        seg_ob = SegWay(cfg, self.chr_seg, self.segway_cell_names)
+        seg_ob = SegWay(cfg, chr_seg, segway_cell_names)
         annotations = seg_ob.segway_gbr().reset_index(drop=True)
         annotations = downstream_ob.downstream_helper_ob.get_window_data(annotations)
         annotations["pos"] = annotations["pos"] + downstream_ob.downstream_helper_ob.start
@@ -27,7 +82,7 @@ def feature_importance(self, cfg, ig_pos_df, mode):
 
     elif mode == "ctcf":
         cell = "GM12878"
-        ctcf_ob = TFChip(cfg, cell, self.chr_ctcf)
+        ctcf_ob = TFChip(cfg, cell, chr_ctcf)
         ctcf_data = ctcf_ob.get_ctcf_data()
         ctcf_data = ctcf_data.drop_duplicates(keep='first').reset_index(drop=True)
         ctcf_data = downstream_ob.downstream_helper_ob.get_window_data(ctcf_data)
@@ -38,8 +93,8 @@ def feature_importance(self, cfg, ig_pos_df, mode):
 
     elif mode == "fire":
         fire_ob = Fires(cfg)
-        fire_ob.get_fire_data(self.fire_path)
-        fire_labeled = fire_ob.filter_fire_data(self.chr_fire)
+        fire_ob.get_fire_data(fire_path)
+        fire_labeled = fire_ob.filter_fire_data(chr_fire)
         fire_window_labels = fire_labeled.filter(['start', 'end', "GM12878" + '_l'], axis=1)
         fire_window_labels.rename(columns={"GM12878" + '_l': 'target'}, inplace=True)
         fire_window_labels = fire_window_labels.drop_duplicates(keep='first').reset_index(drop=True)
@@ -52,8 +107,8 @@ def feature_importance(self, cfg, ig_pos_df, mode):
 
     elif mode == "tad":
         fire_ob = Fires(cfg)
-        fire_ob.get_tad_data(self.fire_path, self.fire_cell_names)
-        tad_cell = fire_ob.filter_tad_data(self.chr_tad)[0]
+        fire_ob.get_tad_data(fire_path, fire_cell_names)
+        tad_cell = fire_ob.filter_tad_data(chr_tad)[0]
         tad_cell['target'] = 1
         tad_cell = tad_cell.filter(['start', 'end', 'target'], axis=1)
         tad_cell = tad_cell.drop_duplicates(keep='first').reset_index(drop=True)
@@ -107,7 +162,7 @@ def feature_importance(self, cfg, ig_pos_df, mode):
     elif mode == "cohesin":
         cell = "GM12878"
         cohesin_df = pd.DataFrame()
-        tf_ob = TFChip(cfg, cell, self.chr_ctcf)
+        tf_ob = TFChip(cfg, cell, chr_ctcf)
         rad_data, smc_data = tf_ob.get_cohesin_data()
         rad_data = rad_data.drop_duplicates(keep='first').reset_index(drop=True)
         smc_data = smc_data.drop_duplicates(keep='first').reset_index(drop=True)
@@ -127,3 +182,29 @@ def feature_importance(self, cfg, ig_pos_df, mode):
         ig_pos_df = pd.concat([ig_pos_df, ig_pos], sort=True).reset_index(drop=True)
 
     return ig_pos_df
+
+
+if __name__ == '__main__':
+
+    cfg = config.Config()
+    cell = "GM12878"
+
+    # load model
+    model_name = "shuffle2_og"
+    model = SeqLSTM(cfg, device, model_name).to(device)
+    model.load_weights()
+
+    # test_chr = list(range(5, 11))
+    test_chr = [22]
+
+    # embed_rows = np.load(cfg.output_directory + "embeddings.npy")
+
+    for chr in test_chr:
+        print('Testing Start Chromosome: {}'.format(chr))
+
+        ig_df = captum_test(cfg, model, cell, chr)
+
+        # captum_analyze_tfs(cfg, chr)
+        captum_analyze_elements(cfg, chr, ig_df, mode="ctcf")
+
+    print("done")
