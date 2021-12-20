@@ -51,8 +51,9 @@ def captum_analyze_tfs(cfg, chr):
     return comb_df
 
 
-def captum_analyze_elements(cfg, chr, ig_pos_df, mode):
+def captum_analyze_elements(cfg, chr, ig_df, mode):
     downstream_ob = DownstreamTasks(cfg, chr, mode='lstm')
+    ig_df = ig_df.astype({"pos": int})
 
     chr_seg = 'chr' + str(chr)
     segway_cell_names = ["GM12878"]
@@ -67,18 +68,16 @@ def captum_analyze_elements(cfg, chr, ig_pos_df, mode):
         annotations = seg_ob.segway_small_annotations()
         annotations = downstream_ob.downstream_helper_ob.get_window_data(annotations)
         annotations["pos"] = annotations["pos"] + downstream_ob.downstream_helper_ob.start
-        ig_pos = pd.merge(ig_df, annotations, on="pos")
-        ig_pos.reset_index(drop=True, inplace=True)
-        ig_pos_df = pd.concat([ig_pos_df, ig_pos], sort=True).reset_index(drop=True)
+        ig_df = pd.merge(ig_df, annotations, on="pos")
+        ig_df.reset_index(drop=True, inplace=True)
 
     elif mode == "gbr":
         seg_ob = SegWay(cfg, chr_seg, segway_cell_names)
         annotations = seg_ob.segway_gbr().reset_index(drop=True)
         annotations = downstream_ob.downstream_helper_ob.get_window_data(annotations)
         annotations["pos"] = annotations["pos"] + downstream_ob.downstream_helper_ob.start
-        ig_pos = pd.merge(ig_df, annotations, on="pos")
-        ig_pos.reset_index(drop=True, inplace=True)
-        ig_pos_df = pd.concat([ig_pos_df, ig_pos], sort=True).reset_index(drop=True)
+        ig_df = pd.merge(ig_df, annotations, on="pos")
+        ig_df.reset_index(drop=True, inplace=True)
 
     elif mode == "ctcf":
         cell = "GM12878"
@@ -87,9 +86,8 @@ def captum_analyze_elements(cfg, chr, ig_pos_df, mode):
         ctcf_data = ctcf_data.drop_duplicates(keep='first').reset_index(drop=True)
         ctcf_data = downstream_ob.downstream_helper_ob.get_window_data(ctcf_data)
         ctcf_data["pos"] = ctcf_data["pos"] + downstream_ob.downstream_helper_ob.start
-        ig_pos = pd.merge(ig_df, ctcf_data, on="pos")
-        ig_pos.reset_index(drop=True, inplace=True)
-        ig_pos_df = pd.concat([ig_pos_df, ig_pos], sort=True).reset_index(drop=True)
+        ig_df = pd.merge(ig_df, ctcf_data, on="pos")
+        ig_df.reset_index(drop=True, inplace=True)
 
     elif mode == "fire":
         fire_ob = Fires(cfg)
@@ -101,9 +99,8 @@ def captum_analyze_elements(cfg, chr, ig_pos_df, mode):
 
         fire_window_labels = downstream_ob.downstream_helper_ob.get_window_data(fire_window_labels)
         fire_window_labels["pos"] = fire_window_labels["pos"] + downstream_ob.downstream_helper_ob.start
-        ig_pos = pd.merge(ig_df, fire_window_labels, on="pos")
-        ig_pos.reset_index(drop=True, inplace=True)
-        ig_pos_df = pd.concat([ig_pos_df, ig_pos], sort=True).reset_index(drop=True)
+        ig_df = pd.merge(ig_df, fire_window_labels, on="pos")
+        ig_df.reset_index(drop=True, inplace=True)
 
     elif mode == "tad":
         fire_ob = Fires(cfg)
@@ -116,9 +113,8 @@ def captum_analyze_elements(cfg, chr, ig_pos_df, mode):
         tad_cell = downstream_ob.downstream_helper_ob.get_window_data(tad_cell)
         tad_cell["pos"] = tad_cell["pos"] + downstream_ob.downstream_helper_ob.start
 
-        ig_pos = pd.merge(ig_df, tad_cell, on="pos")
-        ig_pos.reset_index(drop=True, inplace=True)
-        ig_pos_df = pd.concat([ig_pos_df, ig_pos], sort=True).reset_index(drop=True)
+        ig_df = pd.merge(ig_df, tad_cell, on="pos")
+        ig_df.reset_index(drop=True, inplace=True)
 
     elif mode == "loops":
         loop_ob = Loops(cfg, "GM12878", chr)
@@ -140,9 +136,8 @@ def captum_analyze_elements(cfg, chr, ig_pos_df, mode):
             temp_data["pos"] = temp_data["pos"] + downstream_ob.downstream_helper_ob.start
             pos_matrix = pos_matrix.append(temp_data)
 
-        ig_pos = pd.merge(ig_df, pos_matrix, on="pos")
-        ig_pos.reset_index(drop=True, inplace=True)
-        ig_pos_df = pd.concat([ig_pos_df, ig_pos], sort=True).reset_index(drop=True)
+        ig_df = pd.merge(ig_df, pos_matrix, on="pos")
+        ig_df.reset_index(drop=True, inplace=True)
 
     elif mode == "domains":
         domain_ob = Domains(cfg, "GM12878", chr)
@@ -155,9 +150,8 @@ def captum_analyze_elements(cfg, chr, ig_pos_df, mode):
         domain_data = downstream_ob.downstream_helper_ob.get_window_data(domain_data)
         domain_data["pos"] = domain_data["pos"] + downstream_ob.downstream_helper_ob.start
 
-        ig_pos = pd.merge(ig_df, domain_data, on="pos")
-        ig_pos.reset_index(drop=True, inplace=True)
-        ig_pos_df = pd.concat([ig_pos_df, ig_pos], sort=True).reset_index(drop=True)
+        ig_df = pd.merge(ig_df, domain_data, on="pos")
+        ig_df.reset_index(drop=True, inplace=True)
 
     elif mode == "cohesin":
         cell = "GM12878"
@@ -177,34 +171,31 @@ def captum_analyze_elements(cfg, chr, ig_pos_df, mode):
         smc_data["target"] = "SMC3"
         cohesin_df = cohesin_df.append(smc_data)
 
-        ig_pos = pd.merge(ig_df, cohesin_df, on="pos")
-        ig_pos.reset_index(drop=True, inplace=True)
-        ig_pos_df = pd.concat([ig_pos_df, ig_pos], sort=True).reset_index(drop=True)
+        ig_df = pd.merge(ig_df, cohesin_df, on="pos")
+        ig_df.reset_index(drop=True, inplace=True)
 
-    return ig_pos_df
+    return ig_df
 
 
 if __name__ == '__main__':
 
     cfg = config.Config()
-    cell = "GM12878"
 
     # load model
-    model_name = "shuffle2_og"
+    cell = cfg.cell
+    model_name = "shuffle_" + cell
     model = SeqLSTM(cfg, device, model_name).to(device)
     model.load_weights()
 
     # test_chr = list(range(5, 11))
     test_chr = [22]
 
-    # embed_rows = np.load(cfg.output_directory + "embeddings.npy")
-
     for chr in test_chr:
         print('Testing Start Chromosome: {}'.format(chr))
 
         ig_df = captum_test(cfg, model, cell, chr)
 
-        # captum_analyze_tfs(cfg, chr)
-        captum_analyze_elements(cfg, chr, ig_df, mode="ctcf")
+        ig_filtered_df = captum_analyze_tfs(cfg, chr)
+        # ig_filtered_df = captum_analyze_elements(cfg, chr, ig_df, mode="ctcf")
 
     print("done")

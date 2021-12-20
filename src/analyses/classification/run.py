@@ -9,6 +9,7 @@ from analyses.classification.pe_interactions import PeInteractions
 from analyses.classification.loops import Loops
 from analyses.classification.domains import Domains
 from analyses.classification.subcompartments import Subcompartments
+import matplotlib.pyplot as plt
 
 logger = logging.getLogger(__name__)
 
@@ -376,9 +377,32 @@ class DownstreamTasks:
 
         return mean_map
 
+    def plot_combined(self, map_frame):
+        tasks = ["Gene Expression", "Replication Timing", "Enhancers", "TSS", "PE-Interactions", "FIREs",
+                 "Non-loop Domains", "Loop Domains"]
+
+        df_main = pd.DataFrame(columns=["Tasks", "Hi-C-LSTM"])
+        df_main["Tasks"] = tasks
+        df_main["Hi-C-LSTM"] = [map_frame["gene_map"].mean(), map_frame["rep_map"].mean(),
+                                map_frame["enhancers_map"].mean(), map_frame["tss_map"].mean(),
+                                map_frame["pe_map"].mean(), map_frame["fire_map"].mean(),
+                                map_frame["domains_map"].mean(), map_frame["loops_map"].mean()]
+
+        plt.figure(figsize=(12, 10))
+        plt.xticks(rotation=90, fontsize=20)
+        plt.yticks(fontsize=20)
+        plt.xlabel("Prediction Target", fontsize=20)
+        plt.ylabel("mAP ", fontsize=20)
+        plt.plot('Tasks', 'Hi-C-LSTM', data=df_main, marker='o', markersize=16, color="C3",
+                 linewidth=3,
+                 label="Hi-C-LSTM")
+        plt.legend(fontsize=18)
+        plt.show()
+
+        pass
+
 
 if __name__ == '__main__':
-
     cfg = Config()
     test_chr = list(range(22, 23))
     map_frame = pd.DataFrame(
@@ -388,30 +412,30 @@ if __name__ == '__main__':
     for chr in test_chr:
         logging.info("Downstream start Chromosome: {}".format(chr))
 
-        downstream_ob = DownstreamTasks(cfg, chr, mode='lstm')
+    downstream_ob = DownstreamTasks(cfg, chr, mode='lstm')
 
-        gene_map = downstream_ob.run_rna_seq(cfg)
+    gene_map = downstream_ob.run_rna_seq(cfg)
 
-        pe_map = downstream_ob.run_pe(cfg)
+    pe_map = downstream_ob.run_pe(cfg)
 
-        fire_map = downstream_ob.run_fires(cfg)
+    fire_map = downstream_ob.run_fires(cfg)
 
-        rep_map = downstream_ob.run_rep_timings(cfg)
+    rep_map = downstream_ob.run_rep_timings(cfg)
 
-        loops_map = downstream_ob.run_loops(cfg)
+    loops_map = downstream_ob.run_loops(cfg)
 
-        domains_map = downstream_ob.run_domains(cfg)
+    domains_map = downstream_ob.run_domains(cfg)
 
-        # mapdict_subcomp = downstream_ob.run_sub_compartments(cfg)
+    # mapdict_subcomp = downstream_ob.run_sub_compartments(cfg)
 
-        enhancers_map = downstream_ob.run_p_and_e(cfg)
+    enhancers_map = downstream_ob.run_p_and_e(cfg)
 
-        tss_map = downstream_ob.run_tss(cfg)
+    tss_map = downstream_ob.run_tss(cfg)
 
-        map_frame = map_frame.append(
-            {"chr": chr, "gene_map": gene_map, "pe_map": pe_map, "fire_map": fire_map, "rep_map": rep_map,
-             "loops_map": loops_map, "domains_map": domains_map, "enhancers_map": enhancers_map, "tss_map": tss_map},
-            ignore_index=True)
+    map_frame = map_frame.append(
+        {"chr": chr, "gene_map": gene_map, "pe_map": pe_map, "fire_map": fire_map, "rep_map": rep_map,
+         "loops_map": loops_map, "domains_map": domains_map, "enhancers_map": enhancers_map, "tss_map": tss_map},
+        ignore_index=True)
 
     map_frame.to_csv(cfg.output_directory + "mapframe_%s.csv" % (cfg.cell), sep="\t")
     print("done")

@@ -26,7 +26,6 @@ if __name__ == '__main__':
     # test_chr = [21]
     cfg = config.Config()
     cell = cfg.cell
-    # model_name = sys.argv[1]
     model_name = "shuffle_" + cell
 
     # initalize model

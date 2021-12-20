@@ -1,12 +1,11 @@
 import logging
 import numpy as np
-from common.log import setup_logging
-from train_fns.test_hic import get_config
 import matplotlib.pyplot as plt
 import operator
 import pandas as pd
 import seaborn as sns
-from scipy.signal import savgol_filter
+import training.config as config
+
 
 logger = logging.getLogger(__name__)
 
@@ -554,12 +553,7 @@ class PlotMap:
 
 
 if __name__ == "__main__":
-    setup_logging()
-    config_base = 'config.yaml'
-    result_base = 'down_images'
-    model_path = "/home/kevindsouza/Documents/projects/PhD/hic_lstm/src/saved_model/model_lstm/log_run"
-
-    cfg = get_config(model_path, config_base, result_base)
+    cfg = config.Config()
     plot_ob = PlotMap(cfg)
 
     #plot_ob.plot_combined()
