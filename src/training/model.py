@@ -340,7 +340,7 @@ class SeqLSTM(nn.Module):
         inv_exp_val = np.nan_to_num(1 / coeffs) - delta
         return inv_exp_val
 
-    def ko_post(self, ind, val, pred, pred_df):
+    def ko_post(self, ind, val, pred, pred_df, mode="ko"):
         idx = np.array(np.where(np.sum(ind, axis=1) == 0))[0]
         ind = np.delete(ind, idx, axis=0)
         val = np.delete(val, idx, axis=0)
@@ -350,34 +350,35 @@ class SeqLSTM(nn.Module):
         pred_df["v"] = val
         pred_df["ko_pred"] = pred
 
-        start = int(pred_df['i'].min())
-        stop = int(pred_df['i'].max())
-        chunk_start = 256803
-        chunk_end = 257017
-        dupl_start = 257018
-        dupl_end = 257232
-        shift = 215
+        if mode == "duplication":
+            start = int(pred_df['i'].min())
+            stop = int(pred_df['i'].max())
+            chunk_start = 256803
+            chunk_end = 257017
+            dupl_start = 257018
+            dupl_end = 257232
+            shift = 215
 
-        for r in range(start, stop + 1):
-            if r < chunk_start:
-                continue
-            elif r >= chunk_start and r <= chunk_end:
-                og_pred = pred_df.loc[pred_df['i'] == r]["ko_pred"]
-                dupl_pred = pred_df.loc[pred_df['i'] == r + shift]["ko_pred"]
-
-                if len(dupl_pred) == 0:
+            for r in range(start, stop + 1):
+                if r < chunk_start:
                     continue
-                og_inv = self.inverse_exp(og_pred)
-                dupl_inv = self.inverse_exp(dupl_pred)
+                elif r >= chunk_start and r <= chunk_end:
+                    og_pred = pred_df.loc[pred_df['i'] == r]["ko_pred"]
+                    dupl_pred = pred_df.loc[pred_df['i'] == r + shift]["ko_pred"]
 
-                exp_pred = self.contactProb(og_inv + dupl_inv)
-                pred_df.loc[pred_df['i'] == r, 'ko_pred'] = exp_pred
+                    if len(dupl_pred) == 0:
+                        continue
+                    og_inv = self.inverse_exp(og_pred)
+                    dupl_inv = self.inverse_exp(dupl_pred)
 
-            elif r >= dupl_start and r <= dupl_end:
-                pred_df.loc[pred_df['i'] == r, 'ko_pred'] = pred_df.loc[pred_df['i'] == r + shift]["ko_pred"]
+                    exp_pred = self.contactProb(og_inv + dupl_inv)
+                    pred_df.loc[pred_df['i'] == r, 'ko_pred'] = exp_pred
 
-            elif r > dupl_end:
-                break
+                elif r >= dupl_start and r <= dupl_end:
+                    pred_df.loc[pred_df['i'] == r, 'ko_pred'] = pred_df.loc[pred_df['i'] == r + shift]["ko_pred"]
+
+                elif r > dupl_end:
+                    break
 
         return pred_df
 
@@ -410,7 +411,7 @@ class SeqLSTM(nn.Module):
                 ko_predictions = torch.cat((ko_predictions, lstm_output), 0)
 
                 pred = lstm_output.cpu().detach().numpy().reshape(-1, 1)
-                pred_df = self.ko_post(ind, val, pred, pred_df)
+                pred_df = self.ko_post(ind, val, pred, pred_df, mode="ko")
 
                 main_pred_df = pd.concat([main_pred_df, pred_df], axis=0)
 
