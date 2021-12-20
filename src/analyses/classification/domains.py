@@ -2,9 +2,8 @@ import pandas as pd
 import re
 import os
 import numpy as np
-from train_fns import config
-from train_fns.data_prep_hic import DataPrepHic
-from downstream.downstream_helper import DownstreamHelper
+from training import config
+from analyses.classification.downstream_helper import DownstreamHelper
 
 
 class Domains:
@@ -15,7 +14,6 @@ class Domains:
         self.cell_path = os.path.join(cfg.downstream_dir, "domains", self.exp_name)
         self.cfg = cfg
         self.chr = chr
-        self.data_ob = DataPrepHic(cfg, chr=str(chr), mode='test')
         self.down_helper_ob = DownstreamHelper(cfg, chr, mode="test")
 
     def get_domain_data(self):
