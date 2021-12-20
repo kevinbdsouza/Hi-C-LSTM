@@ -18,7 +18,7 @@ def plot_heatmaps(data):
     hic_mat = np.zeros((nr, nr))
     hic_mat[rows, cols] = np.array(data["v"])
     hic_upper = np.triu(hic_mat)
-    hic_mat[cols, rows] = np.array(data["pred"])
+    hic_mat[cols, rows] = np.array(data["ko_pred"])
     hic_lower = np.tril(hic_mat)
     hic_mat = hic_upper + hic_lower
     hic_mat[np.diag_indices_from(hic_mat)] /= 2
@@ -145,7 +145,7 @@ if __name__ == '__main__':
         '''
         pred_data = pd.read_csv(cfg.output_directory + "shuffle_%s_afko_chr%s.csv" % (cell, str(chr)), sep="\t")
         plot_heatmaps(pred_data)
-        
+
     print("done")
 
     # pred_data = pd.read_csv(cfg.output_directory + "combined150sh_predictions_chr%s.csv" % str(chr), sep="\t")
