@@ -1,8 +1,6 @@
 import numpy as np
 import pandas as pd
 import scipy.sparse
-import math
-import os
 import torch
 import torch.utils.data
 from torch.nn.utils.rnn import pad_sequence
@@ -10,7 +8,17 @@ import training.config as config
 import matplotlib
 
 matplotlib.use('pdf')
-import matplotlib.pyplot as plt
+
+
+def get_cumpos(chr_num):
+    sizes = np.load(cfg.hic_path + cfg.sizes_file, allow_pickle=True).item()
+    if chr_num == 1:
+        cum_pos = 0
+    else:
+        key = "chr" + str(chr_num - 1)
+        cum_pos = sizes[key]
+
+    return cum_pos
 
 
 def get_bin_idx(chr, pos, cfg):
@@ -32,7 +40,7 @@ def get_genomic_coord(chr, bin_idx, cfg):
 def load_hic(cfg, cell, chr):
     data = pd.read_csv("%s%s/%s/hic_chr%s.txt" % (cfg.hic_path, cell, chr, chr), sep="\t", names=['i', 'j', 'v'])
 
-    #data = data.dropna()
+    # data = data.dropna()
     data[['i', 'j']] = data[['i', 'j']] / cfg.resolution
     data[['i', 'j']] = data[['i', 'j']].astype('int64')
     return data

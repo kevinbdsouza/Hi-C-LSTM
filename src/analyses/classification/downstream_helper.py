@@ -3,22 +3,18 @@ import numpy as np
 import pandas as pd
 import xgboost
 from sklearn.metrics import average_precision_score
+from sklearn.metrics import precision_recall_curve
 from sklearn.utils import resample
-from train_fns.test_hic import get_config
-from train_fns.data_prep_hic import DataPrepHic
+from training.config import Config
+from training.data_utils import get_cumpos
 from sklearn.preprocessing import LabelEncoder
-import sklearn
 from sklearn.neural_network import MLPRegressor
 from sklearn.model_selection import train_test_split
-from sklearn.metrics import mean_squared_error
-from math import sqrt
-from sklearn.metrics import r2_score
 from sklearn.linear_model import LinearRegression
 from sklearn import preprocessing
 from sklearn.metrics import *
 import seaborn as sn
 import matplotlib.pyplot as plt
-from sklearn.metrics import precision_recall_curve
 
 logger = logging.getLogger(__name__)
 
@@ -28,9 +24,9 @@ class DownstreamHelper:
         self.cfg = cfg
         self.chr = chr
         self.cell = cfg.cell
-        self.data_ob = DataPrepHic(cfg, mode='test', chr=str(chr))
-        self.start = self.data_ob.start_ends["chr" + str(chr)]["start"] + self.data_ob.get_cumpos()
-        self.stop = self.data_ob.start_ends["chr" + str(chr)]["stop"] + self.data_ob.get_cumpos()
+        self.start_ends = np.load(cfg.hic_path + cfg.start_end_file, allow_pickle=True).item()
+        self.start = self.start_ends["chr" + str(chr)]["start"] + get_cumpos(chr)
+        self.stop = self.start_ends["chr" + str(chr)]["stop"] + get_cumpos(chr)
         self.feature_columns = list(range(0, 16))
         self.chr_len = cfg.genome_len
         self.num_subc = 5
@@ -42,19 +38,13 @@ class DownstreamHelper:
             self.embed_rows = pd.DataFrame(np.load(self.embed_path))
             self.embed_rows["pos"] = self.embed_rows.index + self.start
         elif mode == 'lstm':
-            self.embed_rows = pd.DataFrame(columns = list(np.arange(cfg.pos_embed_size)) + ["pos"])
+            self.embed_rows = pd.DataFrame(columns=list(np.arange(cfg.pos_embed_size)) + ["pos"])
             self.pred_rows = pd.read_csv(
                 cfg.output_directory + "shuffle_%s_predictions_chr%s.csv" % (self.cell, str(chr)), sep="\t")
             self.pred_rows = self.pred_rows.drop(['Unnamed: 0'], axis=1)
             for k in range(cfg.pos_embed_size):
                 self.embed_rows[k] = self.pred_rows[str(k)]
             self.embed_rows["pos"] = self.pred_rows["i"]
-
-            # self.embed_path = self.cfg.model_dir + "/embed_rows_test.npy"
-            # self.hidden_states_path = self.cfg.model_dir + "/lstm_hidden_states_test.npy"
-            # self.hidden_states = np.load(self.hidden_states_path)
-            # self.embed_rows = pd.DataFrame(self.embed_rows[self.start:self.stop + 1])
-            # self.embed_rows["pos"] = self.embed_rows.index + self.start
         elif mode == "graph":
             self.embed_path = self.cfg.graph_annotation_path + "embedding_" + str(self.chr) + ".npy"
             self.embed_rows = pd.DataFrame(np.load(self.embed_path))
@@ -344,7 +334,7 @@ class DownstreamHelper:
         return r_squared_test
 
     def add_cum_pos(self, frame, mode):
-        cum_pos = self.data_ob.get_cumpos()
+        cum_pos = get_cumpos(self.chr)
 
         if mode == "ends":
             pos_columns = ["start", "end"]
@@ -374,7 +364,7 @@ class DownstreamHelper:
         ind_list = []
 
         # max_len = data.iloc[-1]["y2"]
-        max_len = self.data_ob.start_ends["chr" + str(self.chr)]["stop"]
+        max_len = self.start_ends["chr" + str(self.chr)]["stop"]
         mask_vec = np.zeros(max_len, bool)
         n_run = len(col_list) // 2
 
@@ -454,15 +444,6 @@ class DownstreamHelper:
 
 
 if __name__ == '__main__':
-    file_name = "/home/kevindsouza/Documents/projects/latent/results/03-04-2019_n/downstream/feat_rna_h3_E004.pkl"
-    config_base = 'config.yaml'
-    result_base = 'down_images'
-    model_path = '/home/kevindsouza/Documents/projects/hic_lstm/src/saved_model/model_lstm/log_run'
-
-    cfg = get_config(model_path, config_base, result_base)
+    cfg = Config()
+    chr = 21
     helper_ob = DownstreamHelper(cfg, chr, mode="lstm")
-
-    feature_matrix = pd.read_pickle(file_name)
-    feature_matrix.target = feature_matrix.target.astype(int)
-
-    balanced_feat = helper_ob.fix_class_imbalance(feature_matrix, mode='oversampling')
