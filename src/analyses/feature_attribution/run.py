@@ -12,6 +12,8 @@ from analyses.classification.run import DownstreamTasks
 from analyses.classification.fires import Fires
 from analyses.classification.loops import Loops
 from analyses.classification.domains import Domains
+import seaborn as sns
+import matplotlib.pyplot as plt
 
 device = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
 # device = 'cpu'
@@ -43,7 +45,7 @@ def captum_analyze_tfs(cfg, ig_df, chr):
     sizes = np.load(cfg.hic_path + cfg.sizes_file, allow_pickle=True).item()
     chr_start = sizes["chr" + str(chr - 1)]
     tf_db_chr["start"] = tf_db_chr["start"] + chr_start
-    tf_db_chr = tf_db_chr.rename(columns={'start': 'pos'})
+    tf_db_chr = tf_db_chr.rename(columns={'start': 'pos', 'HGNC symbol': 'target'})
 
     comb_df = pd.merge(tf_db_chr, ig_df, on="pos")
     return comb_df
@@ -175,6 +177,20 @@ def captum_analyze_elements(cfg, chr, ig_df, mode):
     return ig_df
 
 
+def plot_gbr(ig_df):
+    ig_df["ig"] = ig_df["ig"].astype(float)
+
+    plt.figure(figsize=(16, 7))
+    sns.set(font_scale=1.8)
+    sns.set_style(style='white')
+    plt.xticks(rotation=90, fontsize=20)
+    plt.ylim(-1, 1)
+    ax = sns.violinplot(x="target", y="ig", data=ig_df)
+    ax.set(xlabel='', ylabel='IG Importance')
+    plt.show()
+    pass
+
+
 if __name__ == '__main__':
 
     cfg = config.Config()
@@ -198,5 +214,6 @@ if __name__ == '__main__':
 
         ig_filtered_df = captum_analyze_tfs(cfg, ig_df, chr)
         # ig_filtered_df = captum_analyze_elements(cfg, chr, ig_df, mode="ctcf")
+        plot_gbr(ig_filtered_df)
 
     print("done")
