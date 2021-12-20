@@ -30,10 +30,10 @@ def captum_test(cfg, model, cell, chr):
 
 
 def captum_analyze_tfs(cfg, ig_df, chr):
-    columns = ["target", "chromosome", "start"]
+    columns = ["HGNC symbol", "chromosome", "start"]
     prediction_path = "/data2/hic_lstm/downstream/predictions/"
     ig_df = ig_df.astype({"pos": int})
-    
+
     tf_db = pd.read_csv(prediction_path + "/tf_db.csv")
     tf_db = tf_db.filter(columns, axis=1)
     tf_db = tf_db.loc[(tf_db['chromosome'] != 'X') & (tf_db['chromosome'] != 'Y')]
