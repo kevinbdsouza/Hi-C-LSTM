@@ -104,7 +104,8 @@ class Knockout():
 
     def ko_indices(self, embed_rows, start, indices):
         # chose from input ko indices or give your own
-        indices = [279219, 279229]
+        #indices = [279219, 279229]
+        indices = [284706, 284743]
         window = 10
 
         for ind in indices:
@@ -114,11 +115,11 @@ class Knockout():
             window_left_arr = embed_rows[ind - start - window: ind - start, :].copy()
             window_right_arr = embed_rows[ind - start + 1: ind - start + window + 1, :].copy()
 
-            idx_l = np.array(np.where(np.sum(window_left_arr, axis=1) == 0))[0]
-            idx_r = np.array(np.where(np.sum(window_right_arr, axis=1) == 0))[0]
+            # idx_l = np.array(np.where(np.sum(window_left_arr, axis=1) == 0))[0]
+            # idx_r = np.array(np.where(np.sum(window_right_arr, axis=1) == 0))[0]
 
-            #window_left_arr[idx_l, :] = zero_embed[:cfg.pos_embed_size]
-            #window_right_arr[idx_r, :] = zero_embed[:cfg.pos_embed_size]
+            # window_left_arr[idx_l, :] = zero_embed[:cfg.pos_embed_size]
+            # window_right_arr[idx_r, :] = zero_embed[:cfg.pos_embed_size]
 
             window_arr_avg = np.stack((window_left_arr, window_right_arr)).mean(axis=0).mean(axis=0)
             embed_rows[ind - start, :] = window_arr_avg
@@ -131,7 +132,7 @@ class Knockout():
         embed_rows = self.ko_indices(embed_rows, start, indices)
 
         _, ko_pred_df = model.perform_ko(data_loader, embed_rows, start)
-        ko_pred_df.to_csv(cfg.output_directory + "seq50_afko_chr%s.csv" % str(chr), sep="\t")
+        ko_pred_df.to_csv(cfg.output_directory + "shuffle_%s_afko_chr%s.csv" % (self.cfg.cell, str(self.chr)), sep="\t")
 
         return ko_pred_df
 
@@ -144,13 +145,13 @@ class Knockout():
                 embed_rows[n, :] = embed_rows[n, :] / norm
         return embed_rows
 
-    def normalize_embed_predict(self, model, pred_data, zero_embed):
-        data_loader, samples = get_data_loader_chr(self.cfg, self.cell, self.chr)
+    def normalize_embed_predict(self, model, pred_data):
+        data_loader, samples = get_data_loader_chr(self.cfg, self.chr)
         embed_rows, start = self.convert_df_to_np(pred_data)
         embed_rows = self.normalize_embed(embed_rows)
 
-        _, ko_pred_df = model.perform_ko(data_loader, embed_rows, zero_embed, start)
-        ko_pred_df.to_csv(cfg.output_directory + "seq50_norm_chr%s.csv" % str(chr), sep="\t")
+        _, ko_pred_df = model.perform_ko(data_loader, embed_rows, start)
+        ko_pred_df.to_csv(cfg.output_directory + "shuffle_%s_norm_chr%s.csv" % (self.cfg.cell, str(self.chr)), sep="\t")
 
         return ko_pred_df
 
@@ -181,7 +182,7 @@ class Knockout():
         return embed_rows
 
     def melo_insert(self, model, pred_data, zero_embed):
-        data_loader, samples = get_data_loader_chr(self.cfg, self.cell, self.chr)
+        data_loader, samples = get_data_loader_chr(self.cfg, self.chr)
         embed_rows, start = self.convert_df_to_np(pred_data)
         embed_rows = self.duplicate(embed_rows)
         # embed_rows = self.reverse_embeddings(embed_rows)
@@ -213,7 +214,7 @@ if __name__ == '__main__':
 
         ko_pred_df = ko_ob.perform_ko(model, pred_data)
         # np.save(cfg.output_directory + "ko_predict_chr" + str(chr) + ".npy", ko_pred_df)
-        # ko_pred_df = ko_ob.normalize_embed_predict(model, pred_data, zero_embed)
+        # ko_pred_df = ko_ob.normalize_embed_predict(model, pred_data)
         # melo_pred_df = ko_ob.melo_insert(model, pred_data, zero_embed)
 
     print("done")
