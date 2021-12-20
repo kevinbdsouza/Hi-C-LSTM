@@ -398,9 +398,8 @@ class SeqLSTM(nn.Module):
 
                 for n in range(ind.shape[0]):
                     if ind[n, 0] == 0 and ind[n, 1] == 0:
-                        embed_ij[n, 0:cfg.pos_embed_size] = zero_embed[0:cfg.pos_embed_size]
-                        embed_ij[n, cfg.pos_embed_size:2 * cfg.pos_embed_size] = zero_embed[
-                                                                                 cfg.pos_embed_size:2 * cfg.pos_embed_size]
+                        embed_ij[n, 0:cfg.pos_embed_size] = np.mean(embed_rows, axis=0)
+                        embed_ij[n, cfg.pos_embed_size:2 * cfg.pos_embed_size] = np.mean(embed_rows, axis=0)
                     else:
                         embed_ij[n, 0:cfg.pos_embed_size] = embed_rows[int(ind[n, 0]) - start]
                         embed_ij[n, cfg.pos_embed_size:2 * cfg.pos_embed_size] = embed_rows[int(ind[n, 1]) - start]
