@@ -193,7 +193,7 @@ if __name__ == '__main__':
     for chr in test_chr:
         print('Testing Start Chromosome: {}'.format(chr))
 
-        ig_df = captum_test(cfg, model, cell, chr)
+        # ig_df = captum_test(cfg, model, cell, chr)
 
         ig_filtered_df = captum_analyze_tfs(cfg, chr)
         # ig_filtered_df = captum_analyze_elements(cfg, chr, ig_df, mode="ctcf")
