@@ -29,13 +29,11 @@ def captum_test(cfg, model, cell, chr):
     return ig_df
 
 
-def captum_analyze_tfs(cfg, chr):
+def captum_analyze_tfs(cfg, ig_df, chr):
+    columns = ["target", "chromosome", "start"]
     prediction_path = "/data2/hic_lstm/downstream/predictions/"
-    columns = ["HGNC symbol", "chromosome", "start"]
-    ig_df = pd.DataFrame(np.load(prediction_path + "ig_df_chr" + str(chr) + ".npy"),
-                         columns=["pos", "ig"])
     ig_df = ig_df.astype({"pos": int})
-
+    
     tf_db = pd.read_csv(prediction_path + "/tf_db.csv")
     tf_db = tf_db.filter(columns, axis=1)
     tf_db = tf_db.loc[(tf_db['chromosome'] != 'X') & (tf_db['chromosome'] != 'Y')]
@@ -194,8 +192,11 @@ if __name__ == '__main__':
         print('Testing Start Chromosome: {}'.format(chr))
 
         # ig_df = captum_test(cfg, model, cell, chr)
+        prediction_path = "/data2/hic_lstm/downstream/predictions/"
+        ig_df = pd.DataFrame(np.load(prediction_path + "ig_df_chr" + str(chr) + ".npy"),
+                             columns=["pos", "ig"])
 
-        ig_filtered_df = captum_analyze_tfs(cfg, chr)
+        ig_filtered_df = captum_analyze_tfs(cfg, ig_df, chr)
         # ig_filtered_df = captum_analyze_elements(cfg, chr, ig_df, mode="ctcf")
 
     print("done")
