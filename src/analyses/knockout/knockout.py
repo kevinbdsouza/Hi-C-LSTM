@@ -21,7 +21,7 @@ class Knockout():
         self.cell = cell
         self.res = cfg.resolution
         self.sizes_path = self.cfg.hic_path + self.cfg.sizes_file
-        self.sizes = np.load(self.sizes_path).item()
+        self.sizes = np.load(self.sizes_path, allow_pickle=True).item()
         self.file_path = os.path.join(cfg.downstream_dir, "ctcf")
 
     def alter_index(self, embed_rows):
