@@ -1,10 +1,7 @@
 import pandas as pd
-import re
 import os
-import numpy as np
-from train_fns import config
-from train_fns.data_prep_hic import DataPrepHic
-from downstream.downstream_helper import DownstreamHelper
+from training import config
+from analyses.classification.downstream_helper import DownstreamHelper
 
 
 class Subcompartments:
@@ -18,8 +15,7 @@ class Subcompartments:
         self.cell_path = os.path.join(cfg.downstream_dir, "subcompartments", self.exp_name)
         self.cfg = cfg
         self.chr = chr
-        self.data_ob = DataPrepHic(cfg, cell, mode='test', chr=str(chr))
-        self.down_helper_ob = DownstreamHelper(cfg, cell, chr, mode="test")
+        self.down_helper_ob = DownstreamHelper(cfg, chr, mode="test")
 
     def get_sc_data(self):
         data = pd.read_csv(self.cell_path, sep="\s+", header=None)
