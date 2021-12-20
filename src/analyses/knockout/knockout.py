@@ -1,5 +1,4 @@
 from __future__ import division
-import traceback
 import torch
 import numpy as np
 import os
@@ -126,7 +125,7 @@ class Knockout():
         return embed_rows
 
     def perform_ko(self, model, pred_data, zero_embed):
-        data_loader, samples = get_data_loader_chr(self.cfg, self.cell, self.chr)
+        data_loader, samples = get_data_loader_chr(self.cfg, self.chr)
         indices = self.get_ctcf_indices()
         embed_rows, start = self.convert_df_to_np(pred_data)
         embed_rows = self.ko_indices(embed_rows, start, indices, zero_embed)
@@ -196,27 +195,25 @@ class Knockout():
 if __name__ == '__main__':
 
     cfg = config.Config()
-    cell = "GM"
+    cell = cfg.cell
 
     # load model
-    model_name = "combined_150"
+    model_name = "shuffle_" + cell
     model = SeqLSTM(cfg, device, model_name).to(device)
     model.load_weights()
 
     # test_chr = list(range(21, 23))
-    # test_chr.remove(11)
-    # embed_rows = pd.DataFrame(np.load(cfg.output_directory + "seq50_embeddings_chr21.npy"))
-    test_chr = [17]
+    test_chr = [22]
 
     for chr in test_chr:
         print('Testing Start Chromosome: {}'.format(chr))
-        pred_data = pd.read_csv(cfg.output_directory + "combined150_predictions_chr%s.csv" % str(chr), sep="\t")
+        pred_data = pd.read_csv(cfg.output_directory + "shuffle_%s_predictions_chr%s.csv" % (cell, str(chr)), sep="\t")
         zero_embed = np.load(cfg.output_directory + "combined150_zero_chr%s.npy" % str(chr))
         ko_ob = Knockout(cfg, cell, chr)
 
-        # ko_pred_df = ko_ob.perform_ko(model, pred_data, zero_embed)
+        ko_pred_df = ko_ob.perform_ko(model, pred_data, zero_embed)
         # np.save(cfg.output_directory + "ko_predict_chr" + str(chr) + ".npy", ko_pred_df)
         # ko_pred_df = ko_ob.normalize_embed_predict(model, pred_data, zero_embed)
-        melo_pred_df = ko_ob.melo_insert(model, pred_data, zero_embed)
+        # melo_pred_df = ko_ob.melo_insert(model, pred_data, zero_embed)
 
     print("done")
