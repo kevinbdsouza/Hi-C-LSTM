@@ -131,18 +131,21 @@ def plot_r2(comb_r2_df):
 
 
 if __name__ == '__main__':
-    plot_chr = list(range(15, 23))
+    plot_chr = list(range(22, 23))
     cfg = config.Config()
     cell = cfg.cell
     comb_r2_df = pd.DataFrame(columns=["diff", "r2"])
 
     for chr in plot_chr:
+        '''
         r2_diff = pd.read_csv(cfg.output_directory + "r2frame_%s_chr%s.csv" % (cell, str(chr)), sep="\t")
         r2_diff = r2_diff.drop(['Unnamed: 0'], axis=1)
         comb_r2_df = comb_r2_df.append(r2_diff, ignore_index=True)
-
         plot_r2(comb_r2_df)
-
+        '''
+        pred_data = pd.read_csv(cfg.output_directory + "shuffle_%s_afko_chr%s.csv" % (cell, str(chr)), sep="\t")
+        plot_heatmaps(pred_data)
+        
     print("done")
 
     # pred_data = pd.read_csv(cfg.output_directory + "combined150sh_predictions_chr%s.csv" % str(chr), sep="\t")
