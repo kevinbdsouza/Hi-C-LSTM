@@ -381,7 +381,7 @@ class SeqLSTM(nn.Module):
 
         return pred_df
 
-    def perform_ko(self, data_loader, embed_rows, zero_embed, start):
+    def perform_ko(self, data_loader, embed_rows, start):
         device = self.device
         cfg = self.cfg
         num_outputs = cfg.sequence_length
