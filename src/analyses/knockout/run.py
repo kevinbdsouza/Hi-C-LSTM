@@ -104,7 +104,7 @@ class Knockout():
 
     def ko_indices(self, embed_rows, start, indices):
         # chose from input ko indices or give your own
-        #indices = [279219, 279229]
+        # indices = [279219, 279229]
         indices = [284706, 284743]
         window = 10
 
@@ -114,12 +114,6 @@ class Knockout():
 
             window_left_arr = embed_rows[ind - start - window: ind - start, :].copy()
             window_right_arr = embed_rows[ind - start + 1: ind - start + window + 1, :].copy()
-
-            # idx_l = np.array(np.where(np.sum(window_left_arr, axis=1) == 0))[0]
-            # idx_r = np.array(np.where(np.sum(window_right_arr, axis=1) == 0))[0]
-
-            # window_left_arr[idx_l, :] = zero_embed[:cfg.pos_embed_size]
-            # window_right_arr[idx_r, :] = zero_embed[:cfg.pos_embed_size]
 
             window_arr_avg = np.stack((window_left_arr, window_right_arr)).mean(axis=0).mean(axis=0)
             embed_rows[ind - start, :] = window_arr_avg
@@ -155,43 +149,6 @@ class Knockout():
 
         return ko_pred_df
 
-    def duplicate(self, embed_rows):
-        plt_start = 6700
-        chunk_start = 6794
-        chunk_end = 7008
-        dupl_start = 7009
-        dupl_end = 7223
-        plt_end = 7440
-
-        shift = 215
-
-        # key = "chr" + str(self.chr - 1)
-        # cum_pos = int(self.sizes[key])
-        # diff = start - (cum_pos + 1)
-        lstrow = len(embed_rows) - 1
-        startrow = lstrow - plt_end
-        endrow = lstrow - dupl_start
-
-        for n in range(startrow, endrow + 1):
-            embed_rows[lstrow - n, :] = embed_rows[lstrow - n - shift, :]
-
-        return embed_rows
-
-    def reverse_embeddings(self, embed_rows):
-        embed_rows = np.fliplr(embed_rows)
-        return embed_rows
-
-    def melo_insert(self, model, pred_data, zero_embed):
-        data_loader, samples = get_data_loader_chr(self.cfg, self.chr)
-        embed_rows, start = self.convert_df_to_np(pred_data)
-        embed_rows = self.duplicate(embed_rows)
-        # embed_rows = self.reverse_embeddings(embed_rows)
-
-        _, melo_pred_df = model.perform_ko(data_loader, embed_rows, zero_embed, start)
-        melo_pred_df.to_csv(cfg.output_directory + "combined150_meloafkofusion_chr%s.csv" % str(chr), sep="\t")
-
-        return melo_pred_df
-
 
 if __name__ == '__main__':
 
@@ -209,11 +166,9 @@ if __name__ == '__main__':
     for chr in test_chr:
         print('Testing Start Chromosome: {}'.format(chr))
         pred_data = pd.read_csv(cfg.output_directory + "shuffle_%s_predictions_chr%s.csv" % (cell, str(chr)), sep="\t")
-        # zero_embed = np.load(cfg.output_directory + "combined150_zero_chr%s.npy" % str(chr))
         ko_ob = Knockout(cfg, cell, chr)
 
-        ko_pred_df = ko_ob.perform_ko(model, pred_data)
-        # np.save(cfg.output_directory + "ko_predict_chr" + str(chr) + ".npy", ko_pred_df)
+        # ko_pred_df = ko_ob.perform_ko(model, pred_data)
         # ko_pred_df = ko_ob.normalize_embed_predict(model, pred_data)
         # melo_pred_df = ko_ob.melo_insert(model, pred_data, zero_embed)
 
