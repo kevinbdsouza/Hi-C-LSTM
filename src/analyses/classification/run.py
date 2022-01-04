@@ -10,8 +10,13 @@ from analyses.classification.loops import Loops
 from analyses.classification.domains import Domains
 from analyses.classification.subcompartments import Subcompartments
 import matplotlib.pyplot as plt
+from training.model import SeqLSTM
+import torch
+from training.test_model import test_model
+import numpy as np
 
 logger = logging.getLogger(__name__)
+device = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
 
 
 class DownstreamTasks:
@@ -377,65 +382,89 @@ class DownstreamTasks:
 
         return mean_map
 
-    def plot_combined(self, map_frame):
-        tasks = ["Gene Expression", "Replication Timing", "Enhancers", "TSS", "PE-Interactions", "FIREs",
-                 "Non-loop Domains", "Loop Domains"]
 
-        df_main = pd.DataFrame(columns=["Tasks", "Hi-C-LSTM"])
-        df_main["Tasks"] = tasks
-        df_main["Hi-C-LSTM"] = [map_frame["gene_map"].mean(), map_frame["rep_map"].mean(),
-                                map_frame["enhancers_map"].mean(), map_frame["tss_map"].mean(),
-                                map_frame["pe_map"].mean(), map_frame["fire_map"].mean(),
-                                map_frame["domains_map"].mean(), map_frame["loops_map"].mean()]
+def plot_combined(map_frame):
+    tasks = ["Gene Expression", "Replication Timing", "Enhancers", "TSS", "PE-Interactions", "FIREs",
+             "Non-loop Domains", "Loop Domains"]
 
-        plt.figure(figsize=(12, 10))
-        plt.xticks(rotation=90, fontsize=20)
-        plt.yticks(fontsize=20)
-        plt.xlabel("Prediction Target", fontsize=20)
-        plt.ylabel("mAP ", fontsize=20)
-        plt.plot('Tasks', 'Hi-C-LSTM', data=df_main, marker='o', markersize=16, color="C3",
-                 linewidth=3,
-                 label="Hi-C-LSTM")
-        plt.legend(fontsize=18)
-        plt.show()
+    df_main = pd.DataFrame(columns=["Tasks", "Hi-C-LSTM"])
+    df_main["Tasks"] = tasks
+    df_main["Hi-C-LSTM"] = [map_frame["gene_map"].mean(), map_frame["rep_map"].mean(),
+                            map_frame["enhancers_map"].mean(), map_frame["tss_map"].mean(),
+                            map_frame["pe_map"].mean(), map_frame["fire_map"].mean(),
+                            map_frame["domains_map"].mean(), map_frame["loops_map"].mean()]
 
-        pass
+    plt.figure(figsize=(12, 10))
+    plt.xticks(rotation=90, fontsize=20)
+    plt.yticks(fontsize=20)
+    plt.xlabel("Prediction Target", fontsize=20)
+    plt.ylabel("mAP ", fontsize=20)
+    plt.plot('Tasks', 'Hi-C-LSTM', data=df_main, marker='o', markersize=16, color="C3",
+             linewidth=3,
+             label="Hi-C-LSTM")
+    plt.legend(fontsize=18)
+    plt.show()
+
+    pass
 
 
 if __name__ == '__main__':
     cfg = Config()
     test_chr = list(range(22, 23))
     map_frame = pd.DataFrame(
-        columns=["chr", "gene_map", "pe_map", "fire_map", "rep_map", "loops_map", "domains_map", "enhancers_map",
-                 "tss_map"])
+        columns=["chr", "Gene Expression", "Replication Timing", "Enhancers", "TSS", "PE-Interactions",
+                 "FIREs", "Non-loop Domains", "Loop Domains"])
+
+    cell = cfg.cell
+    model_name = "shuffle_" + cell
+
+    # initalize model
+    model = SeqLSTM(cfg, device, model_name).to(device)
+
+    # load model weights
+    model.load_weights()
 
     for chr in test_chr:
         logging.info("Downstream start Chromosome: {}".format(chr))
 
-    downstream_ob = DownstreamTasks(cfg, chr, mode='lstm')
+        # running test model to get embeddings
+        test_model(model, cfg, cell, chr)
 
-    gene_map = downstream_ob.run_rna_seq(cfg)
+        downstream_ob = DownstreamTasks(cfg, chr, mode='lstm')
 
-    pe_map = downstream_ob.run_pe(cfg)
+        gene_map = downstream_ob.run_rna_seq(cfg)
 
-    fire_map = downstream_ob.run_fires(cfg)
+        pe_map = downstream_ob.run_pe(cfg)
 
-    rep_map = downstream_ob.run_rep_timings(cfg)
+        fire_map = downstream_ob.run_fires(cfg)
 
-    loops_map = downstream_ob.run_loops(cfg)
+        rep_map = downstream_ob.run_rep_timings(cfg)
 
-    domains_map = downstream_ob.run_domains(cfg)
+        loops_map = downstream_ob.run_loops(cfg)
 
-    # mapdict_subcomp = downstream_ob.run_sub_compartments(cfg)
+        domains_map = downstream_ob.run_domains(cfg)
 
-    enhancers_map = downstream_ob.run_p_and_e(cfg)
+        # mapdict_subcomp = downstream_ob.run_sub_compartments(cfg)
 
-    tss_map = downstream_ob.run_tss(cfg)
+        enhancers_map = downstream_ob.run_p_and_e(cfg)
 
-    map_frame = map_frame.append(
-        {"chr": chr, "gene_map": gene_map, "pe_map": pe_map, "fire_map": fire_map, "rep_map": rep_map,
-         "loops_map": loops_map, "domains_map": domains_map, "enhancers_map": enhancers_map, "tss_map": tss_map},
-        ignore_index=True)
+        tss_map = downstream_ob.run_tss(cfg)
+
+        map_frame = map_frame.append(
+            {"chr": chr, "Gene Expression": gene_map, "Replication Timing": rep_map, "Enhancers": enhancers_map,
+             "TSS": tss_map, "PE-Interactions": pe_map, "FIREs": fire_map, "Non-loop Domains": domains_map,
+             "Loop Domains": loops_map},
+            ignore_index=True)
 
     map_frame.to_csv(cfg.output_directory + "mapframe_%s.csv" % (cfg.cell), sep="\t")
+
+    plot_combined(map_frame)
+
     print("done")
+
+    # Other mAP plots can be obtained by:
+    # Changing the cell type,
+    # The model associated with the cell type,
+    # Other models like Sniper and SCA.
+
+    # If you have all the data, you can use plot_combined function in analyses/plot/plot_fns.py

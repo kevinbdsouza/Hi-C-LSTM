@@ -1,7 +1,4 @@
-import numpy as np
-import pandas as pd
 import torch
-
 import training.config as config
 from training.model import SeqLSTM
 from training.data_utils import get_data_loader_chr

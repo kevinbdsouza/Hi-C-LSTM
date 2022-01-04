@@ -1,6 +1,5 @@
 import pandas as pd
 from training.config import Config
-from training.test_model import test_model
 import torch
 from training.model import SeqLSTM
 from analyses.reconstruction.hic_r2 import HiC_R2
@@ -37,3 +36,12 @@ if __name__ == '__main__':
 
     # plot r2
     plot_utils.plot_r2(comb_r2_df)
+
+    # Other R2 plots can be obtained by:
+    # Changing the cell type,
+    # The model associated with the cell type,
+    # Ablations of the model,
+    # Other models like Sniper and SCA,
+    # Changing the data to the replicate
+
+    # If you have all the data, you can use plot_r2 function in analyses/plot/plot_fns.py

@@ -168,7 +168,7 @@ if __name__ == '__main__':
         pred_data = pd.read_csv(cfg.output_directory + "shuffle_%s_predictions_chr%s.csv" % (cell, str(chr)), sep="\t")
         ko_ob = Knockout(cfg, cell, chr)
 
-        # ko_pred_df = ko_ob.perform_ko(model, pred_data)
+        ko_pred_df = ko_ob.perform_ko(model, pred_data)
         # ko_pred_df = ko_ob.normalize_embed_predict(model, pred_data)
         # melo_pred_df = ko_ob.melo_insert(model, pred_data, zero_embed)
 

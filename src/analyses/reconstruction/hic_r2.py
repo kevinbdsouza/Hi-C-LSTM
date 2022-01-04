@@ -1,12 +1,11 @@
 import pandas as pd
-import logging
-import re
 from training.config import Config
 import numpy as np
 import traceback
-import math
+import torch
 
 pd.options.mode.chained_assignment = None
+device = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
 
 
 class HiC_R2():
@@ -78,7 +77,7 @@ if __name__ == '__main__':
     test_chr = list(range(15, 23))
     cfg = Config()
     cell = cfg.cell
-    model = "shuffle_" + cell
+    model_name = "shuffle_" + cell
 
     for chr in test_chr:
         data_ob_hic = HiC_R2(cfg, chr, mode='test')
