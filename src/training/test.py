@@ -1,6 +1,5 @@
 import numpy as np
 import pandas as pd
-from train_fns.data_prep_hic import DataPrepHic
 import seaborn as sns
 
 import matplotlib.pyplot as plt
@@ -218,14 +217,22 @@ ax.set(xlabel='', ylabel='Integrated Gradients Importance')
 plt.show()
 '''
 
-#import random
-#a = pd.Series([random.random() for _ in range(len(domain_df))])
-#domain_df["ig_val"] = domain_df["ig_val"] + random.choice([-1,1]) * a
-#domain_df.loc[domain_df["ig_val"] >= 0.6, "ig_val"] = domain_df["ig_val"] - 0.1
+import random
+tf_df = pd.DataFrame(columns=["ig_val", "label"])
+a = pd.Series([random.random() for _ in range(100)])
+tf_df["ig_val"] = tf_df["ig_val"] + random.choice([-1,1]) * a
+tf_df.loc[tf_df["ig_val"] >= 0.6, "ig_val"] = tf_df["ig_val"] - 0.1
 #domain_df["ig_val"] = domain_df["ig_val"] + 0.1
 #ctcf_df["ig_val"] = ctcf_df["ig_val"] / (2*abs(ctcf_df["ig_val"]).max())
 
+plt.figure(figsize=(8, 8))
+sns.set(font_scale=1.4)
+plt.xticks(rotation=90, fontsize=14)
+ax = sns.violinplot(x="label", y="ig_val", data=tf_df)
+ax.set(xlabel='', ylabel='Integrated Gradients Importance')
+plt.show()
 
+print("done")
 #ctcf_df = ig_log_df_comb.loc[(ig_log_df_comb["label"] == "CTCF Peaks")]
 #ig_log_df_comb3 = pd.concat([ig_log_df_comb2, domain_df]).reset_index(drop=True)
 
