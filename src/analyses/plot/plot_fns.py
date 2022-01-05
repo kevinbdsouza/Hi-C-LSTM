@@ -379,7 +379,7 @@ class PlotFns:
         pass
 
     def plot_gbr(self):
-        ig_log_df = pd.DataFrame(np.load(self.path + "ig_log_df_all.npy"))
+        ig_log_df = pd.DataFrame(np.load(self.path + "ig_log_df_all.npy", allow_pickle=True))
         ig_log_df = ig_log_df.rename(columns={0: "ig_val", 1: "label"})
         ig_log_df["ig_val"] = ig_log_df["ig_val"].astype(float)
 
