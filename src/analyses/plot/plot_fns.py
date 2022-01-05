@@ -223,11 +223,11 @@ class PlotFns:
                  "Loop Domains", "Subcompartments"]
 
         lstm_auroc_all_tasks = np.load(self.path + "gm_auroc_all_tasks.npy")
-        sniper_intra_auroc_all_tasks = lstm_auroc_all_tasks.copy()
-        sniper_inter_auroc_all_tasks = lstm_auroc_all_tasks.copy()
-        graph_auroc_all_tasks = lstm_auroc_all_tasks.copy()
-        pca_auroc_all_tasks = lstm_auroc_all_tasks.copy()
-        sbcid_auroc_all_tasks = lstm_auroc_all_tasks.copy()
+        sniper_intra_auroc_all_tasks = np.load(self.path + "sniper_intra_auroc_all_tasks.npy")
+        sniper_inter_auroc_all_tasks = np.load(self.path + "sniper_inter_auroc_all_tasks.npy")
+        graph_auroc_all_tasks = np.load(self.path + "graph_auroc_all_tasks.npy")
+        pca_auroc_all_tasks = np.load(self.path + "pca_auroc_all_tasks.npy")
+        sbcid_auroc_all_tasks = np.load(self.path + "sbcid_auroc_all_tasks.npy")
 
         df_main = pd.DataFrame(columns=["Tasks", "Hi-C-LSTM", "SNIPER-INTRA", "SNIPER-INTER", "SCI", "PCA", "SBCID"])
         df_main["Tasks"] = tasks
