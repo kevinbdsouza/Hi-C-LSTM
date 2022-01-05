@@ -294,6 +294,30 @@ class PlotMap:
 
         print("done")
 
+    def plot_r2_celltypes(self):
+        pos = [10, 20, 30, 40, 50]
+
+        r1_hiclstm_gm = np.load(self.path + "lstm/" + "r1_hiclstm_full.npy")
+        r1_hiclstm_h1 = r1_hiclstm_gm
+        r1_hiclstm_hff = r1_hiclstm_gm
+        r1_hiclstm_wtc = r1_hiclstm_gm
+
+        plt.figure(figsize=(12, 10))
+        plt.plot(pos, r1_hiclstm_gm, marker='', markersize=14, color='C0', label='GM12878')
+        plt.plot(pos, r1_hiclstm_h1, marker='o', markersize=14, color='C0', label='H1hESC')
+        plt.plot(pos, r1_hiclstm_hff, marker='^', markersize=14, color='C0', label='HFFhTERT')
+        plt.plot(pos, r1_hiclstm_wtc, marker='v', markersize=14, color='C0', label='WTC11')
+
+        plt.tick_params(axis="x", labelsize=20, length=0)
+        plt.tick_params(axis="y", labelsize=20)
+        plt.xlabel('Distance between positions in Mbp', fontsize=20)
+        plt.ylabel('R-squared for Replicate-1', fontsize=20)
+        plt.legend(loc='upper right', fontsize=20)
+
+        plt.show()
+
+        pass
+
     def plot_r2(self):
         r1_hiclstm_full = np.load(self.path + "lstm/" + "r1_hiclstm_full.npy")
         r1_hiclstm_lstm = np.load(self.path + "lstm/" + "r1_hiclstm_lstm.npy")
@@ -558,13 +582,14 @@ if __name__ == "__main__":
 
     #plot_ob.plot_combined()
 
-    hidden_list = [4, 8, 16, 32, 64, 128]
-    plot_ob.plot_hidden(hidden_list)
+    # hidden_list = [4, 8, 16, 32, 64, 128]
+    # plot_ob.plot_hidden(hidden_list)
 
     #plot_ob.plot_xgb()
     # plot_ob.plot_gbr()
 
     # plot_ob.plot_r2()
+    plot_ob.plot_r2_celltypes()
     # plot_ob.plot_symmetry()
 
     # plot_ob.plot_knockout_results()
