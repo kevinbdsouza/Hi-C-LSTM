@@ -154,7 +154,7 @@ class PlotFns:
                  "Non-loop Domains",
                  "Loop Domains", "Subcompartments"]
 
-        gm_values_all_tasks = np.load(self.path + "lstm/" + "lstm_values_all_tasks.npy")
+        gm_values_all_tasks = np.load(self.path + "lstm_values_all_tasks.npy")
         h1_values_all_tasks = None
         hff_values_all_tasks = None
         wtc_values_all_tasks = None
