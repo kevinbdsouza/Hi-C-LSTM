@@ -691,7 +691,8 @@ if __name__ == "__main__":
 
     #plot_ob.plot_combined()
     # plot_ob.plot_mAP_celltypes()
-    plot_ob.plot_auroc_celltypes()
+    # plot_ob.plot_auroc_celltypes()
+    plot_ob.plot_auroc()
 
     # hidden_list = [4, 8, 16, 32, 64, 128]
     # plot_ob.plot_hidden(hidden_list)
