@@ -222,21 +222,21 @@ class PlotFns:
                  "Non-loop Domains",
                  "Loop Domains", "Subcompartments"]
 
-        lstm_values_all_tasks = np.load(self.path + "lstm_values_all_tasks.npy")
-        sniper_intra_values_all_tasks = lstm_values_all_tasks.copy()
-        sniper_inter_values_all_tasks = lstm_values_all_tasks.copy()
-        graph_values_all_tasks = lstm_values_all_tasks.copy()
-        pca_values_all_tasks = lstm_values_all_tasks.copy()
-        sbcid_values_all_tasks = lstm_values_all_tasks.copy()
+        lstm_auroc_all_tasks = np.load(self.path + "gm_auroc_all_tasks.npy")
+        sniper_intra_auroc_all_tasks = lstm_auroc_all_tasks.copy()
+        sniper_inter_auroc_all_tasks = lstm_auroc_all_tasks.copy()
+        graph_auroc_all_tasks = lstm_auroc_all_tasks.copy()
+        pca_auroc_all_tasks = lstm_auroc_all_tasks.copy()
+        sbcid_auroc_all_tasks = lstm_auroc_all_tasks.copy()
 
         df_main = pd.DataFrame(columns=["Tasks", "Hi-C-LSTM", "SNIPER-INTRA", "SNIPER-INTER", "SCI", "PCA", "SBCID"])
         df_main["Tasks"] = tasks
-        df_main["Hi-C-LSTM"] = lstm_values_all_tasks
-        df_main["SNIPER-INTRA"] = sniper_intra_values_all_tasks
-        df_main["SNIPER-INTER"] = sniper_inter_values_all_tasks
-        df_main["SCI"] = graph_values_all_tasks
-        df_main["PCA"] = pca_values_all_tasks
-        df_main["SBCID"] = sbcid_values_all_tasks
+        df_main["Hi-C-LSTM"] = lstm_auroc_all_tasks
+        df_main["SNIPER-INTRA"] = sniper_intra_auroc_all_tasks
+        df_main["SNIPER-INTER"] = sniper_inter_auroc_all_tasks
+        df_main["SCI"] = graph_auroc_all_tasks
+        df_main["PCA"] = pca_auroc_all_tasks
+        df_main["SBCID"] = sbcid_auroc_all_tasks
 
         plt.figure(figsize=(12, 10))
         plt.xticks(rotation=90, fontsize=20)
