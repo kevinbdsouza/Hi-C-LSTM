@@ -143,7 +143,7 @@ class Knockout():
         plt.plot(pos, mean_diff, marker='o', markersize=16, color="C0", linewidth=3, label="CTCF KO")
         plt.legend(fontsize=18)
         plt.show()
-        
+
         return mean_diff
 
     def perform_ko(self, model, pred_data):
@@ -152,7 +152,7 @@ class Knockout():
         embed_rows, start, stop = self.convert_df_to_np(pred_data)
         embed_rows = self.ko_indices(embed_rows, start, indices)
 
-        _, ko_pred_df = model.perform_ko(data_loader, embed_rows, start)
+        _, ko_pred_df = model.perform_ko(data_loader, embed_rows, start, mode="ko")
         ko_pred_df.to_csv(cfg.output_directory + "shuffle_%s_afko_chr%s.csv" % (self.cfg.cell, str(self.chr)), sep="\t")
 
         mean_diff = self.compute_kodiff(pred_data, ko_pred_df, indices, stop)
@@ -173,7 +173,7 @@ class Knockout():
         embed_rows, start, stop = self.convert_df_to_np(pred_data)
         embed_rows = self.normalize_embed(embed_rows)
 
-        _, ko_pred_df = model.perform_ko(data_loader, embed_rows, start)
+        _, ko_pred_df = model.perform_ko(data_loader, embed_rows, start, mode="ko")
         ko_pred_df.to_csv(cfg.output_directory + "shuffle_%s_norm_chr%s.csv" % (self.cfg.cell, str(self.chr)), sep="\t")
 
         return ko_pred_df
@@ -200,6 +200,5 @@ if __name__ == '__main__':
 
         ko_pred_df, mean_diff = ko_ob.perform_ko(model, pred_data)
         # ko_pred_df = ko_ob.normalize_embed_predict(model, pred_data)
-        # melo_pred_df = ko_ob.melo_insert(model, pred_data, zero_embed)
 
     print("done")

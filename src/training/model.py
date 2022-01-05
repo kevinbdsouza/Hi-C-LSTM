@@ -340,7 +340,7 @@ class SeqLSTM(nn.Module):
         inv_exp_val = np.nan_to_num(1 / coeffs) - delta
         return inv_exp_val
 
-    def ko_post(self, ind, val, pred, pred_df, mode="ko"):
+    def ko_post(self, ind, val, pred, pred_df, mode):
         idx = np.array(np.where(np.sum(ind, axis=1) == 0))[0]
         ind = np.delete(ind, idx, axis=0)
         val = np.delete(val, idx, axis=0)
@@ -350,7 +350,7 @@ class SeqLSTM(nn.Module):
         pred_df["v"] = val
         pred_df["ko_pred"] = pred
 
-        if mode == "duplication":
+        if mode == "dup":
             start = int(pred_df['i'].min())
             stop = int(pred_df['i'].max())
             chunk_start = 256803
@@ -382,7 +382,7 @@ class SeqLSTM(nn.Module):
 
         return pred_df
 
-    def perform_ko(self, data_loader, embed_rows, start):
+    def perform_ko(self, data_loader, embed_rows, start, mode):
         device = self.device
         cfg = self.cfg
         num_outputs = cfg.sequence_length
@@ -411,7 +411,7 @@ class SeqLSTM(nn.Module):
                 ko_predictions = torch.cat((ko_predictions, lstm_output), 0)
 
                 pred = lstm_output.cpu().detach().numpy().reshape(-1, 1)
-                pred_df = self.ko_post(ind, val, pred, pred_df, mode="ko")
+                pred_df = self.ko_post(ind, val, pred, pred_df, mode=mode)
 
                 main_pred_df = pd.concat([main_pred_df, pred_df], axis=0)
 

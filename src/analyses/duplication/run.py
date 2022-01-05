@@ -52,11 +52,11 @@ class Duplicate():
 
     def melo_insert(self, model, pred_data):
         data_loader, samples = get_data_loader_chr(self.cfg, self.chr)
-        embed_rows, start = self.ko_ob.convert_df_to_np(pred_data)
+        embed_rows, start, stop = self.ko_ob.convert_df_to_np(pred_data)
         embed_rows = self.duplicate(embed_rows)
         # embed_rows = self.reverse_embeddings(embed_rows)
 
-        _, melo_pred_df = model.perform_ko(data_loader, embed_rows, start)
+        _, melo_pred_df = model.perform_ko(data_loader, embed_rows, start, mode="dup")
         melo_pred_df.to_csv(
             cfg.output_directory + "shuffle_%s_meloafkofusion_chr%s.csv" % (self.cfg.cell, str(self.chr)), sep="\t")
 
