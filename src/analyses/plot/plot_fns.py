@@ -115,8 +115,6 @@ class PlotFns:
         pca_values_all_tasks = np.load(self.path + "lstm/" + "pca_values_all_tasks.npy")
         sbcid_values_all_tasks = np.load(self.path + "lstm/" + "sbcid_values_all_tasks.npy")
 
-        methods = ["Hi-C-LSTM", "SNIPER-INTRA", "SNIPER-INTER", "SCI", "PCA", "SBCID"]
-
         df_main = pd.DataFrame(columns=["Tasks", "Hi-C-LSTM", "SNIPER-INTRA", "SNIPER-INTER", "SCI", "PCA", "SBCID"])
         df_main["Tasks"] = tasks
         df_main["Hi-C-LSTM"] = lstm_values_all_tasks
@@ -155,9 +153,9 @@ class PlotFns:
                  "Loop Domains", "Subcompartments"]
 
         gm_values_all_tasks = np.load(self.path + "lstm_values_all_tasks.npy")
-        h1_values_all_tasks = None
-        hff_values_all_tasks = None
-        wtc_values_all_tasks = None
+        h1_values_all_tasks = np.load(self.path + "h1_values_all_tasks.npy")
+        hff_values_all_tasks = np.load(self.path + "hff_values_all_tasks.npy")
+        wtc_values_all_tasks = np.load(self.path + "wtc_values_all_tasks.npy")
 
         df_main = pd.DataFrame(columns=["Tasks", "GM12878", "H1hESC", "HFFhTERT", "WTC11"])
         df_main["Tasks"] = tasks
@@ -182,6 +180,80 @@ class PlotFns:
         plt.legend(fontsize=18)
         plt.show()
 
+        pass
+
+    def plot_auroc_celltypes(self):
+        tasks = ["Gene Expression", "Replication Timing", "Enhancers", "TSS", "PE-Interactions", "FIREs",
+                 "Non-loop Domains",
+                 "Loop Domains", "Subcompartments"]
+
+        gm_values_all_tasks = np.load(self.path + "lstm_auroc_all_tasks.npy")
+        h1_values_all_tasks = np.load(self.path + "h1_auroc_all_tasks.npy")
+        hff_values_all_tasks = np.load(self.path + "hff_auroc_all_tasks.npy")
+        wtc_values_all_tasks = np.load(self.path + "wtc_auroc_all_tasks.npy")
+
+        df_main = pd.DataFrame(columns=["Tasks", "GM12878", "H1hESC", "HFFhTERT", "WTC11"])
+        df_main["Tasks"] = tasks
+        df_main["GM12878"] = gm_values_all_tasks
+        df_main["H1hESC"] = h1_values_all_tasks
+        df_main["HFFhTERT"] = hff_values_all_tasks
+        df_main["WTC11"] = wtc_values_all_tasks
+
+        plt.figure(figsize=(12, 10))
+        plt.xticks(rotation=90, fontsize=20)
+        plt.yticks(fontsize=20)
+        plt.xlabel("Prediction Target", fontsize=20)
+        plt.ylabel("mAP ", fontsize=20)
+        plt.plot('Tasks', 'GM12878', data=df_main, marker='o', markersize=16, color="C3", linewidth=3,
+                 label="GM12878")
+        plt.plot('Tasks', 'H1hESC', data=df_main, marker='*', markersize=16, color="C0", linewidth=3,
+                 linestyle='dashed', label="H1hESC")
+        plt.plot('Tasks', 'HFFhTERT', data=df_main, marker='X', markersize=16, color="C1", linewidth=3,
+                 linestyle='dotted', label="HFFhTERT")
+        plt.plot('Tasks', 'WTC11', data=df_main, marker='^', markersize=16, color="C2", linewidth=3,
+                 linestyle='dashdot',
+                 label="WTC11")
+        plt.legend(fontsize=18)
+        plt.show()
+        pass
+
+    def plot_auroc(self):
+        lstm_values_all_tasks = np.load(self.path + "lstm/" + "lstm_values_all_tasks.npy")
+        sniper_intra_values_all_tasks = np.load(self.path + "lstm/" + "sniper_intra_values_all_tasks.npy")
+        sniper_inter_values_all_tasks = np.load(self.path + "lstm/" + "sniper_inter_values_all_tasks.npy")
+        graph_values_all_tasks = np.load(self.path + "lstm/" + "graph_values_all_tasks.npy")
+        pca_values_all_tasks = np.load(self.path + "lstm/" + "pca_values_all_tasks.npy")
+        sbcid_values_all_tasks = np.load(self.path + "lstm/" + "sbcid_values_all_tasks.npy")
+
+        df_main = pd.DataFrame(columns=["Tasks", "Hi-C-LSTM", "SNIPER-INTRA", "SNIPER-INTER", "SCI", "PCA", "SBCID"])
+        df_main["Tasks"] = tasks
+        df_main["Hi-C-LSTM"] = lstm_values_all_tasks
+        df_main["SNIPER-INTRA"] = sniper_intra_values_all_tasks
+        df_main["SNIPER-INTER"] = sniper_inter_values_all_tasks
+        df_main["SCI"] = graph_values_all_tasks
+        df_main["PCA"] = pca_values_all_tasks
+        df_main["SBCID"] = sbcid_values_all_tasks
+
+        palette = {"Hi-C-LSTM": "C3", "SNIPER-INTRA": "C0", "SNIPER-INTER": "C1", "SCI": "C2", "PCA": "C4",
+                   "SBCID": "C5"}
+        plt.figure(figsize=(12, 10))
+        plt.xticks(rotation=90, fontsize=20)
+        plt.yticks(fontsize=20)
+        plt.xlabel("Prediction Target", fontsize=20)
+        plt.ylabel("mAP ", fontsize=20)
+        plt.plot('Tasks', 'Hi-C-LSTM', data=df_main, marker='o', markersize=16, color="C3", linewidth=3,
+                 label="Hi-C-LSTM")
+        plt.plot('Tasks', 'SNIPER-INTRA', data=df_main, marker='*', markersize=16, color="C0", linewidth=3,
+                 linestyle='dashed', label="SNIPER-INTRA")
+        plt.plot('Tasks', 'SNIPER-INTER', data=df_main, marker='X', markersize=16, color="C1", linewidth=3,
+                 linestyle='dotted', label="SNIPER-INTER")
+        plt.plot('Tasks', 'SCI', data=df_main, marker='^', markersize=16, color="C2", linewidth=3, linestyle='dashdot',
+                 label="SCI")
+        plt.plot('Tasks', 'PCA', data=df_main, marker='D', markersize=16, color="C4", linewidth=3, label="PCA")
+        plt.plot('Tasks', 'SBCID', data=df_main, marker='s', markersize=16, color="C5", linewidth=3, linestyle='dashed',
+                 label="SBCID")
+        plt.legend(fontsize=18)
+        plt.show()
         pass
 
     def plot_hidden(self, hidden_list):
@@ -616,7 +688,8 @@ if __name__ == "__main__":
     plot_ob = PlotFns(cfg)
 
     #plot_ob.plot_combined()
-    plot_ob.plot_mAP_celltypes()
+    # plot_ob.plot_mAP_celltypes()
+    plot_ob.plot_auroc_celltypes()
 
     # hidden_list = [4, 8, 16, 32, 64, 128]
     # plot_ob.plot_hidden(hidden_list)
