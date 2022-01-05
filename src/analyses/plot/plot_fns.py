@@ -10,10 +10,10 @@ import training.config as config
 logger = logging.getLogger(__name__)
 
 
-class PlotMap:
+class PlotFns:
     def __init__(self, cfg):
         self.cfg = cfg
-        self.path = "/home/kevindsouza/Documents/projects/PhD/hic_lstm/src/saved_model/model_lstm/log_run/"
+        self.path = cfg.output_directory
         self.cell_type = ["E116", "GM12878"]
 
     def get_dict(self, path):
@@ -297,7 +297,7 @@ class PlotMap:
     def plot_r2_celltypes(self):
         pos = [10, 20, 30, 40, 50]
 
-        r1_hiclstm_gm = np.load(self.path + "lstm/" + "r1_hiclstm_full.npy")
+        r1_hiclstm_gm = np.load(self.path + "r1_hiclstm_full.npy")
         r1_hiclstm_h1 = r1_hiclstm_gm
         r1_hiclstm_hff = r1_hiclstm_gm
         r1_hiclstm_wtc = r1_hiclstm_gm
@@ -578,7 +578,7 @@ class PlotMap:
 
 if __name__ == "__main__":
     cfg = config.Config()
-    plot_ob = PlotMap(cfg)
+    plot_ob = PlotFns(cfg)
 
     #plot_ob.plot_combined()
 
