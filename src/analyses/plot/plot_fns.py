@@ -187,23 +187,23 @@ class PlotFns:
                  "Non-loop Domains",
                  "Loop Domains", "Subcompartments"]
 
-        gm_values_all_tasks = np.load(self.path + "lstm_auroc_all_tasks.npy")
-        h1_values_all_tasks = np.load(self.path + "h1_auroc_all_tasks.npy")
-        hff_values_all_tasks = np.load(self.path + "hff_auroc_all_tasks.npy")
-        wtc_values_all_tasks = np.load(self.path + "wtc_auroc_all_tasks.npy")
+        gm_auroc_all_tasks = np.load(self.path + "gm_auroc_all_tasks.npy")
+        h1_auroc_all_tasks = np.load(self.path + "h1_auroc_all_tasks.npy")
+        hff_auroc_all_tasks = np.load(self.path + "hff_auroc_all_tasks.npy")
+        wtc_auroc_all_tasks = np.load(self.path + "wtc_auroc_all_tasks.npy")
 
         df_main = pd.DataFrame(columns=["Tasks", "GM12878", "H1hESC", "HFFhTERT", "WTC11"])
         df_main["Tasks"] = tasks
-        df_main["GM12878"] = gm_values_all_tasks
-        df_main["H1hESC"] = h1_values_all_tasks
-        df_main["HFFhTERT"] = hff_values_all_tasks
-        df_main["WTC11"] = wtc_values_all_tasks
+        df_main["GM12878"] = gm_auroc_all_tasks
+        df_main["H1hESC"] = h1_auroc_all_tasks
+        df_main["HFFhTERT"] = hff_auroc_all_tasks
+        df_main["WTC11"] = wtc_auroc_all_tasks
 
         plt.figure(figsize=(12, 10))
         plt.xticks(rotation=90, fontsize=20)
         plt.yticks(fontsize=20)
         plt.xlabel("Prediction Target", fontsize=20)
-        plt.ylabel("mAP ", fontsize=20)
+        plt.ylabel("AuROC ", fontsize=20)
         plt.plot('Tasks', 'GM12878', data=df_main, marker='o', markersize=16, color="C3", linewidth=3,
                  label="GM12878")
         plt.plot('Tasks', 'H1hESC', data=df_main, marker='*', markersize=16, color="C0", linewidth=3,
@@ -218,12 +218,16 @@ class PlotFns:
         pass
 
     def plot_auroc(self):
-        lstm_values_all_tasks = np.load(self.path + "lstm/" + "lstm_values_all_tasks.npy")
-        sniper_intra_values_all_tasks = np.load(self.path + "lstm/" + "sniper_intra_values_all_tasks.npy")
-        sniper_inter_values_all_tasks = np.load(self.path + "lstm/" + "sniper_inter_values_all_tasks.npy")
-        graph_values_all_tasks = np.load(self.path + "lstm/" + "graph_values_all_tasks.npy")
-        pca_values_all_tasks = np.load(self.path + "lstm/" + "pca_values_all_tasks.npy")
-        sbcid_values_all_tasks = np.load(self.path + "lstm/" + "sbcid_values_all_tasks.npy")
+        tasks = ["Gene Expression", "Replication Timing", "Enhancers", "TSS", "PE-Interactions", "FIREs",
+                 "Non-loop Domains",
+                 "Loop Domains", "Subcompartments"]
+
+        lstm_values_all_tasks = np.load(self.path + "lstm_values_all_tasks.npy")
+        sniper_intra_values_all_tasks = lstm_values_all_tasks.copy()
+        sniper_inter_values_all_tasks = lstm_values_all_tasks.copy()
+        graph_values_all_tasks = lstm_values_all_tasks.copy()
+        pca_values_all_tasks = lstm_values_all_tasks.copy()
+        sbcid_values_all_tasks = lstm_values_all_tasks.copy()
 
         df_main = pd.DataFrame(columns=["Tasks", "Hi-C-LSTM", "SNIPER-INTRA", "SNIPER-INTER", "SCI", "PCA", "SBCID"])
         df_main["Tasks"] = tasks
@@ -234,13 +238,11 @@ class PlotFns:
         df_main["PCA"] = pca_values_all_tasks
         df_main["SBCID"] = sbcid_values_all_tasks
 
-        palette = {"Hi-C-LSTM": "C3", "SNIPER-INTRA": "C0", "SNIPER-INTER": "C1", "SCI": "C2", "PCA": "C4",
-                   "SBCID": "C5"}
         plt.figure(figsize=(12, 10))
         plt.xticks(rotation=90, fontsize=20)
         plt.yticks(fontsize=20)
         plt.xlabel("Prediction Target", fontsize=20)
-        plt.ylabel("mAP ", fontsize=20)
+        plt.ylabel("AuROC ", fontsize=20)
         plt.plot('Tasks', 'Hi-C-LSTM', data=df_main, marker='o', markersize=16, color="C3", linewidth=3,
                  label="Hi-C-LSTM")
         plt.plot('Tasks', 'SNIPER-INTRA', data=df_main, marker='*', markersize=16, color="C0", linewidth=3,
