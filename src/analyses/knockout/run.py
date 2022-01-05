@@ -120,20 +120,20 @@ class Knockout():
         return embed_rows
 
     def compute_kodiff(self, pred_data, ko_pred_df, indices, stop):
-        diff_list = []
-        for ind in indices:
-            temp_diff_list = []
+        indices = np.array(indices[:5])
+        diff_list = np.zeros((len(indices), 11))
+        for i, ind in enumerate(indices):
             for k in range(11):
-                subset_og = pred_data.loc[pred_data["i"] == ind + k]
-                if subset_og.empty or (ind + k) > stop:
+                subset_og = pred_data.loc[pred_data["i"] == ind[0] + k]
+                if subset_og.empty or (ind[0] + k) > stop:
                     continue
-                subset_ko = ko_pred_df.loc[ko_pred_df["i"] == ind + k]
+                subset_ko = ko_pred_df.loc[ko_pred_df["i"] == ind[0] + k]
                 mean_diff = (subset_ko["ko_pred"] - subset_og["pred"]).mean()
-                temp_diff_list.append(mean_diff)
+                diff_list[i, k] = mean_diff
 
-            diff_list.append(np.mean(temp_diff_list))
+        mean_diff = np.mean(diff_list, axis=0)
 
-        return diff_list
+        return mean_diff
 
     def perform_ko(self, model, pred_data):
         data_loader, samples = get_data_loader_chr(self.cfg, self.chr)
@@ -144,9 +144,9 @@ class Knockout():
         _, ko_pred_df = model.perform_ko(data_loader, embed_rows, start)
         ko_pred_df.to_csv(cfg.output_directory + "shuffle_%s_afko_chr%s.csv" % (self.cfg.cell, str(self.chr)), sep="\t")
 
-        diff_list = self.compute_kodiff(pred_data, ko_pred_df, indices, stop)
+        mean_diff = self.compute_kodiff(pred_data, ko_pred_df, indices, stop)
 
-        return ko_pred_df, diff_list
+        return ko_pred_df, mean_diff
 
     def normalize_embed(self, embed_rows):
         for n in range(len(embed_rows)):
@@ -187,7 +187,7 @@ if __name__ == '__main__':
         # ko_pred_df = pd.read_csv(cfg.output_directory + "shuffle_%s_afko_chr%s.csv" % (cell, str(chr)), sep="\t")
         ko_ob = Knockout(cfg, cell, chr)
 
-        ko_pred_df, diff_list = ko_ob.perform_ko(model, pred_data)
+        ko_pred_df, mean_diff = ko_ob.perform_ko(model, pred_data)
         # ko_pred_df = ko_ob.normalize_embed_predict(model, pred_data)
         # melo_pred_df = ko_ob.melo_insert(model, pred_data, zero_embed)
 
