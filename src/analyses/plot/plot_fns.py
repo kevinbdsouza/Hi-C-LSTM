@@ -149,6 +149,41 @@ class PlotFns:
 
         pass
 
+    def plot_mAP_celltypes(self):
+        tasks = ["Gene Expression", "Replication Timing", "Enhancers", "TSS", "PE-Interactions", "FIREs",
+                 "Non-loop Domains",
+                 "Loop Domains", "Subcompartments"]
+
+        gm_values_all_tasks = np.load(self.path + "lstm/" + "lstm_values_all_tasks.npy")
+        h1_values_all_tasks = None
+        hff_values_all_tasks = None
+        wtc_values_all_tasks = None
+
+        df_main = pd.DataFrame(columns=["Tasks", "GM12878", "H1hESC", "HFFhTERT", "WTC11"])
+        df_main["Tasks"] = tasks
+        df_main["GM12878"] = gm_values_all_tasks
+        df_main["H1hESC"] = h1_values_all_tasks
+        df_main["HFFhTERT"] = hff_values_all_tasks
+        df_main["WTC11"] = wtc_values_all_tasks
+
+        plt.figure(figsize=(12, 10))
+        plt.xticks(rotation=90, fontsize=20)
+        plt.yticks(fontsize=20)
+        plt.xlabel("Prediction Target", fontsize=20)
+        plt.ylabel("mAP ", fontsize=20)
+        plt.plot('Tasks', 'GM12878', data=df_main, marker='o', markersize=16, color="C3", linewidth=3,
+                 label="GM12878")
+        plt.plot('Tasks', 'H1hESC', data=df_main, marker='*', markersize=16, color="C0", linewidth=3,
+                 linestyle='dashed', label="H1hESC")
+        plt.plot('Tasks', 'HFFhTERT', data=df_main, marker='X', markersize=16, color="C1", linewidth=3,
+                 linestyle='dotted', label="HFFhTERT")
+        plt.plot('Tasks', 'WTC11', data=df_main, marker='^', markersize=16, color="C2", linewidth=3, linestyle='dashdot',
+                 label="WTC11")
+        plt.legend(fontsize=18)
+        plt.show()
+
+        pass
+
     def plot_hidden(self, hidden_list):
         map_hidden = np.load(self.path + "lstm/" + "hiclstm_ablation.npy")
         map_2_layer = np.load(self.path + "lstm/" + "hiclstm_2_layer_ablation.npy")
@@ -298,15 +333,15 @@ class PlotFns:
         pos = [10, 20, 30, 40, 50]
 
         r1_hiclstm_gm = np.load(self.path + "r1_hiclstm_full.npy")
-        r1_hiclstm_h1 = r1_hiclstm_gm
-        r1_hiclstm_hff = r1_hiclstm_gm
-        r1_hiclstm_wtc = r1_hiclstm_gm
+        r1_hiclstm_h1 = np.load(self.path + "r1_hiclstm_h1.npy")
+        r1_hiclstm_hff = np.load(self.path + "r1_hiclstm_hff.npy")
+        r1_hiclstm_wtc = np.load(self.path + "r1_hiclstm_wtc.npy")
 
-        plt.figure(figsize=(12, 10))
-        plt.plot(pos, r1_hiclstm_gm, marker='', markersize=14, color='C0', label='GM12878')
-        plt.plot(pos, r1_hiclstm_h1, marker='o', markersize=14, color='C0', label='H1hESC')
-        plt.plot(pos, r1_hiclstm_hff, marker='^', markersize=14, color='C0', label='HFFhTERT')
-        plt.plot(pos, r1_hiclstm_wtc, marker='v', markersize=14, color='C0', label='WTC11')
+        plt.figure(figsize=(10, 8))
+        plt.plot(pos, r1_hiclstm_gm, marker='', markersize=16, color='C0', linewidth=3, label='GM12878')
+        plt.plot(pos, r1_hiclstm_h1, marker='o', markersize=16, color='C1', linewidth=3, label='H1hESC')
+        plt.plot(pos, r1_hiclstm_hff, marker='^', markersize=16, color='C2', linewidth=3, label='HFFhTERT')
+        plt.plot(pos, r1_hiclstm_wtc, marker='v', markersize=16, color='C3', linewidth=3, label='WTC11')
 
         plt.tick_params(axis="x", labelsize=20, length=0)
         plt.tick_params(axis="y", labelsize=20)
@@ -581,6 +616,7 @@ if __name__ == "__main__":
     plot_ob = PlotFns(cfg)
 
     #plot_ob.plot_combined()
+    plot_ob.plot_mAP_celltypes()
 
     # hidden_list = [4, 8, 16, 32, 64, 128]
     # plot_ob.plot_hidden(hidden_list)
@@ -589,7 +625,7 @@ if __name__ == "__main__":
     # plot_ob.plot_gbr()
 
     # plot_ob.plot_r2()
-    plot_ob.plot_r2_celltypes()
+    # plot_ob.plot_r2_celltypes()
     # plot_ob.plot_symmetry()
 
     # plot_ob.plot_knockout_results()
