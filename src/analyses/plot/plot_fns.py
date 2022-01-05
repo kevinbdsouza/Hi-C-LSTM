@@ -379,7 +379,7 @@ class PlotFns:
         pass
 
     def plot_gbr(self):
-        ig_log_df = pd.DataFrame(np.load("/home/kevindsouza/Documents/projects/hic_lstm/data/ig_log_df_all.npy"))
+        ig_log_df = pd.DataFrame(np.load(self.path + "ig_log_df_all.npy"))
         ig_log_df = ig_log_df.rename(columns={0: "ig_val", 1: "label"})
         ig_log_df["ig_val"] = ig_log_df["ig_val"].astype(float)
 
@@ -692,13 +692,13 @@ if __name__ == "__main__":
     #plot_ob.plot_combined()
     # plot_ob.plot_mAP_celltypes()
     # plot_ob.plot_auroc_celltypes()
-    plot_ob.plot_auroc()
+    # plot_ob.plot_auroc()
 
     # hidden_list = [4, 8, 16, 32, 64, 128]
     # plot_ob.plot_hidden(hidden_list)
 
     #plot_ob.plot_xgb()
-    # plot_ob.plot_gbr()
+    plot_ob.plot_gbr()
 
     # plot_ob.plot_r2()
     # plot_ob.plot_r2_celltypes()

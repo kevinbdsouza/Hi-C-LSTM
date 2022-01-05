@@ -214,6 +214,8 @@ if __name__ == '__main__':
 
         ig_filtered_df = captum_analyze_tfs(cfg, ig_df, chr)
         # ig_filtered_df = captum_analyze_elements(cfg, chr, ig_df, mode="ctcf")
+
+        # ig_filtered_df = ig_filtered_df.loc[ig_filtered_df["ig"] >= 0.5]
         plot_gbr(ig_filtered_df)
 
     print("done")
