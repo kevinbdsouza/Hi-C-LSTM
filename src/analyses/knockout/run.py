@@ -6,6 +6,7 @@ import pandas as pd
 import training.config as config
 from training.model import SeqLSTM
 from training.data_utils import get_data_loader_chr
+import matplotlib.pyplot as plt
 
 device = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
 
@@ -133,6 +134,16 @@ class Knockout():
 
         mean_diff = np.mean(diff_list, axis=0)
 
+        pos = np.linspace(0, 1, 11)
+        plt.figure(figsize=(10, 8))
+        plt.xticks(rotation=90, fontsize=20)
+        plt.yticks(fontsize=20)
+        plt.xlabel("Distance between positions in Mbp", fontsize=20)
+        plt.ylabel("Average Difference in Contact Strength \n (KO - No KO)", fontsize=20)
+        plt.plot(pos, mean_diff, marker='o', markersize=16, color="C0", linewidth=3, label="CTCF KO")
+        plt.legend(fontsize=18)
+        plt.show()
+        
         return mean_diff
 
     def perform_ko(self, model, pred_data):
