@@ -100,7 +100,7 @@ class Knockout():
                     col = [str(x) for x in col]
                     embed_rows[j_new - start, :] = np.array(pred_data.loc[r, col])
 
-        return embed_rows, start
+        return embed_rows, start, stop
 
     def ko_indices(self, embed_rows, start, indices):
         # chose from input ko indices or give your own
@@ -119,16 +119,34 @@ class Knockout():
             embed_rows[ind - start, :] = window_arr_avg
         return embed_rows
 
+    def compute_kodiff(self, pred_data, ko_pred_df, indices, stop):
+        diff_list = []
+        for ind in indices:
+            temp_diff_list = []
+            for k in range(11):
+                subset_og = pred_data.loc[pred_data["i"] == ind + k]
+                if subset_og.empty or (ind + k) > stop:
+                    continue
+                subset_ko = ko_pred_df.loc[ko_pred_df["i"] == ind + k]
+                mean_diff = (subset_ko["ko_pred"] - subset_og["pred"]).mean()
+                temp_diff_list.append(mean_diff)
+
+            diff_list.append(np.mean(temp_diff_list))
+
+        return diff_list
+
     def perform_ko(self, model, pred_data):
         data_loader, samples = get_data_loader_chr(self.cfg, self.chr)
         indices = self.get_ctcf_indices()
-        embed_rows, start = self.convert_df_to_np(pred_data)
+        embed_rows, start, stop = self.convert_df_to_np(pred_data)
         embed_rows = self.ko_indices(embed_rows, start, indices)
 
         _, ko_pred_df = model.perform_ko(data_loader, embed_rows, start)
         ko_pred_df.to_csv(cfg.output_directory + "shuffle_%s_afko_chr%s.csv" % (self.cfg.cell, str(self.chr)), sep="\t")
 
-        return ko_pred_df
+        diff_list = self.compute_kodiff(pred_data, ko_pred_df, indices, stop)
+
+        return ko_pred_df, diff_list
 
     def normalize_embed(self, embed_rows):
         for n in range(len(embed_rows)):
@@ -141,7 +159,7 @@ class Knockout():
 
     def normalize_embed_predict(self, model, pred_data):
         data_loader, samples = get_data_loader_chr(self.cfg, self.chr)
-        embed_rows, start = self.convert_df_to_np(pred_data)
+        embed_rows, start, stop = self.convert_df_to_np(pred_data)
         embed_rows = self.normalize_embed(embed_rows)
 
         _, ko_pred_df = model.perform_ko(data_loader, embed_rows, start)
@@ -166,9 +184,10 @@ if __name__ == '__main__':
     for chr in test_chr:
         print('Testing Start Chromosome: {}'.format(chr))
         pred_data = pd.read_csv(cfg.output_directory + "shuffle_%s_predictions_chr%s.csv" % (cell, str(chr)), sep="\t")
+        # ko_pred_df = pd.read_csv(cfg.output_directory + "shuffle_%s_afko_chr%s.csv" % (cell, str(chr)), sep="\t")
         ko_ob = Knockout(cfg, cell, chr)
 
-        ko_pred_df = ko_ob.perform_ko(model, pred_data)
+        ko_pred_df, diff_list = ko_ob.perform_ko(model, pred_data)
         # ko_pred_df = ko_ob.normalize_embed_predict(model, pred_data)
         # melo_pred_df = ko_ob.melo_insert(model, pred_data, zero_embed)
 
