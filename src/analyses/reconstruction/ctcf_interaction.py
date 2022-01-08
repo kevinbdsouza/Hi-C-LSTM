@@ -40,7 +40,7 @@ class CTCF_Interactions():
 
 
 if __name__ == '__main__':
-    test_chr = list(range(12, 13))
+    test_chr = list(range(1, 2))
     cfg = Config()
     cell = cfg.cell
     model_name = "shuffle_" + cell
