@@ -216,7 +216,7 @@ ax = sns.violinplot(x="label", y="ig_val", data=ig_log_df_comb)
 ax.set(xlabel='', ylabel='Integrated Gradients Importance')
 plt.show()
 '''
-
+'''
 import random
 tf_df = pd.DataFrame(columns=["ig_val", "label"])
 a = pd.Series([random.random() for _ in range(100)])
@@ -231,6 +231,7 @@ plt.xticks(rotation=90, fontsize=14)
 ax = sns.violinplot(x="label", y="ig_val", data=tf_df)
 ax.set(xlabel='', ylabel='Integrated Gradients Importance')
 plt.show()
+'''
 
 print("done")
 #ctcf_df = ig_log_df_comb.loc[(ig_log_df_comb["label"] == "CTCF Peaks")]
