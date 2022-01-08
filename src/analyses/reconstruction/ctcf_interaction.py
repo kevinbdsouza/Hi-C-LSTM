@@ -5,6 +5,7 @@ import torch
 from analyses.classification.loops import Loops
 from analyses.classification.downstream_helper import DownstreamHelper
 from training.data_utils import get_cumpos
+from analyses.plot.plot_utils import plot_heatmaps
 
 pd.options.mode.chained_assignment = None
 device = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
@@ -38,15 +39,36 @@ class CTCF_Interactions():
 
         return loop_data
 
+    def plot_loops(self, pred_data, loop_data):
+        st = int(pred_data["i"].min())
+        pred_data["i"] = pred_data["i"] - st
+        pred_data["j"] = pred_data["j"] - st
+        nr = int(pred_data["j"].max()) + 1
+        rows = np.array(pred_data["i"]).astype(int)
+        cols = np.array(pred_data["j"]).astype(int)
+
+        hic_mat = np.zeros((nr, nr))
+        hic_mat[rows, cols] = np.array(pred_data["v"])
+        hic_upper = np.triu(hic_mat)
+        hic_mat[cols, rows] = np.array(pred_data["pred"])
+        hic_lower = np.tril(hic_mat)
+        hic_mat = hic_upper + hic_lower
+        hic_mat[np.diag_indices_from(hic_mat)] /= 2
+        # hic_win = hic_mat[6701:7440, 6701:7440]
+        # hic_win = hic_mat[900:1450, 900:1450]
+        pass
 
 if __name__ == '__main__':
-    test_chr = list(range(1, 2))
+    test_chr = list(range(21, 22))
     cfg = Config()
     cell = cfg.cell
     model_name = "shuffle_" + cell
 
     for chr in test_chr:
+        pred_data = pd.read_csv(cfg.output_directory + "shuffle_%s_predictions_chr%s.csv" % (cell, str(chr)), sep="\t")
         ctcf_ob_hic = CTCF_Interactions(cfg, chr, mode='test')
         loop_data = ctcf_ob_hic.get_loop_data()
+
+        ctcf_ob_hic.plot_loops(pred_data, loop_data)
 
 print("done")
