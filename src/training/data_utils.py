@@ -245,7 +245,8 @@ def get_data_loader_batch_chr(cfg):
 
 
 def save_processed_data(cfg, cell):
-    for chr in list(range(1, 23)):
+    chr_list = [6, 7, 8, 10, 11, 12, 14, 15, 16, 17, 18, 19, 20, 21, 22]
+    for chr in chr_list:
         idx, val, sample_idx = get_data(cfg, cell, chr)
 
         torch.save(idx, cfg.processed_data_dir + 'input_idx_chr' + str(chr) + '.pth')
