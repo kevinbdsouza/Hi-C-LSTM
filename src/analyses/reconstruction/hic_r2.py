@@ -80,11 +80,11 @@ if __name__ == '__main__':
     model_name = "shuffle_" + cell
 
     for chr in test_chr:
-        data_ob_hic = HiC_R2(cfg, chr, mode='test')
+        r2_ob_hic = HiC_R2(cfg, chr, mode='test')
         hic_predictions = pd.read_csv(cfg.output_directory + "shuffle_%s_predictions_chr%s.csv" % (cell, str(chr)),
                                       sep="\t")
         hic_predictions = hic_predictions.drop(['Unnamed: 0'], axis=1)
-        r2_frame = data_ob_hic.hic_r2(hic_predictions)
+        r2_frame = r2_ob_hic.hic_r2(hic_predictions)
         r2_frame.to_csv(cfg.output_directory + "r2frame_%s_chr%s.csv" % (cell, str(chr)), sep="\t")
 
 print("done")
