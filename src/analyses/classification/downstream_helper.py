@@ -25,8 +25,8 @@ class DownstreamHelper:
         self.chr = chr
         self.cell = cfg.cell
         self.start_ends = np.load(cfg.hic_path + cfg.start_end_file, allow_pickle=True).item()
-        self.start = self.start_ends["chr" + str(chr)]["start"] + get_cumpos(chr)
-        self.stop = self.start_ends["chr" + str(chr)]["stop"] + get_cumpos(chr)
+        self.start = self.start_ends["chr" + str(chr)]["start"] + get_cumpos(cfg, chr)
+        self.stop = self.start_ends["chr" + str(chr)]["stop"] + get_cumpos(cfg, chr)
         self.feature_columns = list(range(0, 16))
         self.chr_len = cfg.genome_len
         self.num_subc = 5
@@ -328,7 +328,7 @@ class DownstreamHelper:
         return r_squared_test
 
     def add_cum_pos(self, frame, mode):
-        cum_pos = get_cumpos(self.chr)
+        cum_pos = get_cumpos(self.cfg, self.chr)
 
         if mode == "ends":
             pos_columns = ["start", "end"]

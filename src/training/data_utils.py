@@ -10,7 +10,7 @@ import matplotlib
 matplotlib.use('pdf')
 
 
-def get_cumpos(chr_num):
+def get_cumpos(cfg, chr_num):
     sizes = np.load(cfg.hic_path + cfg.sizes_file, allow_pickle=True).item()
     if chr_num == 1:
         cum_pos = 0
