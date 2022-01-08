@@ -23,7 +23,7 @@ class CTCF_Interactions():
         self.sizes = np.load(self.sizes_path, allow_pickle=True).item()
         self.start_end_path = self.cfg.hic_path + self.cfg.start_end_file
         self.start_ends = np.load(self.start_end_path, allow_pickle=True).item()
-        self.downstream_helper_ob = DownstreamHelper(cfg, chr, mode="lstm")
+        self.downstream_helper_ob = DownstreamHelper(cfg, chr, mode="other")
 
     def get_loop_data(self):
         loop_ob = Loops(cfg, cell, chr)
