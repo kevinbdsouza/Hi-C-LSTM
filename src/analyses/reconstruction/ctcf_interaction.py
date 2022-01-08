@@ -28,7 +28,7 @@ class CTCF_Interactions():
     def get_loop_data(self):
         loop_ob = Loops(cfg, cell, chr)
         loop_data = loop_ob.get_loop_data()
-        cum_pos = get_cumpos(self.chr)
+        cum_pos = get_cumpos(self.cfg, self.chr)
 
         col_list = ['x1', 'x2', 'y1', 'y2']
 
