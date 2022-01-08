@@ -5,7 +5,7 @@ import torch
 from analyses.classification.loops import Loops
 from analyses.classification.downstream_helper import DownstreamHelper
 from training.data_utils import get_cumpos
-from analyses.plot.plot_utils import plot_heatmaps
+from analyses.plot.plot_utils import simple_plot
 
 pd.options.mode.chained_assignment = None
 device = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
@@ -43,6 +43,10 @@ class CTCF_Interactions():
         st = int(pred_data["i"].min())
         pred_data["i"] = pred_data["i"] - st
         pred_data["j"] = pred_data["j"] - st
+        loop_data["x1"] = loop_data["x1"] - st
+        loop_data["x2"] = loop_data["x2"] - st
+        loop_data["y1"] = loop_data["y1"] - st
+        loop_data["y2"] = loop_data["y2"] - st
         nr = int(pred_data["j"].max()) + 1
         rows = np.array(pred_data["i"]).astype(int)
         cols = np.array(pred_data["j"]).astype(int)
@@ -54,9 +58,14 @@ class CTCF_Interactions():
         hic_lower = np.tril(hic_mat)
         hic_mat = hic_upper + hic_lower
         hic_mat[np.diag_indices_from(hic_mat)] /= 2
+        for i in range(len(loop_data)):
+            hic_win = hic_mat[loop_data[i, "x1"]:loop_data[i, "x2"], loop_data[i, "y1"]:loop_data[i, "y2"]]
+            simple_plot(hic_win)
+            print("here")
         # hic_win = hic_mat[6701:7440, 6701:7440]
         # hic_win = hic_mat[900:1450, 900:1450]
         pass
+
 
 if __name__ == '__main__':
     test_chr = list(range(21, 22))
