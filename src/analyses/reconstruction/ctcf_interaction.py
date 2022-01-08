@@ -58,13 +58,11 @@ class CTCF_Interactions():
         hic_lower = np.tril(hic_mat)
         hic_mat = hic_upper + hic_lower
         hic_mat[np.diag_indices_from(hic_mat)] /= 2
+        loop_mat = np.zeros((5, 5))
         for i in range(len(loop_data)):
             hic_win = hic_mat[loop_data.iloc[i, "x1"]:loop_data.iloc[i, "x2"],
                       loop_data.iloc[i, "y1"]:loop_data.iloc[i, "y2"]]
-            simple_plot(hic_win)
-            print("here")
-        # hic_win = hic_mat[6701:7440, 6701:7440]
-        # hic_win = hic_mat[900:1450, 900:1450]
+
         pass
 
 

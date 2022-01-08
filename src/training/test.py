@@ -243,8 +243,8 @@ print("done")
 
 #np.save("/home/kevindsouza/Documents/projects/hic_lstm/data/ig_log_df_comb.npy", ig_log_df_comb3)
 
-embed_rows = np.load("/home/kevindsouza/Documents/projects/hic_lstm/src/saved_model/model_lstm/new_run/embed_rows_test.npy")
-embed_rows_exp = np.load("/home/kevindsouza/Documents/projects/hic_lstm/src/saved_model/model_lstm/exp_run/embed_rows_test.npy")
+#embed_rows = np.load("/home/kevindsouza/Documents/projects/hic_lstm/src/saved_model/model_lstm/new_run/embed_rows_test.npy")
+#embed_rows_exp = np.load("/home/kevindsouza/Documents/projects/hic_lstm/src/saved_model/model_lstm/exp_run/embed_rows_test.npy")
 
 import random
 #window_hic = hic_mat.loc[4250:4270, 4250:4270]
@@ -373,3 +373,11 @@ pred_win = compare_hic.loc[261:281,261:281]
 rad = np.array(pred_win) + np.array(-rad_hic)
 rad[(rad > 1)] = 1
 '''
+
+loop_mat = np.zeros((5, 5))
+sns.set_theme()
+ax = sns.heatmap(loop_mat, cmap="Reds")
+ax.set_yticks([])
+ax.set_xticks([])
+plt.show()
+print("done")
