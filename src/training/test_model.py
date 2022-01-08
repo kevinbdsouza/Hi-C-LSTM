@@ -19,7 +19,7 @@ def test_model(model, cfg, cell, chr):
 
 if __name__ == '__main__':
     # test_chr = list(range(1, 11))
-    test_chr = list(range(15, 23))
+    test_chr = list(range(21, 23))
     # test_chr = [21]
     cfg = config.Config()
     cell = cfg.cell
