@@ -59,7 +59,7 @@ class CTCF_Interactions():
         hic_mat = hic_upper + hic_lower
         hic_mat[np.diag_indices_from(hic_mat)] /= 2
         for i in range(len(loop_data)):
-            hic_win = hic_mat[loop_data[i, "x1"]:loop_data[i, "x2"], loop_data[i, "y1"]:loop_data[i, "y2"]]
+            hic_win = hic_mat[loop_data[i]["x1"]:loop_data[i]["x2"], loop_data[i]["y1"]:loop_data[i]["y2"]]
             simple_plot(hic_win)
             print("here")
         # hic_win = hic_mat[6701:7440, 6701:7440]
