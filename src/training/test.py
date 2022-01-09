@@ -374,10 +374,16 @@ rad = np.array(pred_win) + np.array(-rad_hic)
 rad[(rad > 1)] = 1
 '''
 
+'''
 loop_mat = np.zeros((5, 5))
 sns.set_theme()
 ax = sns.heatmap(loop_mat, cmap="Reds")
 ax.set_yticks([])
 ax.set_xticks([])
 plt.show()
+print("done")
+'''
+
+file_name = "/data2/hic_lstm/data/HEK239T/GSE77142_8619_5CYoung-HEK239T-WT-R1.matrix"
+hek_hic = pd.read_csv(file_name, sep="\t",)
 print("done")
