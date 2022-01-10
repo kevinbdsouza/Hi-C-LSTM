@@ -384,6 +384,19 @@ plt.show()
 print("done")
 '''
 
+'''
 file_name = "/data2/hic_lstm/data/HEK239T/GSE77142_8619_5CYoung-HEK239T-WT-R1.matrix"
-hek_hic = pd.read_csv(file_name, sep="\t",)
+hek_hic = pd.read_csv(file_name, sep="\t")
+print("done")
+'''
+
+
+ig_log_df = pd.DataFrame(np.load("/data2/hic_lstm/downstream/predictions/" + "ig_log_df_all.npy", allow_pickle=True))
+ig_log_df = ig_log_df.rename(columns={0: "ig_val", 1: "label"})
+ig_log_df["ig_val"] = ig_log_df["ig_val"].astype(float)
+
+tf_df = pd.DataFrame(np.load("/data2/hic_lstm/downstream/predictions/" + "ig_tf_dfs.npy", allow_pickle=True))
+tf_df = tf_df.rename(columns={0: "ig_val", 1: "label"})
+tf_df["ig_val"] = tf_df["ig_val"].astype(float)
+
 print("done")
