@@ -177,7 +177,7 @@ class PlotFns:
         h1_values_all_tasks = np.load(self.path + "h1_values_all_tasks.npy")
         hff_values_all_tasks = np.load(self.path + "hff_values_all_tasks.npy")
         wtc_values_all_tasks = np.load(self.path + "wtc_values_all_tasks.npy")
-        gmlow_values_all_tasks = hff_values_all_tasks + 0.01
+        gmlow_values_all_tasks = np.load(self.path + "gmlow_values_all_tasks.npy")
 
         df_main = pd.DataFrame(columns=["Tasks", "GM12878 (Rao 2014)", "H1hESC (Dekker 4DN)", "WTC11 (Dekker 4DN)",
                                         "GM12878 (low - Aiden 4DN)", "HFFhTERT (Dekker 4DN)"])
@@ -763,8 +763,8 @@ if __name__ == "__main__":
     cfg = config.Config()
     plot_ob = PlotFns(cfg)
 
-    # plot_ob.plot_combined(cell = "H1hESC")
-    plot_ob.plot_mAP_celltypes()
+    plot_ob.plot_combined(cell = "H1hESC")
+    # plot_ob.plot_mAP_celltypes()
     # plot_ob.plot_auroc_celltypes()
     # plot_ob.plot_auroc()
 
