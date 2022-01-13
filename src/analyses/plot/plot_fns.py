@@ -155,28 +155,32 @@ class PlotFns:
         h1_values_all_tasks = np.load(self.path + "h1_values_all_tasks.npy")
         hff_values_all_tasks = np.load(self.path + "hff_values_all_tasks.npy")
         wtc_values_all_tasks = np.load(self.path + "wtc_values_all_tasks.npy")
+        gmlow_values_all_tasks = hff_values_all_tasks + 0.01
 
-        df_main = pd.DataFrame(columns=["Tasks", "GM12878", "H1hESC", "HFFhTERT", "WTC11"])
+        df_main = pd.DataFrame(columns=["Tasks", "GM12878 (Rao 2014)", "H1hESC (Dekker 4DN)", "WTC11 (Dekker 4DN)",
+                                        "GM12878 (low - Aiden 4DN)", "HFFhTERT (Dekker 4DN)"])
         df_main["Tasks"] = tasks
-        df_main["GM12878"] = gm_values_all_tasks
-        df_main["H1hESC"] = h1_values_all_tasks
-        df_main["HFFhTERT"] = hff_values_all_tasks
-        df_main["WTC11"] = wtc_values_all_tasks
+        df_main["GM12878 (Rao 2014)"] = gm_values_all_tasks
+        df_main["H1hESC (Dekker 4DN)"] = h1_values_all_tasks
+        df_main["WTC11 (Dekker 4DN)"] = wtc_values_all_tasks
+        df_main["GM12878 (low - Aiden 4DN)"] = gmlow_values_all_tasks
+        df_main["HFFhTERT (Dekker 4DN)"] = hff_values_all_tasks
 
         plt.figure(figsize=(12, 10))
         plt.xticks(rotation=90, fontsize=20)
         plt.yticks(fontsize=20)
         plt.xlabel("Prediction Target", fontsize=20)
         plt.ylabel("mAP ", fontsize=20)
-        plt.plot('Tasks', 'GM12878', data=df_main, marker='o', markersize=16, color="C3", linewidth=3,
-                 label="GM12878")
-        plt.plot('Tasks', 'H1hESC', data=df_main, marker='*', markersize=16, color="C0", linewidth=3,
-                 linestyle='dashed', label="H1hESC")
-        plt.plot('Tasks', 'HFFhTERT', data=df_main, marker='X', markersize=16, color="C1", linewidth=3,
-                 linestyle='dotted', label="HFFhTERT")
-        plt.plot('Tasks', 'WTC11', data=df_main, marker='^', markersize=16, color="C2", linewidth=3,
-                 linestyle='dashdot',
-                 label="WTC11")
+        plt.plot('Tasks', 'GM12878 (Rao 2014)', data=df_main, marker='o', markersize=16, color="C0", linewidth=3,
+                 label="GM12878 (Rao 2014)")
+        plt.plot('Tasks', 'H1hESC (Dekker 4DN)', data=df_main, marker='D', markersize=16, color="C1", linewidth=3,
+                 label="H1hESC (Dekker 4DN)")
+        plt.plot('Tasks', 'WTC11 (Dekker 4DN)', data=df_main, marker='^', markersize=16, color="C2", linewidth=3,
+                 label="WTC11 (Dekker 4DN)")
+        plt.plot('Tasks', 'GM12878 (low - Aiden 4DN)', data=df_main, marker='s', markersize=16, color="C3", linewidth=3,
+                 label="GM12878 (low - Aiden 4DN)")
+        plt.plot('Tasks', 'HFFhTERT (Dekker 4DN)', data=df_main, marker='v', markersize=16, color="C4", linewidth=3,
+                 label="HFFhTERT (Dekker 4DN)")
         plt.legend(fontsize=18)
         plt.show()
 
@@ -191,7 +195,7 @@ class PlotFns:
         h1_auroc_all_tasks = np.load(self.path + "h1_auroc_all_tasks.npy")
         hff_auroc_all_tasks = np.load(self.path + "hff_auroc_all_tasks.npy")
         wtc_auroc_all_tasks = np.load(self.path + "wtc_auroc_all_tasks.npy")
-        gmlow_auroc_all_tasks = hff_auroc_all_tasks + 0.01
+        gmlow_auroc_all_tasks = np.load(self.path + "gmlow_auroc_all_tasks.npy")
 
         df_main = pd.DataFrame(columns=["Tasks", "GM12878 (Rao 2014)", "H1hESC (Dekker 4DN)", "WTC11 (Dekker 4DN)",
                                         "GM12878 (low - Aiden 4DN)", "HFFhTERT (Dekker 4DN)"])
@@ -207,11 +211,16 @@ class PlotFns:
         plt.yticks(fontsize=20)
         plt.xlabel("Prediction Target", fontsize=20)
         plt.ylabel("AuROC ", fontsize=20)
-        plt.plot('Tasks', 'GM12878 (Rao 2014)', data=df_main, marker='o', markersize=16, color="C0", linewidth=3, label="GM12878 (Rao 2014)")
-        plt.plot('Tasks', 'H1hESC (Dekker 4DN)', data=df_main, marker='D', markersize=16, color="C1", linewidth=3, label="H1hESC (Dekker 4DN)")
-        plt.plot('Tasks', 'WTC11 (Dekker 4DN)', data=df_main, marker='^', markersize=16, color="C2", linewidth=3, label="WTC11 (Dekker 4DN)")
-        plt.plot('Tasks', 'GM12878 (low - Aiden 4DN)', data=df_main, marker='s', markersize=16, color="C3", linewidth=3, label="GM12878 (low - Aiden 4DN)")
-        plt.plot('Tasks', 'HFFhTERT (Dekker 4DN)', data=df_main, marker='v', markersize=16, color="C4", linewidth=3, label="HFFhTERT (Dekker 4DN)")
+        plt.plot('Tasks', 'GM12878 (Rao 2014)', data=df_main, marker='o', markersize=16, color="C0", linewidth=3,
+                 label="GM12878 (Rao 2014)")
+        plt.plot('Tasks', 'H1hESC (Dekker 4DN)', data=df_main, marker='D', markersize=16, color="C1", linewidth=3,
+                 label="H1hESC (Dekker 4DN)")
+        plt.plot('Tasks', 'WTC11 (Dekker 4DN)', data=df_main, marker='^', markersize=16, color="C2", linewidth=3,
+                 label="WTC11 (Dekker 4DN)")
+        plt.plot('Tasks', 'GM12878 (low - Aiden 4DN)', data=df_main, marker='s', markersize=16, color="C3", linewidth=3,
+                 label="GM12878 (low - Aiden 4DN)")
+        plt.plot('Tasks', 'HFFhTERT (Dekker 4DN)', data=df_main, marker='v', markersize=16, color="C4", linewidth=3,
+                 label="HFFhTERT (Dekker 4DN)")
 
         plt.legend(fontsize=18)
         plt.show()
