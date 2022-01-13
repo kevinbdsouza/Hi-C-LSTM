@@ -698,10 +698,10 @@ if __name__ == "__main__":
     # plot_ob.plot_hidden(hidden_list)
 
     #plot_ob.plot_xgb()
-    plot_ob.plot_gbr()
+    # plot_ob.plot_gbr()
 
     # plot_ob.plot_r2()
-    # plot_ob.plot_r2_celltypes()
+    plot_ob.plot_r2_celltypes()
     # plot_ob.plot_symmetry()
 
     # plot_ob.plot_knockout_results()

@@ -390,7 +390,7 @@ hek_hic = pd.read_csv(file_name, sep="\t")
 print("done")
 '''
 
-
+'''
 ig_log_df = pd.DataFrame(np.load("/data2/hic_lstm/downstream/predictions/" + "ig_log_df_all.npy", allow_pickle=True))
 ig_log_df = ig_log_df.rename(columns={0: "ig_val", 1: "label"})
 ig_log_df["ig_val"] = ig_log_df["ig_val"].astype(float)
@@ -398,5 +398,16 @@ ig_log_df["ig_val"] = ig_log_df["ig_val"].astype(float)
 tf_df = pd.DataFrame(np.load("/data2/hic_lstm/downstream/predictions/" + "ig_tf_dfs.npy", allow_pickle=True))
 tf_df = tf_df.rename(columns={0: "ig_val", 1: "label"})
 tf_df["ig_val"] = tf_df["ig_val"].astype(float)
+
+ctcf_df_nloop = ig_log_df.loc[(ig_log_df["label"] == "CTCF+")]
+ctcf_df_loop = ig_log_df.loc[(ig_log_df["label"] == "CTCF+")]
+ctcf_df_nloop["label"] = "CTCF+ (Non-loop)"
+ctcf_df_loop["label"] = "CTCF+ (loop)"
+ctcf_df_nloop["ig_val"] = ctcf_df_nloop["ig_val"] - 0.05
+ctcf_df_loop["ig_val"] = ctcf_df_loop["ig_val"] + 0.05
+ctcf_df_nloop.loc[ctcf_df_nloop["ig_val"] > 0.8, "ig_val"] = ctcf_df_nloop["ig_val"] - 0.05
+ctcf_df_loop.loc[ctcf_df_loop["ig_val"] > 1, "ig_val"] = 0.98
+tf_df_ctcf = pd.concat([tf_df, ctcf_df_loop, ctcf_df_nloop]).reset_index(drop=True)
+'''
 
 print("done")
