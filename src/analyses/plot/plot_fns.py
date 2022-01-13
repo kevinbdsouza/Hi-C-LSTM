@@ -6,7 +6,6 @@ import pandas as pd
 import seaborn as sns
 import training.config as config
 
-
 logger = logging.getLogger(__name__)
 
 
@@ -175,7 +174,8 @@ class PlotFns:
                  linestyle='dashed', label="H1hESC")
         plt.plot('Tasks', 'HFFhTERT', data=df_main, marker='X', markersize=16, color="C1", linewidth=3,
                  linestyle='dotted', label="HFFhTERT")
-        plt.plot('Tasks', 'WTC11', data=df_main, marker='^', markersize=16, color="C2", linewidth=3, linestyle='dashdot',
+        plt.plot('Tasks', 'WTC11', data=df_main, marker='^', markersize=16, color="C2", linewidth=3,
+                 linestyle='dashdot',
                  label="WTC11")
         plt.legend(fontsize=18)
         plt.show()
@@ -410,12 +410,54 @@ class PlotFns:
         r1_hiclstm_h1 = np.load(self.path + "r1_hiclstm_h1.npy")
         r1_hiclstm_hff = np.load(self.path + "r1_hiclstm_hff.npy")
         r1_hiclstm_wtc = np.load(self.path + "r1_hiclstm_wtc.npy")
+        r1_hiclstm_gmlow = np.load(self.path + "r1_hiclstm_gmlow.npy")
 
+        r2_hiclstm_gm = np.load(self.path + "lstm/" + "r2_hiclstm_lstm.npy")
+        r2_hiclstm_h1 = np.load(self.path + "lstm/" + "r2_sci_cnn.npy")
+        r2_hiclstm_hff = np.load(self.path + "lstm/" + "r2_sniper_cnn.npy")
+        r2_hiclstm_wtc = np.load(self.path + "lstm/" + "r2_sci_fc.npy")
+        r2_hiclstm_gmlow = np.load(self.path + "lstm/" + "r2_sniper_fc.npy")
+
+        fig, (ax1, ax2) = plt.subplots(1, 2, sharey=True, figsize=(14, 8))
+
+        ax1.plot(pos, r1_hiclstm_gm, marker='o', markersize=16, color='C0', linewidth=3, label='GM12878 (Rao 2014)')
+        ax1.plot(pos, r1_hiclstm_h1, marker='D', markersize=16, color='C1', linewidth=3, label='H1hESC (Dekker 4DN)')
+        ax1.plot(pos, r1_hiclstm_hff, marker='^', markersize=16, color='C2', linewidth=3, label='WTC11 (Dekker 4DN)')
+        ax1.plot(pos, r1_hiclstm_wtc, marker='s', markersize=16, color='C3', linewidth=3,
+                 label='GM12878 (low - Aiden 4DN)')
+        ax1.plot(pos, r1_hiclstm_gmlow, marker='v', markersize=16, color='C4', linewidth=3,
+                 label='HFFhTERT (Dekker 4DN)')
+
+        ax2.plot(pos, r2_hiclstm_gm, marker='o', markersize=16, color='C0', linewidth=3, label='GM12878 (Rao 2014)')
+        ax2.plot(pos, r2_hiclstm_h1, marker='D', markersize=16, color='C1', linewidth=3, label='H1hESC (Dekker 4DN)')
+        ax2.plot(pos, r2_hiclstm_hff, marker='^', markersize=16, color='C2', linewidth=3, label='WTC11 (Dekker 4DN)')
+        ax2.plot(pos, r2_hiclstm_wtc, marker='s', markersize=16, color='C3', linewidth=3,
+                 label='GM12878 (low - Aiden 4DN)')
+        ax2.plot(pos, r2_hiclstm_gmlow, marker='v', markersize=16, color='C4', linewidth=3,
+                 label='HFFhTERT (Dekker 4DN)')
+
+        ax1.tick_params(axis="x", labelsize=20, length=0)
+        ax2.tick_params(axis="x", labelsize=20, length=0)
+        ax1.tick_params(axis="y", labelsize=20)
+        ax1.set_xlabel('Distance between positions in Mbp', fontsize=20)
+        ax1.set_ylabel('R-squared for Replicate-1', fontsize=20)
+
+        ax2.set_xlabel('Distance between positions in Mbp', fontsize=20)
+        ax2.set_ylabel('R-squared for Replicate-2', fontsize=20)
+
+        handles, labels = ax1.get_legend_handles_labels()
+        fig.legend(handles, labels, loc='upper right', fontsize=18)
+
+        plt.show()
+
+        '''
         plt.figure(figsize=(10, 8))
-        plt.plot(pos, r1_hiclstm_gm, marker='', markersize=16, color='C0', linewidth=3, label='GM12878')
-        plt.plot(pos, r1_hiclstm_h1, marker='o', markersize=16, color='C1', linewidth=3, label='H1hESC')
-        plt.plot(pos, r1_hiclstm_hff, marker='^', markersize=16, color='C2', linewidth=3, label='HFFhTERT')
-        plt.plot(pos, r1_hiclstm_wtc, marker='v', markersize=16, color='C3', linewidth=3, label='WTC11')
+        plt.plot(pos, r1_hiclstm_gm, marker='', markersize=16, color='C0', linewidth=3, label='GM12878 (Rao 2014)')
+        plt.plot(pos, r1_hiclstm_h1, marker='o', markersize=16, color='C1', linewidth=3, label='H1hESC (Dekker 4DN)')
+        plt.plot(pos, r1_hiclstm_wtc, marker='v', markersize=16, color='C3', linewidth=3, label='WTC11 (Dekker 4DN)')
+        plt.plot(pos, r1_hiclstm_gmlow, marker='D', markersize=16, color='C4', linewidth=3,
+                 label='GM12878 (low - Aiden 4DN)')
+        plt.plot(pos, r1_hiclstm_hff, marker='^', markersize=16, color='C2', linewidth=3, label='HFFhTERT (Dekker 4DN)')
 
         plt.tick_params(axis="x", labelsize=20, length=0)
         plt.tick_params(axis="y", labelsize=20)
@@ -424,6 +466,7 @@ class PlotFns:
         plt.legend(loc='upper right', fontsize=20)
 
         plt.show()
+        '''
 
         pass
 
@@ -689,7 +732,7 @@ if __name__ == "__main__":
     cfg = config.Config()
     plot_ob = PlotFns(cfg)
 
-    #plot_ob.plot_combined()
+    # plot_ob.plot_combined()
     # plot_ob.plot_mAP_celltypes()
     # plot_ob.plot_auroc_celltypes()
     # plot_ob.plot_auroc()
@@ -697,7 +740,7 @@ if __name__ == "__main__":
     # hidden_list = [4, 8, 16, 32, 64, 128]
     # plot_ob.plot_hidden(hidden_list)
 
-    #plot_ob.plot_xgb()
+    # plot_ob.plot_xgb()
     # plot_ob.plot_gbr()
 
     # plot_ob.plot_r2()
@@ -708,6 +751,6 @@ if __name__ == "__main__":
     # plot_ob.pr_curves()
 
     # plot_ob.plot_feature_signal()
-    #plot_ob.plot_pred_range()
+    # plot_ob.plot_pred_range()
 
     print("done")
