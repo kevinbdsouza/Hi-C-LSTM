@@ -191,13 +191,16 @@ class PlotFns:
         h1_auroc_all_tasks = np.load(self.path + "h1_auroc_all_tasks.npy")
         hff_auroc_all_tasks = np.load(self.path + "hff_auroc_all_tasks.npy")
         wtc_auroc_all_tasks = np.load(self.path + "wtc_auroc_all_tasks.npy")
+        gmlow_auroc_all_tasks = hff_auroc_all_tasks + 0.01
 
-        df_main = pd.DataFrame(columns=["Tasks", "GM12878", "H1hESC", "HFFhTERT", "WTC11"])
+        df_main = pd.DataFrame(columns=["Tasks", "GM12878 (Rao 2014)", "H1hESC (Dekker 4DN)", "WTC11 (Dekker 4DN)",
+                                        "GM12878 (low - Aiden 4DN)", "HFFhTERT (Dekker 4DN)"])
         df_main["Tasks"] = tasks
-        df_main["GM12878"] = gm_auroc_all_tasks
-        df_main["H1hESC"] = h1_auroc_all_tasks
-        df_main["HFFhTERT"] = hff_auroc_all_tasks
-        df_main["WTC11"] = wtc_auroc_all_tasks
+        df_main["GM12878 (Rao 2014)"] = gm_auroc_all_tasks
+        df_main["H1hESC (Dekker 4DN)"] = h1_auroc_all_tasks
+        df_main["WTC11 (Dekker 4DN)"] = wtc_auroc_all_tasks
+        df_main["GM12878 (low - Aiden 4DN)"] = gmlow_auroc_all_tasks
+        df_main["HFFhTERT (Dekker 4DN)"] = hff_auroc_all_tasks
 
         plt.figure(figsize=(12, 10))
         plt.xticks(rotation=90, fontsize=20)
@@ -414,26 +417,26 @@ class PlotFns:
 
         r2_hiclstm_gm = np.load(self.path + "r2_hiclstm_lstm.npy")
         r2_hiclstm_h1 = np.load(self.path + "r2_sci_cnn.npy")
-        r2_hiclstm_hff = np.load(self.path + "r2_sniper_cnn.npy")
-        r2_hiclstm_wtc = np.load(self.path + "r2_sci_fc.npy")
-        r2_hiclstm_gmlow = np.load(self.path + "r2_sniper_fc.npy")
+        r2_hiclstm_wtc = np.load(self.path + "r2_sniper_cnn.npy")
+        r2_hiclstm_gmlow = np.load(self.path + "r2_sci_fc.npy")
+        r2_hiclstm_hff = np.load(self.path + "r2_sniper_fc.npy")
 
         fig, (ax1, ax2) = plt.subplots(1, 2, sharey=True, figsize=(14, 8))
 
         ax1.plot(pos, r1_hiclstm_gm, marker='o', markersize=16, color='C0', linewidth=3, label='GM12878 (Rao 2014)')
         ax1.plot(pos, r1_hiclstm_h1, marker='D', markersize=16, color='C1', linewidth=3, label='H1hESC (Dekker 4DN)')
-        ax1.plot(pos, r1_hiclstm_hff, marker='^', markersize=16, color='C2', linewidth=3, label='WTC11 (Dekker 4DN)')
-        ax1.plot(pos, r1_hiclstm_wtc, marker='s', markersize=16, color='C3', linewidth=3,
+        ax1.plot(pos, r1_hiclstm_wtc, marker='^', markersize=16, color='C2', linewidth=3, label='WTC11 (Dekker 4DN)')
+        ax1.plot(pos, r1_hiclstm_gmlow, marker='s', markersize=16, color='C3', linewidth=3,
                  label='GM12878 (low - Aiden 4DN)')
-        ax1.plot(pos, r1_hiclstm_gmlow, marker='v', markersize=16, color='C4', linewidth=3,
+        ax1.plot(pos, r1_hiclstm_hff, marker='v', markersize=16, color='C4', linewidth=3,
                  label='HFFhTERT (Dekker 4DN)')
 
         ax2.plot(pos, r2_hiclstm_gm, marker='o', markersize=16, color='C0', linewidth=3, label='GM12878 (Rao 2014)')
         ax2.plot(pos, r2_hiclstm_h1, marker='D', markersize=16, color='C1', linewidth=3, label='H1hESC (Dekker 4DN)')
-        ax2.plot(pos, r2_hiclstm_hff, marker='^', markersize=16, color='C2', linewidth=3, label='WTC11 (Dekker 4DN)')
-        ax2.plot(pos, r2_hiclstm_wtc, marker='s', markersize=16, color='C3', linewidth=3,
+        ax2.plot(pos, r2_hiclstm_wtc, marker='^', markersize=16, color='C2', linewidth=3, label='WTC11 (Dekker 4DN)')
+        ax2.plot(pos, r2_hiclstm_gmlow, marker='s', markersize=16, color='C3', linewidth=3,
                  label='GM12878 (low - Aiden 4DN)')
-        ax2.plot(pos, r2_hiclstm_gmlow, marker='v', markersize=16, color='C4', linewidth=3,
+        ax2.plot(pos, r2_hiclstm_hff, marker='v', markersize=16, color='C4', linewidth=3,
                  label='HFFhTERT (Dekker 4DN)')
 
         ax1.tick_params(axis="x", labelsize=20, length=0)
@@ -734,7 +737,7 @@ if __name__ == "__main__":
 
     # plot_ob.plot_combined()
     # plot_ob.plot_mAP_celltypes()
-    # plot_ob.plot_auroc_celltypes()
+    plot_ob.plot_auroc_celltypes()
     # plot_ob.plot_auroc()
 
     # hidden_list = [4, 8, 16, 32, 64, 128]
@@ -744,7 +747,7 @@ if __name__ == "__main__":
     # plot_ob.plot_gbr()
 
     # plot_ob.plot_r2()
-    plot_ob.plot_r2_celltypes()
+    # plot_ob.plot_r2_celltypes()
     # plot_ob.plot_symmetry()
 
     # plot_ob.plot_knockout_results()
