@@ -412,11 +412,11 @@ class PlotFns:
         r1_hiclstm_wtc = np.load(self.path + "r1_hiclstm_wtc.npy")
         r1_hiclstm_gmlow = np.load(self.path + "r1_hiclstm_gmlow.npy")
 
-        r2_hiclstm_gm = np.load(self.path + "lstm/" + "r2_hiclstm_lstm.npy")
-        r2_hiclstm_h1 = np.load(self.path + "lstm/" + "r2_sci_cnn.npy")
-        r2_hiclstm_hff = np.load(self.path + "lstm/" + "r2_sniper_cnn.npy")
-        r2_hiclstm_wtc = np.load(self.path + "lstm/" + "r2_sci_fc.npy")
-        r2_hiclstm_gmlow = np.load(self.path + "lstm/" + "r2_sniper_fc.npy")
+        r2_hiclstm_gm = np.load(self.path + "r2_hiclstm_lstm.npy")
+        r2_hiclstm_h1 = np.load(self.path + "r2_sci_cnn.npy")
+        r2_hiclstm_hff = np.load(self.path + "r2_sniper_cnn.npy")
+        r2_hiclstm_wtc = np.load(self.path + "r2_sci_fc.npy")
+        r2_hiclstm_gmlow = np.load(self.path + "r2_sniper_fc.npy")
 
         fig, (ax1, ax2) = plt.subplots(1, 2, sharey=True, figsize=(14, 8))
 
