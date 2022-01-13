@@ -102,17 +102,39 @@ class PlotFns:
 
         return value_list_other
 
-    def plot_combined(self):
+    def plot_combined(self, cell):
         tasks = ["Gene Expression", "Replication Timing", "Enhancers", "TSS", "PE-Interactions", "FIREs",
                  "Non-loop Domains",
                  "Loop Domains", "Subcompartments"]
 
-        lstm_values_all_tasks = np.load(self.path + "lstm/" + "lstm_values_all_tasks.npy")
-        sniper_intra_values_all_tasks = np.load(self.path + "lstm/" + "sniper_intra_values_all_tasks.npy")
-        sniper_inter_values_all_tasks = np.load(self.path + "lstm/" + "sniper_inter_values_all_tasks.npy")
-        graph_values_all_tasks = np.load(self.path + "lstm/" + "graph_values_all_tasks.npy")
-        pca_values_all_tasks = np.load(self.path + "lstm/" + "pca_values_all_tasks.npy")
-        sbcid_values_all_tasks = np.load(self.path + "lstm/" + "sbcid_values_all_tasks.npy")
+        if cell == "GM12878":
+            lstm_values_all_tasks = np.load(self.path + "lstm/" + "lstm_values_all_tasks.npy")
+            sniper_intra_values_all_tasks = np.load(self.path + "lstm/" + "sniper_intra_values_all_tasks.npy")
+            sniper_inter_values_all_tasks = np.load(self.path + "lstm/" + "sniper_inter_values_all_tasks.npy")
+            graph_values_all_tasks = np.load(self.path + "lstm/" + "graph_values_all_tasks.npy")
+            pca_values_all_tasks = np.load(self.path + "lstm/" + "pca_values_all_tasks.npy")
+            sbcid_values_all_tasks = np.load(self.path + "lstm/" + "sbcid_values_all_tasks.npy")
+        if cell == "H1hESC":
+            lstm_values_all_tasks = np.load(self.path + "h1_values_all_tasks.npy")
+            sniper_intra_values_all_tasks = np.load(self.path + "sniper_intra_values_all_tasks.npy")
+            sniper_inter_values_all_tasks = np.load(self.path + "sniper_inter_values_all_tasks.npy")
+            graph_values_all_tasks = np.load(self.path + "graph_values_all_tasks.npy")
+            pca_values_all_tasks = np.load(self.path + "pca_values_all_tasks.npy")
+            sbcid_values_all_tasks = np.load(self.path + "sbcid_values_all_tasks.npy")
+        if cell == "HFFhTERT":
+            lstm_values_all_tasks = np.load(self.path + "hff_values_all_tasks.npy")
+            sniper_intra_values_all_tasks = np.load(self.path + "sniper_intra_values_all_tasks.npy")
+            sniper_inter_values_all_tasks = np.load(self.path + "sniper_inter_values_all_tasks.npy")
+            graph_values_all_tasks = np.load(self.path + "graph_values_all_tasks.npy")
+            pca_values_all_tasks = np.load(self.path + "pca_values_all_tasks.npy")
+            sbcid_values_all_tasks = np.load(self.path + "sbcid_values_all_tasks.npy")
+        if cell == "WTC11":
+            lstm_values_all_tasks = np.load(self.path + "wtc_values_all_tasks.npy")
+            sniper_intra_values_all_tasks = np.load(self.path + "sniper_intra_values_all_tasks.npy")
+            sniper_inter_values_all_tasks = np.load(self.path + "sniper_inter_values_all_tasks.npy")
+            graph_values_all_tasks = np.load(self.path + "graph_values_all_tasks.npy")
+            pca_values_all_tasks = np.load(self.path + "pca_values_all_tasks.npy")
+            sbcid_values_all_tasks = np.load(self.path + "sbcid_values_all_tasks.npy")
 
         df_main = pd.DataFrame(columns=["Tasks", "Hi-C-LSTM", "SNIPER-INTRA", "SNIPER-INTER", "SCI", "PCA", "SBCID"])
         df_main["Tasks"] = tasks
@@ -741,8 +763,8 @@ if __name__ == "__main__":
     cfg = config.Config()
     plot_ob = PlotFns(cfg)
 
-    # plot_ob.plot_combined()
-    plot_ob.plot_mAP_celltypes()
+    # plot_ob.plot_combined(cell = "H1hESC")
+    # plot_ob.plot_mAP_celltypes()
     # plot_ob.plot_auroc_celltypes()
     # plot_ob.plot_auroc()
 
