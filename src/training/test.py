@@ -234,40 +234,41 @@ plt.show()
 '''
 
 print("done")
-#ctcf_df = ig_log_df_comb.loc[(ig_log_df_comb["label"] == "CTCF Peaks")]
-#ig_log_df_comb3 = pd.concat([ig_log_df_comb2, domain_df]).reset_index(drop=True)
+# ctcf_df = ig_log_df_comb.loc[(ig_log_df_comb["label"] == "CTCF Peaks")]
+# ig_log_df_comb3 = pd.concat([ig_log_df_comb2, domain_df]).reset_index(drop=True)
 
-#domain_df = pd.DataFrame(np.load("/home/kevindsouza/Documents/projects/hic_lstm/data/ig_log_df_domain.npy"))
-#domain_df = domain_df.rename(columns={0: "ig_val", 1: "label"})
-#domain_df["ig_val"] = domain_df["ig_val"].astype(float)
+# domain_df = pd.DataFrame(np.load("/home/kevindsouza/Documents/projects/hic_lstm/data/ig_log_df_domain.npy"))
+# domain_df = domain_df.rename(columns={0: "ig_val", 1: "label"})
+# domain_df["ig_val"] = domain_df["ig_val"].astype(float)
 
-#np.save("/home/kevindsouza/Documents/projects/hic_lstm/data/ig_log_df_comb.npy", ig_log_df_comb3)
+# np.save("/home/kevindsouza/Documents/projects/hic_lstm/data/ig_log_df_comb.npy", ig_log_df_comb3)
 
-#embed_rows = np.load("/home/kevindsouza/Documents/projects/hic_lstm/src/saved_model/model_lstm/new_run/embed_rows_test.npy")
-#embed_rows_exp = np.load("/home/kevindsouza/Documents/projects/hic_lstm/src/saved_model/model_lstm/exp_run/embed_rows_test.npy")
+# embed_rows = np.load("/home/kevindsouza/Documents/projects/hic_lstm/src/saved_model/model_lstm/new_run/embed_rows_test.npy")
+# embed_rows_exp = np.load("/home/kevindsouza/Documents/projects/hic_lstm/src/saved_model/model_lstm/exp_run/embed_rows_test.npy")
 
 import random
-#window_hic = hic_mat.loc[4250:4270, 4250:4270]
-#ctcfko_hic = window_hic - 0.15
-#a = list(ctcfko_hic.shape)
-#ctcfko_hic = ctcfko_hic + 0.01*np.random.rand(a[0], a[1])
-#radko_hic = radko_hic + 0.05*np.random.rand(a[0], a[1])
-#ctcfko_hic[(ctcfko_hic > 1)] = 1
-#radko_hic.loc[4256:4264,:] = ctcfko_hic.loc[4256:4264,:]
-#ctcfdiff = window_hic - ctcfko_hic
-#raddiff = window_hic - radko_hic
 
-#radhic = np.load("/data2/hic_lstm/data/GM12878/21/radko_window_hic.npy")
-#og_hic = window_hic.loc[4250:4270,4250:4270]
-#ctcf_diff = og_hic - ctcfhic
-#rad_diff = og_hic - radhic
-#ctcf_diff.loc[4256:4264, 4256:4264] = ctcf_diff.loc[4256:4264, 4256:4264] + 0.05
-#rad_diff.loc[4256:4270, 4250:4255] = rad_diff.loc[4256:4270, 4250:4255] - 0.05
-#rad_diff.loc[4256:4270, 4265:4270] = rad_diff.loc[4256:4270, 4265:4270] - 0.05
-#ctcf_diff.loc[4265:4270, 4256:4264] = ctcf_diff.loc[4265:4270, 4256:4264] - 0.05
-#rad_diff.loc[4265:4270, 4250:4255] = rad_diff.loc[4265:4270, 4250:4255] + 0.04
-#rad_diff = np.tril(rad_diff) + np.triu(rad_diff.T, 1)
-#np.save("/data2/hic_lstm/data/GM12878/21/ctcf_diff_hic.npy", ctcf_diff)
+# window_hic = hic_mat.loc[4250:4270, 4250:4270]
+# ctcfko_hic = window_hic - 0.15
+# a = list(ctcfko_hic.shape)
+# ctcfko_hic = ctcfko_hic + 0.01*np.random.rand(a[0], a[1])
+# radko_hic = radko_hic + 0.05*np.random.rand(a[0], a[1])
+# ctcfko_hic[(ctcfko_hic > 1)] = 1
+# radko_hic.loc[4256:4264,:] = ctcfko_hic.loc[4256:4264,:]
+# ctcfdiff = window_hic - ctcfko_hic
+# raddiff = window_hic - radko_hic
+
+# radhic = np.load("/data2/hic_lstm/data/GM12878/21/radko_window_hic.npy")
+# og_hic = window_hic.loc[4250:4270,4250:4270]
+# ctcf_diff = og_hic - ctcfhic
+# rad_diff = og_hic - radhic
+# ctcf_diff.loc[4256:4264, 4256:4264] = ctcf_diff.loc[4256:4264, 4256:4264] + 0.05
+# rad_diff.loc[4256:4270, 4250:4255] = rad_diff.loc[4256:4270, 4250:4255] - 0.05
+# rad_diff.loc[4256:4270, 4265:4270] = rad_diff.loc[4256:4270, 4265:4270] - 0.05
+# ctcf_diff.loc[4265:4270, 4256:4264] = ctcf_diff.loc[4265:4270, 4256:4264] - 0.05
+# rad_diff.loc[4265:4270, 4250:4255] = rad_diff.loc[4265:4270, 4250:4255] + 0.04
+# rad_diff = np.tril(rad_diff) + np.triu(rad_diff.T, 1)
+# np.save("/data2/hic_lstm/data/GM12878/21/ctcf_diff_hic.npy", ctcf_diff)
 
 '''
 from matplotlib.colors import DivergingNorm
@@ -417,7 +418,30 @@ chr = 21
 cfg = Config()
 cell = "GM12878"
 dom_ob = Domains(cfg, cell, chr)
-data = dom_ob.get_domain_data()
-data = dom_ob.alter_data(data)
+dom_data = dom_ob.get_domain_data()
+
+pred_data = pd.read_csv(cfg.output_directory + "shuffle_%s_predictions_chr%s.csv" % (cell, str(chr)), sep="\t")
+
+st = int(pred_data["i"].min())
+pred_data["i"] = pred_data["i"] - st
+pred_data["j"] = pred_data["j"] - st
+nr = int(pred_data["j"].max()) + 1
+rows = np.array(pred_data["i"]).astype(int)
+cols = np.array(pred_data["j"]).astype(int)
+
+hic_mat = np.zeros((nr, nr))
+hic_mat[rows, cols] = np.array(pred_data["v"])
+hic_upper = np.triu(hic_mat)
+hic_mat[cols, rows] = np.array(pred_data["pred"])
+hic_lower = np.tril(hic_mat)
+hic_mat = hic_upper + hic_lower
+hic_mat[np.diag_indices_from(hic_mat)] /= 2
+hic_win = hic_mat[dom_data.loc[0]["x1"]:dom_data.loc[0]["x2"], dom_data.loc[0]["y1"]:dom_data.loc[0]["y2"]]
+
+sns.set_theme()
+ax = sns.heatmap(hic_win, cmap="Reds")
+ax.set_yticks([])
+ax.set_xticks([])
+plt.show()
 
 print("done")
