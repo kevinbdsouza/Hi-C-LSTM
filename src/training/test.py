@@ -410,4 +410,14 @@ ctcf_df_loop.loc[ctcf_df_loop["ig_val"] > 1, "ig_val"] = 0.98
 tf_df_ctcf = pd.concat([tf_df, ctcf_df_loop, ctcf_df_nloop]).reset_index(drop=True)
 '''
 
+from analyses.classification.domains import Domains
+from training.config import Config
+
+chr = 21
+cfg = Config()
+cell = "GM12878"
+dom_ob = Domains(cfg, cell, chr)
+data = dom_ob.get_domain_data()
+data = dom_ob.alter_data(data)
+
 print("done")
