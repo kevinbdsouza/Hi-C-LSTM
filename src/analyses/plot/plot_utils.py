@@ -1,7 +1,8 @@
 import pandas as pd
 import numpy as np
 import seaborn as sns
-import matplotlib
+import matplotlib as mpl
+mpl.use("Qt5Agg")
 import training.config as config
 import matplotlib.pyplot as plt
 from mpl_toolkits import mplot3d
