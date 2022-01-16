@@ -419,29 +419,8 @@ cfg = Config()
 cell = "GM12878"
 dom_ob = Domains(cfg, cell, chr)
 dom_data = dom_ob.get_domain_data()
-
 pred_data = pd.read_csv(cfg.output_directory + "shuffle_%s_predictions_chr%s.csv" % (cell, str(chr)), sep="\t")
 
-st = int(pred_data["i"].min())
-pred_data["i"] = pred_data["i"] - st
-pred_data["j"] = pred_data["j"] - st
-nr = int(pred_data["j"].max()) + 1
-rows = np.array(pred_data["i"]).astype(int)
-cols = np.array(pred_data["j"]).astype(int)
-
-hic_mat = np.zeros((nr, nr))
-hic_mat[rows, cols] = np.array(pred_data["v"])
-hic_upper = np.triu(hic_mat)
-hic_mat[cols, rows] = np.array(pred_data["pred"])
-hic_lower = np.tril(hic_mat)
-hic_mat = hic_upper + hic_lower
-hic_mat[np.diag_indices_from(hic_mat)] /= 2
-hic_win = hic_mat[dom_data.loc[0]["x1"]:dom_data.loc[0]["x2"], dom_data.loc[0]["y1"]:dom_data.loc[0]["y2"]]
-
-sns.set_theme()
-ax = sns.heatmap(hic_win, cmap="Reds")
-ax.set_yticks([])
-ax.set_xticks([])
-plt.show()
-
+hic_win = create_hic_win(pred_data, dom_data)
+plot_hic(hic_win)
 print("done")
