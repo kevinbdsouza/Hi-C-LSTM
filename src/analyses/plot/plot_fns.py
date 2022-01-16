@@ -5,6 +5,7 @@ import operator
 import pandas as pd
 import seaborn as sns
 import training.config as config
+from analyses.classification.domains import Domains
 
 logger = logging.getLogger(__name__)
 
@@ -101,6 +102,47 @@ class PlotFns:
         value_list_other = [value_list_other[i] for i in res]
 
         return value_list_other
+
+    def plot_heatmaps(self, data):
+        st = int(data["i"].min())
+        data["i"] = data["i"] - st
+        data["j"] = data["j"] - st
+        nr = int(data["j"].max()) + 1
+        rows = np.array(data["i"]).astype(int)
+        cols = np.array(data["j"]).astype(int)
+
+        hic_mat = np.zeros((nr, nr))
+        hic_mat[rows, cols] = np.array(data["v"])
+        hic_upper = np.triu(hic_mat)
+        hic_mat[cols, rows] = np.array(data["pred"])
+        hic_lower = np.tril(hic_mat)
+        hic_mat = hic_upper + hic_lower
+        hic_mat[np.diag_indices_from(hic_mat)] /= 2
+        self.simple_plot(hic_mat)
+        return hic_mat, st
+
+    def simple_plot(self, hic_win):
+        plt.imshow(hic_win, cmap='hot', interpolation='nearest')
+        plt.yticks([])
+        plt.xticks([])
+        plt.show()
+        '''
+        sns.set_theme()
+        ax = sns.heatmap(hic_win, cmap="Reds")
+        ax.set_yticks([])
+        ax.set_xticks([])
+        plt.show()
+        '''
+        pass
+
+    def ctcf_dots(self, hic_mat, st, chr):
+        dom_ob = Domains(cfg, self.cfg.cell, chr)
+        dom_data = dom_ob.get_domain_data()
+
+        hic_win = hic_mat[dom_data.loc[0]["x1"]:dom_data.loc[0]["x2"], dom_data.loc[0]["y1"]:dom_data.loc[0]["y2"]]
+
+        self.simple_plot(hic_win)
+        pass
 
     def plot_combined(self, cell):
         tasks = ["Gene Expression", "Replication Timing", "Enhancers", "TSS", "PE-Interactions", "FIREs",
@@ -896,10 +938,15 @@ if __name__ == "__main__":
     # plot_ob.plot_symmetry()
 
     # plot_ob.plot_knockout_results()
-    plot_ob.plot_knockout_tfs()
+    # plot_ob.plot_knockout_tfs()
     # plot_ob.pr_curves()
 
     # plot_ob.plot_feature_signal()
     # plot_ob.plot_pred_range()
+
+    chr = 21
+    pred_data = pd.read_csv(cfg.output_directory + "shuffle_%s_predictions_chr%s.csv" % (cell, str(chr)), sep="\t")
+    hic_mat, st = plot_ob.plot_heatmaps(pred_data)
+    plot_ob.ctcf_dots(hic_mat, st, chr)
 
     print("done")
