@@ -2,7 +2,7 @@ import pandas as pd
 import numpy as np
 import seaborn as sns
 import matplotlib as mpl
-mpl.use("TkAgg")
+# mpl.use("TkAgg")
 import training.config as config
 import matplotlib.pyplot as plt
 from mpl_toolkits import mplot3d
@@ -45,7 +45,8 @@ def simple_plot(hic_win):
     plt.imshow(hic_win, cmap='hot', interpolation='nearest')
     plt.yticks([])
     plt.xticks([])
-    plt.show()
+
+    plt.show(block = True)
     '''
     sns.set_theme()
     ax = sns.heatmap(hic_win, cmap="Reds")
