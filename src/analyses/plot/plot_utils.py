@@ -2,7 +2,7 @@ import pandas as pd
 import numpy as np
 import seaborn as sns
 import matplotlib as mpl
-mpl.use("Gtk3Agg")
+mpl.use("TkAgg")
 import training.config as config
 import matplotlib.pyplot as plt
 from mpl_toolkits import mplot3d
