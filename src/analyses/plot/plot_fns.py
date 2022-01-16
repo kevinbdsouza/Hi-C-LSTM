@@ -669,9 +669,63 @@ class PlotFns:
 
         print("done")
 
+    def plot_knockout_tfs(self):
+        pos = np.linspace(0, 1, 11)
+        predicted_probs = np.load(self.path + "predicted_probs.npy")
+
+        ctcfko_probs = np.load(self.path + "ctcfko_probs.npy")
+        ctcfko_probs_nl = np.load(self.path + "ctcfko_probs_nl.npy")
+        znfko_probs = np.load(self.path + "znfko_probs.npy")
+        foxgko_probs = np.load(self.path + "foxgko_probs.npy")
+        soxko_probs = np.load(self.path + "soxko_probs.npy")
+        xbpko_probs = np.load(self.path + "xbpko_probs.npy")
+
+        # control - KO
+        ctcfko_diff = ctcfko_probs - predicted_probs
+        ctcfnl_diff = ctcfko_probs_nl - predicted_probs
+        znfko_diff = znfko_probs - predicted_probs
+        foxgko_diff = foxgko_probs - predicted_probs
+        soxko_diff = soxko_probs - predicted_probs
+        xbpko_diff = xbpko_probs - predicted_probs
+
+        df_main = pd.DataFrame(
+            columns=["pos", "CTCF KO (Loop)", "CTCF KO (Non-loop)", "ZNF143 KO", "FOXG1 KO", "SOX2 KO", "XBP1 KO"])
+        df_main["pos"] = pos
+        # df_main["No KO"] = predicted_probs
+        df_main["CTCF KO (Loop)"] = ctcfko_diff
+        df_main["CTCF KO (Non-loop)"] = ctcfnl_diff
+        df_main["ZNF143 KO"] = znfko_diff
+        df_main["FOXG1 KO"] = foxgko_diff
+        df_main["SOX2 KO"] = soxko_diff
+        df_main["XBP1 KO"] = xbpko_diff
+
+        palette = {"CTCF KO": "C0", "Convergent CTCF": "C5", "Divergent CTCF": "C1", "RAD21 KO": "C2",
+                   "SMC3 KO": "C4"}
+        plt.figure(figsize=(10, 8))
+        plt.xticks(rotation=90, fontsize=20)
+        plt.yticks(fontsize=20)
+        plt.xlabel("Distance between positions in Mbp", fontsize=20)
+        plt.ylabel("Average Difference in Contact Strength \n (KO - No KO)", fontsize=20)
+        # plt.plot('pos', 'No KO', data=df_main, marker='o', markersize=14, color="C3", linewidth=2, label="No KO")
+        plt.plot('pos', 'CTCF KO (Loop)', data=df_main, marker='o', markersize=16, color="C0", linewidth=3,
+                 label="CTCF KO (Loop)")
+        plt.plot('pos', 'CTCF KO (Non-loop)', data=df_main, marker='*', markersize=16, color="C5", linewidth=3,
+                 linestyle='dotted', label="CTCF KO (Non-loop)")
+        plt.plot('pos', 'ZNF143 KO', data=df_main, marker='D', markersize=16, color="C1", linewidth=3,
+                 linestyle='dashed', label="ZNF143 KO")
+        plt.plot('pos', 'FOXG1 KO', data=df_main, marker='s', markersize=16, color="C2", linewidth=3,
+                 linestyle='dashdot', label="FOXG1 KO")
+        plt.plot('pos', 'SOX2 KO', data=df_main, marker='^', markersize=16, color="C4", linewidth=3, label="SOX2 KO")
+        plt.plot('pos', 'XBP1 KO', data=df_main, marker='x', markersize=16, color="C6", linewidth=3, label="XBP1 KO")
+        plt.legend(fontsize=18)
+        plt.show()
+
+        pass
+
     def plot_knockout_results(self):
         pos = np.linspace(0, 1, 11)
         predicted_probs = np.load(self.path + "predicted_probs.npy")
+
         ctcfko_probs = np.load(self.path + "ctcfko_probs.npy")
         convctcf_probs = np.load(self.path + "convctcf_probs.npy")
         divctcf_probs = np.load(self.path + "divctcf_probs.npy")
@@ -841,7 +895,8 @@ if __name__ == "__main__":
     # plot_ob.plot_r2_celltypes()
     # plot_ob.plot_symmetry()
 
-    plot_ob.plot_knockout_results()
+    # plot_ob.plot_knockout_results()
+    plot_ob.plot_knockout_tfs()
     # plot_ob.pr_curves()
 
     # plot_ob.plot_feature_signal()
