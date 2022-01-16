@@ -41,11 +41,17 @@ def ctcf_dots(hic_mat, st):
 
 
 def simple_plot(hic_win):
+    plt.imshow(hic_win, cmap='hot', interpolation='nearest')
+    plt.yticks([])
+    plt.xticks([])
+    plt.show()
+    '''
     sns.set_theme()
     ax = sns.heatmap(hic_win, cmap="Reds")
     ax.set_yticks([])
     ax.set_xticks([])
     plt.show()
+    '''
     pass
 
 
