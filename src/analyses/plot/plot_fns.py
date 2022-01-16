@@ -945,7 +945,7 @@ if __name__ == "__main__":
     # plot_ob.plot_pred_range()
 
     chr = 21
-    pred_data = pd.read_csv(cfg.output_directory + "shuffle_%s_predictions_chr%s.csv" % (cell, str(chr)), sep="\t")
+    pred_data = pd.read_csv(cfg.output_directory + "shuffle_%s_predictions_chr%s.csv" % (cfg.cell, str(chr)), sep="\t")
     hic_mat, st = plot_ob.plot_heatmaps(pred_data)
     plot_ob.ctcf_dots(hic_mat, st, chr)
 
