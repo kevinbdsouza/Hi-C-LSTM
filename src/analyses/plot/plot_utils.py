@@ -5,6 +5,7 @@ import matplotlib
 import training.config as config
 import matplotlib.pyplot as plt
 from mpl_toolkits import mplot3d
+from analyses.classification.domains import Domains
 
 
 def plot_heatmaps(data):
@@ -25,11 +26,17 @@ def plot_heatmaps(data):
     # hic_win = hic_mat[6701:7440, 6701:7440]
     # hic_win = hic_mat[900:1450, 900:1450]
 
-    sns.set_theme()
-    ax = sns.heatmap(hic_mat, cmap="Reds")
-    ax.set_yticks([])
-    ax.set_xticks([])
-    plt.show()
+    simple_plot(hic_mat)
+    return hic_mat, st
+
+
+def ctcf_dots(hic_mat, st):
+    dom_ob = Domains(cfg, cell, chr)
+    dom_data = dom_ob.get_domain_data()
+
+    hic_win = hic_mat[dom_data.loc[0]["x1"]:dom_data.loc[0]["x2"], dom_data.loc[0]["y1"]:dom_data.loc[0]["y2"]]
+
+    simple_plot(hic_win)
     pass
 
 
@@ -147,7 +154,8 @@ if __name__ == '__main__':
         # plot_heatmaps(pred_data)
 
         pred_data = pd.read_csv(cfg.output_directory + "shuffle_%s_predictions_chr%s.csv" % (cell, str(chr)), sep="\t")
-        plot_heatmaps(pred_data)
+        hic_mat, st = plot_heatmaps(pred_data)
+        ctcf_dots(hic_mat, st)
 
     print("done")
 
