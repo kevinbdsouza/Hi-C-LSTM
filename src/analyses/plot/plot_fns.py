@@ -671,12 +671,12 @@ class PlotFns:
 
     def plot_knockout_results(self):
         pos = np.linspace(0, 1, 11)
-        predicted_probs = np.load(cfg.hic_path + "GM12878/" + "predicted_probs.npy")
-        ctcfko_probs = np.load(cfg.hic_path + "GM12878/" + "ctcfko_probs.npy")
-        convctcf_probs = np.load(cfg.hic_path + "GM12878/" + "convctcf_probs.npy")
-        divctcf_probs = np.load(cfg.hic_path + "GM12878/" + "divctcf_probs.npy")
-        radko_probs = np.load(cfg.hic_path + "GM12878/" + "radko_probs.npy")
-        smcko_probs = np.load(cfg.hic_path + "GM12878/" + "smcko_probs.npy")
+        predicted_probs = np.load(self.path + "predicted_probs.npy")
+        ctcfko_probs = np.load(self.path + "ctcfko_probs.npy")
+        convctcf_probs = np.load(self.path + "convctcf_probs.npy")
+        divctcf_probs = np.load(self.path + "divctcf_probs.npy")
+        radko_probs = np.load(self.path + "radko_probs.npy")
+        smcko_probs = np.load(self.path + "smcko_probs.npy")
 
         # control - KO
         ctcfko_diff = ctcfko_probs - predicted_probs
