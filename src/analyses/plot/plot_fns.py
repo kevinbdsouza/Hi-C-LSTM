@@ -143,7 +143,8 @@ class PlotFns:
         dom_ob = Domains(cfg, self.cfg.cell, chr)
         dom_data = dom_ob.get_domain_data()
 
-        mean_map = np.zeros((21, 21))
+        mean_map_og = np.zeros((21, 21))
+        mean_map_pred = np.zeros((21, 21))
         num = 0
         for n in range(len(dom_data)):
             x1 = dom_data.loc[n]["x1"] - st + get_cumpos(self.cfg, chr)
@@ -155,11 +156,15 @@ class PlotFns:
                 continue
             else:
                 num += 1
-                hic_win = hic_mat[x2 - 21:x2, y2 - 21:y2]
-                mean_map = mean_map + hic_win
+                hic_win_og = hic_mat[x1:x1 + 21, y2 - 21:y2]
+                hic_win_pred = hic_mat[x1 - 21:x1, y1:y1 + 21]
+                mean_map_og = mean_map_og + hic_win_og
+                mean_map_pred = mean_map_pred + hic_win_pred
 
-        mean_map = mean_map / num
-        self.simple_plot(mean_map)
+        mean_map_og = mean_map_og / num
+        mean_map_pred = mean_map_pred / num
+        self.simple_plot(mean_map_og)
+        self.simple_plot(mean_map_pred)
 
         pass
 
