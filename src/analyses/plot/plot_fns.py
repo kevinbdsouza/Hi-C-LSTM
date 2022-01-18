@@ -8,6 +8,7 @@ import pandas as pd
 import seaborn as sns
 import training.config as config
 from analyses.classification.domains import Domains
+from training.data_utils import get_cumpos
 
 logger = logging.getLogger(__name__)
 
@@ -142,10 +143,10 @@ class PlotFns:
         dom_data = dom_ob.get_domain_data()
 
         for n in range(len(dom_data)):
-            x1 = dom_data.loc[n]["x1"] - st
-            x2 = dom_data.loc[n]["x2"] - st
-            y1 = dom_data.loc[n]["y1"] - st
-            y2 = dom_data.loc[n]["y2"] - st
+            x1 = dom_data.loc[n]["x1"] - st + get_cumpos(self.cfg, chr)
+            x2 = dom_data.loc[n]["x2"] - st + get_cumpos(self.cfg, chr)
+            y1 = dom_data.loc[n]["y1"] - st + get_cumpos(self.cfg, chr)
+            y2 = dom_data.loc[n]["y2"] - st + get_cumpos(self.cfg, chr)
             hic_win = hic_mat[x1:x2, y1:y2]
 
             self.simple_plot(hic_win)
