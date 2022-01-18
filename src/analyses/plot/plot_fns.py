@@ -120,7 +120,7 @@ class PlotFns:
         hic_lower = np.tril(hic_mat)
         hic_mat = hic_upper + hic_lower
         hic_mat[np.diag_indices_from(hic_mat)] /= 2
-        self.simple_plot(hic_mat)
+        # self.simple_plot(hic_mat)
         return hic_mat, st
 
     def simple_plot(self, hic_win):
@@ -141,9 +141,15 @@ class PlotFns:
         dom_ob = Domains(cfg, self.cfg.cell, chr)
         dom_data = dom_ob.get_domain_data()
 
-        hic_win = hic_mat[dom_data.loc[0]["x1"]:dom_data.loc[0]["x2"], dom_data.loc[0]["y1"]:dom_data.loc[0]["y2"]]
+        for n in range(len(dom_data)):
+            x1 = dom_data.loc[n]["x1"] - st
+            x2 = dom_data.loc[n]["x2"] - st
+            y1 = dom_data.loc[n]["y1"] - st
+            y2 = dom_data.loc[n]["y2"] - st
+            hic_win = hic_mat[x1:x2, y1:y2]
 
-        self.simple_plot(hic_win)
+            self.simple_plot(hic_win)
+
         pass
 
     def plot_combined(self, cell):
