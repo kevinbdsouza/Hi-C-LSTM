@@ -7,7 +7,7 @@ from torch.nn.utils.rnn import pad_sequence
 import training.config as config
 import matplotlib
 
-matplotlib.use('pdf')
+#matplotlib.use('pdf')
 
 
 def get_cumpos(cfg, chr_num):

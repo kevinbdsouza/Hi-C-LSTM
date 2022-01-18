@@ -1,5 +1,7 @@
 import logging
 import numpy as np
+import matplotlib as mpl
+mpl.use('module://backend_interagg')
 import matplotlib.pyplot as plt
 import operator
 import pandas as pd
