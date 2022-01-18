@@ -1,6 +1,7 @@
 import logging
 import numpy as np
 import matplotlib as mpl
+
 mpl.use('module://backend_interagg')
 import matplotlib.pyplot as plt
 import operator
@@ -142,14 +143,23 @@ class PlotFns:
         dom_ob = Domains(cfg, self.cfg.cell, chr)
         dom_data = dom_ob.get_domain_data()
 
+        mean_map = np.zeros((21, 21))
+        num = 0
         for n in range(len(dom_data)):
             x1 = dom_data.loc[n]["x1"] - st + get_cumpos(self.cfg, chr)
             x2 = dom_data.loc[n]["x2"] - st + get_cumpos(self.cfg, chr)
             y1 = dom_data.loc[n]["y1"] - st + get_cumpos(self.cfg, chr)
             y2 = dom_data.loc[n]["y2"] - st + get_cumpos(self.cfg, chr)
-            hic_win = hic_mat[x1:x2, y1:y2]
 
-            self.simple_plot(hic_win)
+            if (x2 - x1) <= 20:
+                continue
+            else:
+                num += 1
+                hic_win = hic_mat[x2 - 21:x2, y2 - 21:y2]
+                mean_map = mean_map + hic_win
+
+        mean_map = mean_map / num
+        self.simple_plot(mean_map)
 
         pass
 
