@@ -202,7 +202,7 @@ if __name__ == '__main__':
     model.load_weights()
 
     # test_chr = list(range(5, 11))
-    test_chr = [22]
+    test_chr = [9]
 
     for chr in test_chr:
         print('Testing Start Chromosome: {}'.format(chr))
@@ -213,6 +213,8 @@ if __name__ == '__main__':
                              columns=["pos", "ig"])
 
         ig_filtered_df = captum_analyze_tfs(cfg, ig_df, chr)
+        ig_filtered_df.to_csv(prediction_path + "ig_tf%s.csv" % (chr), sep="\t")
+
         # ig_filtered_df = captum_analyze_elements(cfg, chr, ig_df, mode="ctcf")
 
         # ig_filtered_df = ig_filtered_df.loc[ig_filtered_df["ig"] >= 0.5]
