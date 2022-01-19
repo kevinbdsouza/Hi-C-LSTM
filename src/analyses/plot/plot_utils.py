@@ -35,7 +35,8 @@ def plot_heatmaps(data):
 def plot_tal1_lmo2(data):
     tal_data = data.loc[data["i"] < 5000]
     lmo2_data = data.loc[data["i"] > 5000]
-    plot_heatmaps(tal_data)
+
+    #plot_heatmaps(tal_data)
     plot_heatmaps(lmo2_data)
     pass
 
