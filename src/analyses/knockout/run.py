@@ -198,11 +198,13 @@ if __name__ == '__main__':
 
     for chr in test_chr:
         print('Testing Start Chromosome: {}'.format(chr))
-        pred_data = pd.read_csv(cfg.output_directory + "shuffle_%s_predictions_chr%s.csv" % (cell, str(chr)), sep="\t")
+        # pred_data = pd.read_csv(cfg.output_directory + "shuffle_%s_predictions_chr%s.csv" % (cell, str(chr)), sep="\t")
         # ko_pred_df = pd.read_csv(cfg.output_directory + "shuffle_%s_afko_chr%s.csv" % (cell, str(chr)), sep="\t")
         ko_ob = Knockout(cfg, cell, chr)
 
-        ko_pred_df, mean_diff = ko_ob.perform_ko(model, pred_data)
+        # ko_pred_df, mean_diff = ko_ob.perform_ko(model, pred_data)
         # ko_pred_df = ko_ob.normalize_embed_predict(model, pred_data)
+
+        ko_ob.tal_lmo2()
 
     print("done")
