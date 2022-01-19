@@ -193,17 +193,20 @@ class Knockout():
             loc = int(((int(ind[0]) + int(ind[1])) / 2) // 10000)
             loc_list.append(loc)
 
-        return loc_list
+        return loc_list, chr_list
 
     def tal_lmo2(self):
         hek_mat = pd.read_csv(self.hek_file, sep="\t")
-        index = self.change_index(list(hek_mat.index))
-        columns = self.change_index(hek_mat.columns)
+        index, chr_list = self.change_index(list(hek_mat.index))
+        columns, _ = self.change_index(hek_mat.columns)
 
         hek_mat.index = index
         hek_mat.columns = columns
+        hek_mat["chr"] = chr_list
 
-        new_hek = hek_mat.groupby(level=0, axis=1).sum()
+        tal1_mat = hek_mat.loc[hek_mat["chr"] == "chr1"]
+        lmo2_mat = hek_mat.loc[hek_mat["chr"] == "chr11"]
+        tal1_mat = tal1_mat.groupby(level=0, axis=1).sum()
         pass
 
 
