@@ -31,7 +31,7 @@ class Config:
         ##########################################
 
         self.learning_rate = 0.01
-        self.num_epochs = 40
+        self.num_epochs = 2
         self.batch_size = 210
         self.max_norm = 10  # for gradient clipping
         self.lstm_nontrain = False

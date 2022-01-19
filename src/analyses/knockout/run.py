@@ -7,7 +7,9 @@ import training.config as config
 from training.model import SeqLSTM
 from training.data_utils import get_data_loader_chr
 import matplotlib.pyplot as plt
-from training.data_utils import contactProbabilities
+from training.data_utils import get_samples_sparse
+import time
+from torch.utils.tensorboard import SummaryWriter
 
 device = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
 
@@ -196,7 +198,7 @@ class Knockout():
 
         return loc_list, chr_list
 
-    def tal_lmo2_data(self):
+    def tal_lmo2_preprocess(self):
         hek_mat = pd.read_csv(self.hek_file, sep="\t")
         index, chr_list = self.change_index(list(hek_mat.index))
         columns, _ = self.change_index(hek_mat.columns)
@@ -229,7 +231,53 @@ class Knockout():
             for j in lmo2_j:
                 lmo2_df = lmo2_df.append({"i": i, "j": j, "v": lmo2_mat.loc[i][j]}, ignore_index=True)
 
+        tal_df.to_csv(cfg.hic_path + cfg.cell + "/tal_df.txt", sep="\t")
+        lmo2_df.to_csv(cfg.hic_path + cfg.cell + "/lmo2_df.txt", sep="\t")
+
         return tal_df, lmo2_df
+
+    def prepare_tal1_lmo2(self, cfg):
+        tal_df = pd.read_csv(cfg.hic_path + cfg.cell + "/tal_df.txt", sep="\t")
+        lmo2_df = pd.read_csv(cfg.hic_path + cfg.cell + "/lmo2_df.txt", sep="\t")
+
+        tal_df = tal_df.drop(['Unnamed: 0'], axis=1)
+        lmo2_df = lmo2_df.drop(['Unnamed: 0'], axis=1)
+
+        tal_df[['i', 'j']] = tal_df[['i', 'j']].astype('int64')
+        lmo2_df[['i', 'j']] = lmo2_df[['i', 'j']].astype('int64')
+
+        values = torch.empty(0, cfg.sequence_length)
+        input_idx = torch.empty(0, cfg.sequence_length, 2)
+        sample_index_list = []
+
+        input_idx_tal1, values_tal1, sample_index_tal1 = get_samples_sparse(tal_df, 1, cfg)
+        values = torch.cat((values, values_tal1.float()), 0)
+        input_idx = torch.cat((input_idx, input_idx_tal1), 0)
+        sample_index_list.append(sample_index_tal1)
+
+        input_idx_lmo2, values_lmo2, sample_index_lmo2 = get_samples_sparse(lmo2_df, 11, cfg)
+        values = torch.cat((values, values_tal1.float()), 0)
+        input_idx = torch.cat((input_idx, input_idx_tal1), 0)
+        sample_index_list.append(sample_index_tal1)
+
+        sample_index_tensor = np.vstack(sample_index_list)
+        # create dataset, dataloader
+        dataset = torch.utils.data.TensorDataset(input_idx, values)
+        data_loader = torch.utils.data.DataLoader(dataset=dataset, batch_size=cfg.batch_size, shuffle=True)
+
+        return data_loader, sample_index_tensor
+
+
+    def train_tal1_lmo2(self, model, cfg, model_name):
+        timestr = time.strftime("%Y%m%d-%H%M%S")
+        writer = SummaryWriter('./tensorboard_logs/' + model_name + timestr)
+
+        optimizer, criterion = model.compile_optimizer(cfg)
+        data_loader, samples = self.prepare_tal1_lmo2(cfg)
+
+        model.train_model(data_loader, criterion, optimizer, writer)
+        torch.save(model.state_dict(), cfg.model_dir + model_name + '.pth')
+        pass
 
 
 if __name__ == '__main__':
@@ -254,6 +302,7 @@ if __name__ == '__main__':
         # ko_pred_df, mean_diff = ko_ob.perform_ko(model, pred_data)
         # ko_pred_df = ko_ob.normalize_embed_predict(model, pred_data)
 
-        tal_data, lmo2_data = ko_ob.tal_lmo2_data()
+        # tal_data, lmo2_data = ko_ob.tal_lmo2_preprocess()
+        ko_ob.train_tal1_lmo2(model, cfg, model_name)
 
     print("done")
