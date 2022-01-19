@@ -2,6 +2,7 @@ import pandas as pd
 import numpy as np
 import seaborn as sns
 import matplotlib as mpl
+
 mpl.use('module://backend_interagg')
 import training.config as config
 import matplotlib.pyplot as plt
@@ -31,28 +32,19 @@ def plot_heatmaps(data):
     return hic_mat, st
 
 
-def ctcf_dots(hic_mat, st):
-    dom_ob = Domains(cfg, cell, chr)
-    dom_data = dom_ob.get_domain_data()
-
-    hic_win = hic_mat[dom_data.loc[0]["x1"]:dom_data.loc[0]["x2"], dom_data.loc[0]["y1"]:dom_data.loc[0]["y2"]]
-
-    simple_plot(hic_win)
-    pass
-
-
 def simple_plot(hic_win):
+    '''
     plt.imshow(hic_win, cmap='hot', interpolation='nearest')
     plt.yticks([])
     plt.xticks([])
     plt.show()
     '''
+
     sns.set_theme()
     ax = sns.heatmap(hic_win, cmap="Reds")
     ax.set_yticks([])
     ax.set_xticks([])
     plt.show()
-    '''
     pass
 
 
@@ -160,9 +152,8 @@ if __name__ == '__main__':
         # pred_data = pd.read_csv(cfg.output_directory + "shuffle_%s_afko_chr%s.csv" % (cell, str(chr)), sep="\t")
         # plot_heatmaps(pred_data)
 
-        pred_data = pd.read_csv(cfg.output_directory + "shuffle_%s_predictions_chr%s.csv" % (cell, str(chr)), sep="\t")
-        hic_mat, st = plot_heatmaps(pred_data)
-        ctcf_dots(hic_mat, st)
+        pred_data = pd.read_csv(cfg.output_directory + "%s_predictions_chr.csv" % (cell), sep="\t")
+        plot_heatmaps(pred_data)
 
     print("done")
 
