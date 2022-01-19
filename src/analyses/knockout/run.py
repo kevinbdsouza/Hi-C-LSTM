@@ -10,6 +10,7 @@ import matplotlib.pyplot as plt
 from training.data_utils import get_samples_sparse
 import time
 from torch.utils.tensorboard import SummaryWriter
+import torch.nn.functional as F
 
 device = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
 
@@ -251,14 +252,17 @@ class Knockout():
         sample_index_list = []
 
         input_idx_tal1, values_tal1, sample_index_tal1 = get_samples_sparse(tal_df, 1, cfg)
+        values_tal1 = F.pad(input=values_tal1, pad=(0, 4, 0, 0), mode='constant', value=0)
+        input_idx_tal1 = F.pad(input=input_idx_tal1, pad=(0, 0, 0, 4, 0, 0), mode='constant', value=0)
+
         values = torch.cat((values, values_tal1.float()), 0)
         input_idx = torch.cat((input_idx, input_idx_tal1), 0)
         sample_index_list.append(sample_index_tal1)
 
         input_idx_lmo2, values_lmo2, sample_index_lmo2 = get_samples_sparse(lmo2_df, 11, cfg)
-        values = torch.cat((values, values_tal1.float()), 0)
-        input_idx = torch.cat((input_idx, input_idx_tal1), 0)
-        sample_index_list.append(sample_index_tal1)
+        values = torch.cat((values, values_lmo2.float()), 0)
+        input_idx = torch.cat((input_idx, input_idx_lmo2), 0)
+        sample_index_list.append(sample_index_lmo2)
 
         sample_index_tensor = np.vstack(sample_index_list)
         # create dataset, dataloader
