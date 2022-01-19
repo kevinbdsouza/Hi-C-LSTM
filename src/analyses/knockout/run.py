@@ -202,6 +202,8 @@ class Knockout():
 
         hek_mat.index = index
         hek_mat.columns = columns
+
+        new_hek = hek_mat.groupby(level=0, axis=1).sum()
         pass
 
 
