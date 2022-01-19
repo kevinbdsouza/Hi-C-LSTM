@@ -271,7 +271,6 @@ class Knockout():
 
         return data_loader, sample_index_tensor
 
-
     def train_tal1_lmo2(self, model, cfg, model_name):
         timestr = time.strftime("%Y%m%d-%H%M%S")
         writer = SummaryWriter('./tensorboard_logs/' + model_name + timestr)
@@ -281,6 +280,13 @@ class Knockout():
 
         model.train_model(data_loader, criterion, optimizer, writer)
         torch.save(model.state_dict(), cfg.model_dir + model_name + '.pth')
+        pass
+
+    def test_tal1_lmo2(self, model, cfg):
+        data_loader, samples = self.prepare_tal1_lmo2(cfg)
+        predictions, test_error, values, pred_df, error_list = model.test(data_loader)
+
+        pred_df.to_csv(cfg.output_directory + "%s_predictions_chr.csv" % (cfg.cell), sep="\t")
         pass
 
 
@@ -307,6 +313,7 @@ if __name__ == '__main__':
         # ko_pred_df = ko_ob.normalize_embed_predict(model, pred_data)
 
         # tal_data, lmo2_data = ko_ob.tal_lmo2_preprocess()
-        ko_ob.train_tal1_lmo2(model, cfg, model_name)
+        # ko_ob.train_tal1_lmo2(model, cfg, model_name)
+        ko_ob.test_tal1_lmo2(model, cfg)
 
     print("done")
