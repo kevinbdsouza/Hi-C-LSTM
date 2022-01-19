@@ -222,7 +222,7 @@ class Knockout():
         tal_df = pd.DataFrame(columns=["i", "j", "v"])
         for i in tal_i:
             for j in tal_j:
-            tal_df.append({"i":i, "j":j, "v":tal1_mat.iloc[i,j]})
+                tal_df.append({"i":i, "j":j, "v":tal1_mat.iloc[i,j]})
 
         lmo2_df = pd.DataFrame(columns=["i", "j", "v"])
         for i in lmo2_i:
