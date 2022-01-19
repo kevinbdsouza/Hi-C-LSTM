@@ -179,9 +179,31 @@ class Knockout():
 
         return ko_pred_df
 
+    def change_index(self, list_split):
+        temp = [k.split('|')[-1] for k in list_split]
+        chr_list = []
+        index_list = []
+        for t in temp:
+            index = t.split(':')
+            chr_list.append(index[0])
+            index_list.append(index[1].split('-'))
+
+        loc_list = []
+        for ind in index_list:
+            loc = int(((int(ind[0]) + int(ind[1])) / 2) // 10000)
+            loc_list.append(loc)
+
+        return loc_list
+
     def tal_lmo2(self):
         hek_mat = pd.read_csv(self.hek_file, sep="\t")
+        index = self.change_index(list(hek_mat.index))
+        columns = self.change_index(hek_mat.columns)
+
+        hek_mat.index = index
+        hek_mat.columns = columns
         pass
+
 
 if __name__ == '__main__':
 
