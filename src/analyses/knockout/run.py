@@ -7,6 +7,7 @@ import training.config as config
 from training.model import SeqLSTM
 from training.data_utils import get_data_loader_chr
 import matplotlib.pyplot as plt
+from training.data_utils import contactProbabilities
 
 device = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
 
@@ -195,7 +196,7 @@ class Knockout():
 
         return loc_list, chr_list
 
-    def tal_lmo2(self):
+    def tal_lmo2_data(self):
         hek_mat = pd.read_csv(self.hek_file, sep="\t")
         index, chr_list = self.change_index(list(hek_mat.index))
         columns, _ = self.change_index(hek_mat.columns)
@@ -205,9 +206,30 @@ class Knockout():
         hek_mat["chr"] = chr_list
 
         tal1_mat = hek_mat.loc[hek_mat["chr"] == "chr1"]
+        tal1_mat = tal1_mat.iloc[:, 0:285]
         lmo2_mat = hek_mat.loc[hek_mat["chr"] == "chr11"]
+        lmo2_mat = lmo2_mat.iloc[:, 286:632]
         tal1_mat = tal1_mat.groupby(level=0, axis=1).sum()
-        pass
+        tal1_mat = tal1_mat.groupby(level=0, axis=0).sum()
+        lmo2_mat = lmo2_mat.groupby(level=0, axis=1).sum()
+        lmo2_mat = lmo2_mat.groupby(level=0, axis=0).sum()
+
+        tal_i = list(tal1_mat.index)
+        tal_j = tal1_mat.columns
+        lmo2_i = list(lmo2_mat.index)
+        lmo2_j = lmo2_mat.columns
+
+        tal_df = pd.DataFrame(columns=["i", "j", "v"])
+        for i in tal_i:
+            for j in tal_j:
+            tal_df.append({"i":i, "j":j, "v":tal1_mat.iloc[i,j]})
+
+        lmo2_df = pd.DataFrame(columns=["i", "j", "v"])
+        for i in lmo2_i:
+            for j in lmo2_j:
+                lmo2_df.append({"i": i, "j": j, "v": lmo2_mat.iloc[i, j]})
+
+        return tal_df, lmo2_df
 
 
 if __name__ == '__main__':
@@ -232,6 +254,6 @@ if __name__ == '__main__':
         # ko_pred_df, mean_diff = ko_ob.perform_ko(model, pred_data)
         # ko_pred_df = ko_ob.normalize_embed_predict(model, pred_data)
 
-        ko_ob.tal_lmo2()
+        tal_data, lmo2_data = ko_ob.tal_lmo2_data()
 
     print("done")
