@@ -24,7 +24,7 @@ class Knockout():
         self.sizes_path = self.cfg.hic_path + self.cfg.sizes_file
         self.sizes = np.load(self.sizes_path, allow_pickle=True).item()
         self.file_path = os.path.join(cfg.downstream_dir, "ctcf")
-        self.hek_file = cfg.hic_path + cfg.cell + "/GSE77142_8616_5CYoung-HEK239T-WT.matrix"
+        self.hek_file = cfg.hic_path + cfg.cell + "/HEK239T-WT.matrix"
 
     def alter_index(self, embed_rows):
         if self.chr == 1:
