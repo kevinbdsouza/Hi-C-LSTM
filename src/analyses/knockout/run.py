@@ -297,7 +297,7 @@ class Knockout():
         foxg1_indices = [222863]
 
         self.perform_ko(model, pred_data, foxg1_indices)
-        
+
         pass
 
 
@@ -312,7 +312,7 @@ if __name__ == '__main__':
     model.load_weights()
 
     # test_chr = list(range(21, 23))
-    test_chr = [11]
+    test_chr = [14]
 
     for chr in test_chr:
         print('Testing Start Chromosome: {}'.format(chr))
