@@ -110,8 +110,6 @@ class Knockout():
 
     def ko_indices(self, embed_rows, start, indices):
         # chose from input ko indices or give your own
-        # indices = [279219, 279229]
-        # indices = [284706, 284743]
         window = 10
 
         for ind in indices:
@@ -151,9 +149,8 @@ class Knockout():
 
         return mean_diff
 
-    def perform_ko(self, model, pred_data):
+    def perform_ko(self, model, pred_data, indices):
         data_loader, samples = get_data_loader_chr(self.cfg, self.chr)
-        indices = self.get_ctcf_indices()
         embed_rows, start, stop = self.convert_df_to_np(pred_data)
         embed_rows = self.ko_indices(embed_rows, start, indices)
 
@@ -289,13 +286,18 @@ class Knockout():
         pred_df.to_csv(cfg.output_directory + "%s_predictions_chr.csv" % (cfg.cell), sep="\t")
         pass
 
-    def tf_ko(self):
+    def tf_ko(self, model, pred_data):
+        ctcf_indices_21 = [279219, 279229]
+        ctcf_indices_22 = [284706, 284743]
+
         znf143_chr = 11
-        znf143_pos = 182532
+        znf143_indices = [182532]
 
         foxg1_chr = 14
-        foxg1_pos = 222863
+        foxg1_indices = [222863]
 
+        self.perform_ko(model, pred_data, foxg1_indices)
+        
         pass
 
 
@@ -318,12 +320,15 @@ if __name__ == '__main__':
         # ko_pred_df = pd.read_csv(cfg.output_directory + "shuffle_%s_afko_chr%s.csv" % (cell, str(chr)), sep="\t")
         ko_ob = Knockout(cfg, cell, chr)
 
-        # ko_pred_df, mean_diff = ko_ob.perform_ko(model, pred_data)
+        # indices = ko_ob.get_ctcf_indices()
+        # ko_pred_df, mean_diff = ko_ob.perform_ko(model, pred_data, indices)
         # ko_pred_df = ko_ob.normalize_embed_predict(model, pred_data)
 
         # tal_data, lmo2_data = ko_ob.tal_lmo2_preprocess()
         # ko_ob.train_tal1_lmo2(model, cfg, model_name)
         # ko_ob.test_tal1_lmo2(model, cfg)
+
+        ko_ob.tf_ko(model, pred_data)
 
 
 
