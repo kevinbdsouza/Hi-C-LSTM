@@ -411,6 +411,7 @@ ctcf_df_loop.loc[ctcf_df_loop["ig_val"] > 1, "ig_val"] = 0.98
 tf_df_ctcf = pd.concat([tf_df, ctcf_df_loop, ctcf_df_nloop]).reset_index(drop=True)
 '''
 
+'''
 from analyses.classification.domains import Domains
 from training.config import Config
 
@@ -423,4 +424,13 @@ pred_data = pd.read_csv(cfg.output_directory + "shuffle_%s_predictions_chr%s.csv
 
 hic_win = create_hic_win(pred_data, dom_data)
 plot_hic(hic_win)
+'''
+
+
+#lmo2_wt[24:95, 97:166] = lmo2_wt[24:95, 97:166] - 0.08
+#lmo2_wt[97:169, 22:95] = lmo2_wt[97:169, 22:95] - 0.06
+#a = np.tril(lmo2_ko)
+#b = a.T
+#lmo2_ko = a+b
+#lmo2_ko[np.diag_indices_from(lmo2_ko)] /= 2
 print("done")
