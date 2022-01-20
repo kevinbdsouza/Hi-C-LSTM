@@ -111,7 +111,7 @@ class Knockout():
     def ko_indices(self, embed_rows, start, indices):
         # chose from input ko indices or give your own
         # indices = [279219, 279229]
-        indices = [284706, 284743]
+        # indices = [284706, 284743]
         window = 10
 
         for ind in indices:
@@ -289,6 +289,15 @@ class Knockout():
         pred_df.to_csv(cfg.output_directory + "%s_predictions_chr.csv" % (cfg.cell), sep="\t")
         pass
 
+    def tf_ko(self):
+        znf143_chr = 11
+        znf143_pos = 182532
+
+        foxg1_chr = 14
+        foxg1_pos = 222863
+
+        pass
+
 
 if __name__ == '__main__':
 
@@ -301,11 +310,11 @@ if __name__ == '__main__':
     model.load_weights()
 
     # test_chr = list(range(21, 23))
-    test_chr = [22]
+    test_chr = [11]
 
     for chr in test_chr:
         print('Testing Start Chromosome: {}'.format(chr))
-        # pred_data = pd.read_csv(cfg.output_directory + "shuffle_%s_predictions_chr%s.csv" % (cell, str(chr)), sep="\t")
+        pred_data = pd.read_csv(cfg.output_directory + "shuffle_%s_predictions_chr%s.csv" % (cell, str(chr)), sep="\t")
         # ko_pred_df = pd.read_csv(cfg.output_directory + "shuffle_%s_afko_chr%s.csv" % (cell, str(chr)), sep="\t")
         ko_ob = Knockout(cfg, cell, chr)
 
@@ -314,6 +323,8 @@ if __name__ == '__main__':
 
         # tal_data, lmo2_data = ko_ob.tal_lmo2_preprocess()
         # ko_ob.train_tal1_lmo2(model, cfg, model_name)
-        ko_ob.test_tal1_lmo2(model, cfg)
+        # ko_ob.test_tal1_lmo2(model, cfg)
+
+
 
     print("done")
