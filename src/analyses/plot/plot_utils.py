@@ -31,21 +31,38 @@ def plot_heatmaps(data):
     simple_plot(hic_mat)
     return hic_mat, st
 
+
 def plot_foxg1(data):
     site = 222863
     data["i"] = data["i"] - site
     data["j"] = data["j"] - site
 
-    data = data.loc[data["i"]>= -100]
-    data = data.loc[data["i"] <= 100]
+    data = data.loc[(data["i"] >= -100) & (data["i"] <= 100) &
+                    (data["j"] >= -100) & (data["j"] <= 100)]
 
+    data["i"] = data["i"] + 100
+    data["j"] = data["j"] + 100
+
+    nr = 201
+    rows = np.array(data["i"]).astype(int)
+    cols = np.array(data["j"]).astype(int)
+    hic_mat = np.zeros((nr, nr))
+    hic_mat[rows, cols] = np.array(data["v"])
+    hic_upper = np.triu(hic_mat)
+    hic_mat[cols, rows] = np.array(data["pred"])
+    hic_lower = np.tril(hic_mat)
+    hic_mat = hic_upper + hic_lower
+    hic_mat[np.diag_indices_from(hic_mat)] /= 2
+
+    simple_plot(hic_mat)
     pass
+
 
 def plot_tal1_lmo2(data):
     tal_data = data.loc[data["i"] < 5000]
     lmo2_data = data.loc[data["i"] > 5000]
 
-    #plot_heatmaps(tal_data)
+    # plot_heatmaps(tal_data)
     plot_heatmaps(lmo2_data)
     pass
 
@@ -171,8 +188,8 @@ if __name__ == '__main__':
         pred_data = pd.read_csv(cfg.output_directory + "shuffle_%s_predictions_chr%s.csv" % (cell, str(chr)), sep="\t")
         plot_foxg1(pred_data)
 
-        #pred_data = pd.read_csv(cfg.output_directory + "%s_predictions_chr.csv" % (cell), sep="\t")
-        #plot_tal1_lmo2(pred_data)
+        # pred_data = pd.read_csv(cfg.output_directory + "%s_predictions_chr.csv" % (cell), sep="\t")
+        # plot_tal1_lmo2(pred_data)
 
     print("done")
 
