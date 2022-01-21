@@ -146,7 +146,7 @@ def plot_r2(comb_r2_df):
 
 
 if __name__ == '__main__':
-    plot_chr = list(range(21, 23))
+    plot_chr = list(range(14, 15))
     cfg = config.Config()
     cell = cfg.cell
     comb_r2_df = pd.DataFrame(columns=["diff", "r2"])
@@ -158,15 +158,16 @@ if __name__ == '__main__':
         comb_r2_df = comb_r2_df.append(r2_diff, ignore_index=True)
         plot_r2(comb_r2_df)
         '''
-        # pred_data = pd.read_csv(cfg.output_directory + "shuffle_%s_afko_chr%s.csv" % (cell, str(chr)), sep="\t")
-        # plot_heatmaps(pred_data)
 
-        pred_data = pd.read_csv(cfg.output_directory + "%s_predictions_chr.csv" % (cell), sep="\t")
-        plot_tal1_lmo2(pred_data)
+        pred_data = pd.read_csv(cfg.output_directory + "shuffle_%s_afko_chr%s.csv" % (cell, str(chr)), sep="\t")
+        plot_heatmaps(pred_data)
+
+        #pred_data = pd.read_csv(cfg.output_directory + "%s_predictions_chr.csv" % (cell), sep="\t")
+        #plot_tal1_lmo2(pred_data)
 
     print("done")
 
-    # pred_data = pd.read_csv(cfg.output_directory + "combined150sh_predictions_chr%s.csv" % str(chr), sep="\t")
+    # foxg1_data = pd.read_csv(cfg.output_directory + "shuffle_%s_afko_chr%s.csv" % (self.cfg.cell, str(self.chr)), sep="\t")
     # pred_data = pd.read_csv(cfg.output_directory + "shuffle_%s_predictions_chr%s.csv" % (cell, str(chr)), sep="\t")
     # pred_data = pd.read_csv(cfg.output_directory + "testwin_predictions_chr%s.csv" % str(chr), sep="\t")
     # pred_data = pd.read_csv(cfg.output_directory + "combined150_melobfko_chr%s.csv" % str(chr), sep="\t")
