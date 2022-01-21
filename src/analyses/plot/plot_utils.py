@@ -31,6 +31,15 @@ def plot_heatmaps(data):
     simple_plot(hic_mat)
     return hic_mat, st
 
+def plot_foxg1(data):
+    site = 222863
+    data["i"] = data["i"] - site
+    data["j"] = data["j"] - site
+
+    data = data.loc[data["i"]>= -100]
+    data = data.loc[data["i"] <= 100]
+
+    pass
 
 def plot_tal1_lmo2(data):
     tal_data = data.loc[data["i"] < 5000]
@@ -160,7 +169,7 @@ if __name__ == '__main__':
         '''
 
         pred_data = pd.read_csv(cfg.output_directory + "shuffle_%s_predictions_chr%s.csv" % (cell, str(chr)), sep="\t")
-        plot_heatmaps(pred_data)
+        plot_foxg1(pred_data)
 
         #pred_data = pd.read_csv(cfg.output_directory + "%s_predictions_chr.csv" % (cell), sep="\t")
         #plot_tal1_lmo2(pred_data)
