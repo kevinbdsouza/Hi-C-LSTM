@@ -213,7 +213,7 @@ class PlotFns:
             # plot bars
             left = len(df_main) * [0]
             for idx, name in enumerate(fields):
-                plt.barh(df_main.index, df_main[name], left=left, color=colors[idx])
+                plt.barh(df_main.index, df_main[name], left=left, color=colors[idx], fontsize=18)
                 left = left + df_main[name]
 
             # legend
