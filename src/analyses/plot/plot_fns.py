@@ -971,7 +971,7 @@ if __name__ == "__main__":
     # plot_ob.plot_xgb()
     # plot_ob.plot_gbr()
 
-    plot_ob.plot_r2(cell = "HFFhTERT")
+    plot_ob.plot_r2(cell = "H1hESC")
     # plot_ob.plot_r2_celltypes()
     # plot_ob.plot_symmetry()
 
