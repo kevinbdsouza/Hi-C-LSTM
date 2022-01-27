@@ -192,6 +192,20 @@ class PlotFns:
             pca_auroc_all_tasks = np.load(self.path + "pca_auroc_all_tasks.npy")
             sbcid_auroc_all_tasks = np.load(self.path + "sbcid_auroc_all_tasks.npy")
 
+            lstm_accuracy_all_tasks = np.load(self.path + "gm_auroc_all_tasks.npy")
+            sniper_intra_accuracy_all_tasks = np.load(self.path + "sniper_intra_auroc_all_tasks.npy")
+            sniper_inter_accuracy_all_tasks = np.load(self.path + "sniper_inter_auroc_all_tasks.npy")
+            graph_accuracy_all_tasks = np.load(self.path + "graph_auroc_all_tasks.npy")
+            pca_accuracy_all_tasks = np.load(self.path + "pca_auroc_all_tasks.npy")
+            sbcid_accuracy_all_tasks = np.load(self.path + "sbcid_auroc_all_tasks.npy")
+
+            lstm_fscore_all_tasks = np.load(self.path + "gm_auroc_all_tasks.npy")
+            sniper_intra_fscore_all_tasks = np.load(self.path + "sniper_intra_auroc_all_tasks.npy")
+            sniper_inter_fscore_all_tasks = np.load(self.path + "sniper_inter_auroc_all_tasks.npy")
+            graph_fscore_all_tasks = np.load(self.path + "graph_auroc_all_tasks.npy")
+            pca_fscore_all_tasks = np.load(self.path + "pca_auroc_all_tasks.npy")
+            sbcid_fscore_all_tasks = np.load(self.path + "sbcid_auroc_all_tasks.npy")
+
         df_main = pd.DataFrame(
             columns=["Tasks", "Hi-C-LSTM", "SNIPER-INTRA", "SNIPER-INTER", "SCI", "PCA",
                      "SBCID"])
@@ -217,7 +231,8 @@ class PlotFns:
                 left = left + df_main[name]
 
             # legend
-            plt.legend(methods, bbox_to_anchor=([0.58, 1, 0, 0]), ncol=6, frameon=False, fontsize=18)
+            plt.rcParams.update({'font.size': 22})
+            plt.legend(methods, bbox_to_anchor=([0.03, 1, 0, 0]), ncol=6, frameon=False, fontsize=14)
 
             # remove spines
             ax.spines['right'].set_visible(False)
