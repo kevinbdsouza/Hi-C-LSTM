@@ -961,7 +961,7 @@ if __name__ == "__main__":
     plot_ob = PlotFns(cfg)
 
     # plot_ob.plot_combined(cell = "GM12878")
-    # plot_ob.plot_mAP_celltypes()
+    plot_ob.plot_mAP_celltypes()
     # plot_ob.plot_auroc_celltypes()
     # plot_ob.plot_auroc()
 
@@ -971,7 +971,7 @@ if __name__ == "__main__":
     # plot_ob.plot_xgb()
     # plot_ob.plot_gbr()
 
-    plot_ob.plot_r2(cell = "H1hESC")
+    # plot_ob.plot_r2(cell = "H1hESC")
     # plot_ob.plot_r2_celltypes()
     # plot_ob.plot_symmetry()
 
