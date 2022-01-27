@@ -5,7 +5,8 @@ import torch
 import torch.utils.data
 from torch.nn.utils.rnn import pad_sequence
 import training.config as config
-import matplotlib
+#import matplotlib as mpl
+#mpl.use('module://backend_interagg')
 
 #matplotlib.use('pdf')
 
@@ -223,8 +224,9 @@ def get_data_loader_batch_chr(cfg):
 
     sample_index_list = []
 
-    chr_list = [2, 22, 10, 12, 7, 3, 16, 11, 20, 4, 19, 15, 18, 8, 14, 6, 17, 21, 1]
-    # chr_list = [2, 22, 10, 12, 1, 3, 16, 11, 20, 4, 19, 9, 15, 5, 18, 8, 14, 6, 17, 13]
+    # chr_list = [2, 22, 10, 12, 7, 3, 16, 11, 20, 4, 19, 15, 18, 8, 14, 6, 17, 21]
+    # chr_list = [2, 22, 10, 12, 3, 16, 11, 20, 4, 19, 9, 15, 5, 18, 8, 14, 6, 17, 13, 21]
+    chr_list = [22, 12, 16, 11, 20, 19, 15, 18, 14, 17, 13, 21]
     # chr_list = [19, 22, 20, 21]
 
     for chr in chr_list:

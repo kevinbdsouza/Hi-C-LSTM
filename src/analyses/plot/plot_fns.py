@@ -1,7 +1,7 @@
 import logging
 import numpy as np
 import matplotlib as mpl
-
+#mpl.use('WebAgg')
 mpl.use('module://backend_interagg')
 import matplotlib.pyplot as plt
 import operator
@@ -175,12 +175,12 @@ class PlotFns:
                  "Loop Domains", "Subcompartments"]
 
         if cell == "GM12878":
-            lstm_values_all_tasks = np.load(self.path + "lstm/" + "lstm_values_all_tasks.npy")
-            sniper_intra_values_all_tasks = np.load(self.path + "lstm/" + "sniper_intra_values_all_tasks.npy")
-            sniper_inter_values_all_tasks = np.load(self.path + "lstm/" + "sniper_inter_values_all_tasks.npy")
-            graph_values_all_tasks = np.load(self.path + "lstm/" + "graph_values_all_tasks.npy")
-            pca_values_all_tasks = np.load(self.path + "lstm/" + "pca_values_all_tasks.npy")
-            sbcid_values_all_tasks = np.load(self.path + "lstm/" + "sbcid_values_all_tasks.npy")
+            lstm_values_all_tasks = np.load(self.path + "lstm_values_all_tasks.npy")
+            sniper_intra_values_all_tasks = np.load(self.path + "sniper_intra_values_all_tasks.npy")
+            sniper_inter_values_all_tasks = np.load(self.path + "sniper_inter_values_all_tasks.npy")
+            graph_values_all_tasks = np.load(self.path + "graph_values_all_tasks.npy")
+            pca_values_all_tasks = np.load(self.path + "pca_values_all_tasks.npy")
+            sbcid_values_all_tasks = np.load(self.path + "sbcid_values_all_tasks.npy")
         elif cell == "H1hESC":
             lstm_values_all_tasks = np.load(self.path + "h1_values_all_tasks.npy")
             sniper_intra_values_all_tasks = np.load(self.path + "sniper_intra_h1_all_tasks.npy")
@@ -215,6 +215,7 @@ class PlotFns:
         palette = {"Hi-C-LSTM": "C3", "SNIPER-INTRA": "C0", "SNIPER-INTER": "C1", "SCI": "C2", "PCA": "C4",
                    "SBCID": "C5"}
         plt.figure(figsize=(12, 10))
+        #plt.tight_layout()
         plt.xticks(rotation=90, fontsize=20)
         plt.yticks(fontsize=20)
         plt.xlabel("Prediction Target", fontsize=20)
@@ -231,6 +232,7 @@ class PlotFns:
         plt.plot('Tasks', 'SBCID', data=df_main, marker='s', markersize=16, color="C5", linewidth=3, linestyle='dashed',
                  label="SBCID")
         plt.legend(fontsize=18)
+        plt.savefig("/home/kevindsouza/Downloads/map.png")
         plt.show()
 
         pass
@@ -245,32 +247,37 @@ class PlotFns:
         hff_values_all_tasks = np.load(self.path + "hff_values_all_tasks.npy")
         wtc_values_all_tasks = np.load(self.path + "wtc_values_all_tasks.npy")
         gmlow_values_all_tasks = np.load(self.path + "gmlow_values_all_tasks.npy")
+        gmlow2_values_all_tasks = np.load(self.path + "gmlow2_values_all_tasks.npy")
 
-        df_main = pd.DataFrame(columns=["Tasks", "GM12878 (Rao 2014)", "H1hESC (Dekker 4DN)", "WTC11 (Dekker 4DN)",
-                                        "GM12878 (low - Aiden 4DN)", "HFFhTERT (Dekker 4DN)"])
+        df_main = pd.DataFrame(columns=["Tasks", "GM12878_Rao", "H1hESC_Dekker", "WTC11_Dekker",
+                                        "GM12878_low", "HFFhTERT_Dekker", "GM12878_low2"])
         df_main["Tasks"] = tasks
-        df_main["GM12878 (Rao 2014)"] = gm_values_all_tasks
-        df_main["H1hESC (Dekker 4DN)"] = h1_values_all_tasks
-        df_main["WTC11 (Dekker 4DN)"] = wtc_values_all_tasks
-        df_main["GM12878 (low - Aiden 4DN)"] = gmlow_values_all_tasks
-        df_main["HFFhTERT (Dekker 4DN)"] = hff_values_all_tasks
+        df_main["GM12878_Rao"] = gm_values_all_tasks
+        df_main["H1hESC_Dekker"] = h1_values_all_tasks
+        df_main["WTC11_Dekker"] = wtc_values_all_tasks
+        df_main["GM12878_low"] = gmlow_values_all_tasks
+        df_main["GM12878_low2"] = gmlow2_values_all_tasks
+        df_main["HFFhTERT_Dekker"] = hff_values_all_tasks
 
         plt.figure(figsize=(12, 10))
         plt.xticks(rotation=90, fontsize=20)
         plt.yticks(fontsize=20)
         plt.xlabel("Prediction Target", fontsize=20)
         plt.ylabel("mAP ", fontsize=20)
-        plt.plot('Tasks', 'GM12878 (Rao 2014)', data=df_main, marker='o', markersize=16, color="C0", linewidth=3,
-                 label="GM12878 (Rao 2014)")
-        plt.plot('Tasks', 'H1hESC (Dekker 4DN)', data=df_main, marker='D', markersize=16, color="C1", linewidth=3,
-                 label="H1hESC (Dekker 4DN)")
-        plt.plot('Tasks', 'WTC11 (Dekker 4DN)', data=df_main, marker='^', markersize=16, color="C2", linewidth=3,
-                 label="WTC11 (Dekker 4DN)")
-        plt.plot('Tasks', 'GM12878 (low - Aiden 4DN)', data=df_main, marker='s', markersize=16, color="C3", linewidth=3,
-                 label="GM12878 (low - Aiden 4DN)")
-        plt.plot('Tasks', 'HFFhTERT (Dekker 4DN)', data=df_main, marker='v', markersize=16, color="C4", linewidth=3,
-                 label="HFFhTERT (Dekker 4DN)")
+        plt.plot('Tasks', 'GM12878_Rao', data=df_main, marker='o', markersize=16, color="C0", linewidth=3,
+                 label="GM12878 (Rao 2014, 3B)")
+        plt.plot('Tasks', 'H1hESC_Dekker', data=df_main, marker='D', markersize=16, color="C1", linewidth=3,
+                 label="H1hESC (Dekker 4DN, 2.5B)")
+        plt.plot('Tasks', 'WTC11_Dekker', data=df_main, marker='^', markersize=16, color="C2", linewidth=3,
+                 label="WTC11 (Dekker 4DN, 1.3B)")
+        plt.plot('Tasks', 'HFFhTERT_Dekker', data=df_main, marker='v', markersize=16, color="C4", linewidth=3,
+                 label="HFFhTERT (Dekker 4DN, 354M)")
+        plt.plot('Tasks', 'GM12878_low', data=df_main, marker='s', markersize=16, color="C3", linewidth=3,
+                 label="GM12878 (Aiden 4DN, 300M)")
+        plt.plot('Tasks', 'GM12878_low2', data=df_main, marker='*', markersize=16, color="C5", linewidth=3,
+                 label="GM12878 (Aiden 4DN, 216M)")
         plt.legend(fontsize=18)
+        plt.savefig("/home/kevindsouza/Downloads/map_cells.png")
         plt.show()
 
         pass
@@ -509,30 +516,36 @@ class PlotFns:
         r1_hiclstm_hff = np.load(self.path + "r1_hiclstm_hff.npy")
         r1_hiclstm_wtc = np.load(self.path + "r1_hiclstm_wtc.npy")
         r1_hiclstm_gmlow = np.load(self.path + "r1_hiclstm_gmlow.npy")
+        r1_hiclstm_gmlow2 = np.load(self.path + "r1_hiclstm_gmlow2.npy")
 
         r2_hiclstm_gm = np.load(self.path + "r2_hiclstm_lstm.npy")
         r2_hiclstm_h1 = np.load(self.path + "r2_hiclstm_h1.npy")
         r2_hiclstm_wtc = np.load(self.path + "r2_hiclstm_wtc.npy")
         r2_hiclstm_gmlow = np.load(self.path + "r2_hiclstm_gmlow.npy")
         r2_hiclstm_hff = np.load(self.path + "r2_hiclstm_hff.npy")
+        r2_hiclstm_gmlow2 = np.load(self.path + "r2_hiclstm_gmlow2.npy")
 
         fig, (ax1, ax2) = plt.subplots(1, 2, sharey=True, figsize=(14, 8))
 
-        ax1.plot(pos, r1_hiclstm_gm, marker='o', markersize=16, color='C0', linewidth=3, label='GM12878 (Rao 2014)')
-        ax1.plot(pos, r1_hiclstm_h1, marker='D', markersize=16, color='C1', linewidth=3, label='H1hESC (Dekker 4DN)')
-        ax1.plot(pos, r1_hiclstm_wtc, marker='^', markersize=16, color='C2', linewidth=3, label='WTC11 (Dekker 4DN)')
-        ax1.plot(pos, r1_hiclstm_gmlow, marker='s', markersize=16, color='C3', linewidth=3,
-                 label='GM12878 (low - Aiden 4DN)')
+        ax1.plot(pos, r1_hiclstm_gm, marker='o', markersize=16, color='C0', linewidth=3, label='GM12878 (Rao 2014, 3B)')
+        ax1.plot(pos, r1_hiclstm_h1, marker='D', markersize=16, color='C1', linewidth=3, label='H1hESC (Dekker 4DN, 2.5B)')
+        ax1.plot(pos, r1_hiclstm_wtc, marker='^', markersize=16, color='C2', linewidth=3, label='WTC11 (Dekker 4DN, 1.3B)')
         ax1.plot(pos, r1_hiclstm_hff, marker='v', markersize=16, color='C4', linewidth=3,
-                 label='HFFhTERT (Dekker 4DN)')
+                 label='HFFhTERT (Dekker 4DN, 354M)')
+        ax1.plot(pos, r1_hiclstm_gmlow, marker='s', markersize=16, color='C3', linewidth=3,
+                 label='GM12878 (Aiden 4DN, 300M)')
+        ax1.plot(pos, r1_hiclstm_gmlow2, marker='*', markersize=16, color='C5', linewidth=3,
+                 label='GM12878 (Aiden 4DN, 216M)')
 
-        ax2.plot(pos, r2_hiclstm_gm, marker='o', markersize=16, color='C0', linewidth=3, label='GM12878 (Rao 2014)')
-        ax2.plot(pos, r2_hiclstm_h1, marker='D', markersize=16, color='C1', linewidth=3, label='H1hESC (Dekker 4DN)')
-        ax2.plot(pos, r2_hiclstm_wtc, marker='^', markersize=16, color='C2', linewidth=3, label='WTC11 (Dekker 4DN)')
-        ax2.plot(pos, r2_hiclstm_gmlow, marker='s', markersize=16, color='C3', linewidth=3,
-                 label='GM12878 (low - Aiden 4DN)')
+        ax2.plot(pos, r2_hiclstm_gm, marker='o', markersize=16, color='C0', linewidth=3, label='GM12878 (Rao 2014, 3B)')
+        ax2.plot(pos, r2_hiclstm_h1, marker='D', markersize=16, color='C1', linewidth=3, label='H1hESC (Dekker 4DN, 2.5B)')
+        ax2.plot(pos, r2_hiclstm_wtc, marker='^', markersize=16, color='C2', linewidth=3, label='WTC11 (Dekker 4DN, 1.3B)')
         ax2.plot(pos, r2_hiclstm_hff, marker='v', markersize=16, color='C4', linewidth=3,
-                 label='HFFhTERT (Dekker 4DN)')
+                 label='HFFhTERT (Dekker 4DN, 354M)')
+        ax2.plot(pos, r2_hiclstm_gmlow, marker='s', markersize=16, color='C3', linewidth=3,
+                 label='GM12878 (Aiden 4DN, 300M)')
+        ax2.plot(pos, r2_hiclstm_gmlow2, marker='*', markersize=16, color='C5', linewidth=3,
+                 label='GM12878 (Aiden 4DN, 216M)')
 
         ax1.tick_params(axis="x", labelsize=20, length=0)
         ax2.tick_params(axis="x", labelsize=20, length=0)
@@ -947,7 +960,7 @@ if __name__ == "__main__":
     cfg = config.Config()
     plot_ob = PlotFns(cfg)
 
-    # plot_ob.plot_combined(cell = "H1hESC")
+    plot_ob.plot_combined(cell = "GM12878")
     # plot_ob.plot_mAP_celltypes()
     # plot_ob.plot_auroc_celltypes()
     # plot_ob.plot_auroc()
@@ -958,7 +971,7 @@ if __name__ == "__main__":
     # plot_ob.plot_xgb()
     # plot_ob.plot_gbr()
 
-    # plot_ob.plot_r2(cell = "H1hESC")
+    # plot_ob.plot_r2(cell = "HFFhTERT")
     # plot_ob.plot_r2_celltypes()
     # plot_ob.plot_symmetry()
 
@@ -969,9 +982,11 @@ if __name__ == "__main__":
     # plot_ob.plot_feature_signal()
     # plot_ob.plot_pred_range()
 
+    '''
     chr = 21
     pred_data = pd.read_csv(cfg.output_directory + "shuffle_%s_predictions_chr%s.csv" % (cfg.cell, str(chr)), sep="\t")
     hic_mat, st = plot_ob.plot_heatmaps(pred_data)
     plot_ob.ctcf_dots(hic_mat, st, chr)
+    '''
 
     print("done")

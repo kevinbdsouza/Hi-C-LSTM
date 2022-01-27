@@ -13,6 +13,8 @@ from analyses.classification.fires import Fires
 from analyses.classification.loops import Loops
 from analyses.classification.domains import Domains
 import seaborn as sns
+#import matplotlib as mpl
+#mpl.use('module://backend_interagg')
 import matplotlib.pyplot as plt
 
 device = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
