@@ -204,6 +204,7 @@ class PlotFns:
         df_main["SBCID"] = sbcid_values_all_tasks + sbcid_auroc_all_tasks
 
         def plot_stackedbar(df_main, methods, colors):
+            df_main = df_main.set_index("Tasks")
             fields = df_main.columns.tolist()
 
             # figure and axis
@@ -216,7 +217,7 @@ class PlotFns:
                 left = left + df_main[name]
 
             # legend
-            plt.legend(methods, bbox_to_anchor=([0.58, 1, 0, 0]), ncol=4, frameon=False, fontsize=18)
+            plt.legend(methods, bbox_to_anchor=([0.58, 1, 0, 0]), ncol=6, frameon=False, fontsize=18)
 
             # remove spines
             ax.spines['right'].set_visible(False)
