@@ -192,30 +192,30 @@ class PlotFns:
             pca_auroc_all_tasks = np.load(self.path + "pca_auroc_all_tasks.npy")
             sbcid_auroc_all_tasks = np.load(self.path + "sbcid_auroc_all_tasks.npy")
 
-            lstm_accuracy_all_tasks = np.load(self.path + "gm_auroc_all_tasks.npy")
-            sniper_intra_accuracy_all_tasks = np.load(self.path + "sniper_intra_auroc_all_tasks.npy")
-            sniper_inter_accuracy_all_tasks = np.load(self.path + "sniper_inter_auroc_all_tasks.npy")
-            graph_accuracy_all_tasks = np.load(self.path + "graph_auroc_all_tasks.npy")
-            pca_accuracy_all_tasks = np.load(self.path + "pca_auroc_all_tasks.npy")
-            sbcid_accuracy_all_tasks = np.load(self.path + "sbcid_auroc_all_tasks.npy")
+            lstm_accuracy_all_tasks = np.load(self.path + "gm_accuracy_all_tasks.npy")
+            sniper_intra_accuracy_all_tasks = np.load(self.path + "gm_sniper_intra_accuracy_all_tasks.npy")
+            sniper_inter_accuracy_all_tasks = np.load(self.path + "gm_sniper_inter_accuracy_all_tasks.npy")
+            graph_accuracy_all_tasks = np.load(self.path + "gm_graph_accuracy_all_tasks.npy")
+            pca_accuracy_all_tasks = np.load(self.path + "gm_pca_accuracy_all_tasks.npy")
+            sbcid_accuracy_all_tasks = np.load(self.path + "gm_sbcid_accuracy_all_tasks.npy")
 
-            lstm_fscore_all_tasks = np.load(self.path + "gm_auroc_all_tasks.npy")
-            sniper_intra_fscore_all_tasks = np.load(self.path + "sniper_intra_auroc_all_tasks.npy")
-            sniper_inter_fscore_all_tasks = np.load(self.path + "sniper_inter_auroc_all_tasks.npy")
-            graph_fscore_all_tasks = np.load(self.path + "graph_auroc_all_tasks.npy")
-            pca_fscore_all_tasks = np.load(self.path + "pca_auroc_all_tasks.npy")
-            sbcid_fscore_all_tasks = np.load(self.path + "sbcid_auroc_all_tasks.npy")
+            lstm_fscore_all_tasks = np.load(self.path + "gm_fscore_all_tasks.npy")
+            sniper_intra_fscore_all_tasks = np.load(self.path + "gm_sniper_intra_fscore_all_tasks.npy")
+            sniper_inter_fscore_all_tasks = np.load(self.path + "gm_sniper_inter_fscore_all_tasks.npy")
+            graph_fscore_all_tasks = np.load(self.path + "gm_graph_fscore_all_tasks.npy")
+            pca_fscore_all_tasks = np.load(self.path + "gm_pca_fscore_all_tasks.npy")
+            sbcid_fscore_all_tasks = np.load(self.path + "gm_sbcid_fscore_all_tasks.npy")
 
         df_main = pd.DataFrame(
             columns=["Tasks", "Hi-C-LSTM", "SNIPER-INTRA", "SNIPER-INTER", "SCI", "PCA",
                      "SBCID"])
         df_main["Tasks"] = tasks
-        df_main["Hi-C-LSTM"] = lstm_values_all_tasks + lstm_auroc_all_tasks
-        df_main["SNIPER-INTRA"] = sniper_intra_values_all_tasks + sniper_intra_auroc_all_tasks
-        df_main["SNIPER-INTER"] = sniper_inter_values_all_tasks + sniper_inter_auroc_all_tasks
-        df_main["SCI"] = graph_values_all_tasks + graph_auroc_all_tasks
-        df_main["PCA"] = pca_values_all_tasks + pca_auroc_all_tasks
-        df_main["SBCID"] = sbcid_values_all_tasks + sbcid_auroc_all_tasks
+        df_main["Hi-C-LSTM"] = lstm_values_all_tasks + lstm_auroc_all_tasks + lstm_accuracy_all_tasks + lstm_fscore_all_tasks
+        df_main["SNIPER-INTRA"] = sniper_intra_values_all_tasks + sniper_intra_auroc_all_tasks + sniper_intra_accuracy_all_tasks + sniper_intra_fscore_all_tasks
+        df_main["SNIPER-INTER"] = sniper_inter_values_all_tasks + sniper_inter_auroc_all_tasks + sniper_inter_accuracy_all_tasks + sniper_inter_fscore_all_tasks
+        df_main["SCI"] = graph_values_all_tasks + graph_auroc_all_tasks + graph_accuracy_all_tasks + graph_fscore_all_tasks
+        df_main["PCA"] = pca_values_all_tasks + pca_auroc_all_tasks + pca_accuracy_all_tasks + pca_fscore_all_tasks
+        df_main["SBCID"] = sbcid_values_all_tasks + sbcid_auroc_all_tasks + sbcid_accuracy_all_tasks + sbcid_fscore_all_tasks
 
         def plot_stackedbar(df_main, methods, colors):
             df_main = df_main.set_index("Tasks")
@@ -241,8 +241,8 @@ class PlotFns:
             ax.spines['bottom'].set_visible(False)
 
             # format x ticks
-            xticks = np.arange(0, 2.1, 0.2)
-            xlabels = ['{}'.format(i) for i in np.arange(0, 2.1, 0.2)]
+            xticks = np.arange(0, 24.1, 4)
+            xlabels = ['{}'.format(i) for i in np.arange(0, 24.1, 4)]
             plt.xticks(xticks, xlabels, fontsize=20)
 
             # adjust limits and draw grid lines
