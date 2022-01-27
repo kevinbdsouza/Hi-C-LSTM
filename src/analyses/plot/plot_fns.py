@@ -203,7 +203,7 @@ class PlotFns:
         df_main["PCA"] = pca_values_all_tasks + pca_auroc_all_tasks
         df_main["SBCID"] = sbcid_values_all_tasks + sbcid_auroc_all_tasks
 
-        def plot_stackedbar_p(df_main, methods, colors):
+        def plot_stackedbar(df_main, methods, colors):
             fields = df_main.columns.tolist()
 
             # figure and axis
@@ -234,8 +234,8 @@ class PlotFns:
             ax.xaxis.grid(color='gray', linestyle='dashed')
 
             plt.show()
-            
-        plot_stackedbar_p(df_main, methods, colors)
+
+        plot_stackedbar(df_main, methods, colors)
 
         pass
 
@@ -1039,8 +1039,9 @@ if __name__ == "__main__":
     plot_ob = PlotFns(cfg)
 
     # plot_ob.plot_combined(cell = "HFFhTERT")
+    plot_ob.plot_combined_all(cell = "GM12878")
     # plot_ob.plot_mAP_celltypes()
-    plot_ob.plot_auroc_celltypes()
+    # plot_ob.plot_auroc_celltypes()
     # plot_ob.plot_auroc()
 
     # hidden_list = [4, 8, 16, 32, 64, 128]
