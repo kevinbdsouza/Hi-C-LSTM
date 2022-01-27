@@ -1,7 +1,8 @@
 import logging
 import numpy as np
 import matplotlib as mpl
-#mpl.use('WebAgg')
+
+# mpl.use('WebAgg')
 mpl.use('module://backend_interagg')
 import matplotlib.pyplot as plt
 import operator
@@ -169,6 +170,75 @@ class PlotFns:
 
         pass
 
+    def plot_combined_all(self, cell):
+        tasks = ["Gene Expression", "Replication Timing", "Enhancers", "TSS", "PE-Interactions", "FIREs",
+                 "Non-loop Domains", "Loop Domains", "Subcompartments"]
+
+        methods = ["Hi-C-LSTM", "SNIPER-INTRA", "SNIPER-INTER", "SCI", "PCA", "SBCID"]
+        colors = ['C3', 'C0', 'C1', 'C2', 'C4', 'C5']
+
+        if cell == "GM12878":
+            lstm_values_all_tasks = np.load(self.path + "lstm_values_all_tasks.npy")
+            sniper_intra_values_all_tasks = np.load(self.path + "sniper_intra_values_all_tasks.npy")
+            sniper_inter_values_all_tasks = np.load(self.path + "sniper_inter_values_all_tasks.npy")
+            graph_values_all_tasks = np.load(self.path + "graph_values_all_tasks.npy")
+            pca_values_all_tasks = np.load(self.path + "pca_values_all_tasks.npy")
+            sbcid_values_all_tasks = np.load(self.path + "sbcid_values_all_tasks.npy")
+
+            lstm_auroc_all_tasks = np.load(self.path + "gm_auroc_all_tasks.npy")
+            sniper_intra_auroc_all_tasks = np.load(self.path + "sniper_intra_auroc_all_tasks.npy")
+            sniper_inter_auroc_all_tasks = np.load(self.path + "sniper_inter_auroc_all_tasks.npy")
+            graph_auroc_all_tasks = np.load(self.path + "graph_auroc_all_tasks.npy")
+            pca_auroc_all_tasks = np.load(self.path + "pca_auroc_all_tasks.npy")
+            sbcid_auroc_all_tasks = np.load(self.path + "sbcid_auroc_all_tasks.npy")
+
+        df_main = pd.DataFrame(
+            columns=["Tasks", "Hi-C-LSTM", "SNIPER-INTRA", "SNIPER-INTER", "SCI", "PCA",
+                     "SBCID"])
+        df_main["Tasks"] = tasks
+        df_main["Hi-C-LSTM"] = lstm_values_all_tasks + lstm_auroc_all_tasks
+        df_main["SNIPER-INTRA"] = sniper_intra_values_all_tasks + sniper_intra_auroc_all_tasks
+        df_main["SNIPER-INTER"] = sniper_inter_values_all_tasks + sniper_inter_auroc_all_tasks
+        df_main["SCI"] = graph_values_all_tasks + graph_auroc_all_tasks
+        df_main["PCA"] = pca_values_all_tasks + pca_auroc_all_tasks
+        df_main["SBCID"] = sbcid_values_all_tasks + sbcid_auroc_all_tasks
+
+        def plot_stackedbar_p(df_main, methods, colors):
+            fields = df_main.columns.tolist()
+
+            # figure and axis
+            fig, ax = plt.subplots(1, figsize=(12, 10))
+
+            # plot bars
+            left = len(df_main) * [0]
+            for idx, name in enumerate(fields):
+                plt.barh(df_main.index, df_main[name], left=left, color=colors[idx])
+                left = left + df_main[name]
+
+            # legend
+            plt.legend(methods, bbox_to_anchor=([0.58, 1, 0, 0]), ncol=4, frameon=False, fontsize=18)
+
+            # remove spines
+            ax.spines['right'].set_visible(False)
+            ax.spines['left'].set_visible(False)
+            ax.spines['top'].set_visible(False)
+            ax.spines['bottom'].set_visible(False)
+
+            # format x ticks
+            xticks = np.arange(0, 2.1, 0.2)
+            xlabels = ['{}'.format(i) for i in np.arange(0, 2.1, 0.2)]
+            plt.xticks(xticks, xlabels, fontsize=20)
+
+            # adjust limits and draw grid lines
+            plt.ylim(-0.5, ax.get_yticks()[-1] + 0.5)
+            ax.xaxis.grid(color='gray', linestyle='dashed')
+
+            plt.show()
+            
+        plot_stackedbar_p(df_main, methods, colors)
+
+        pass
+
     def plot_combined(self, cell):
         tasks = ["Gene Expression", "Replication Timing", "Enhancers", "TSS", "PE-Interactions", "FIREs",
                  "Non-loop Domains",
@@ -215,7 +285,7 @@ class PlotFns:
         palette = {"Hi-C-LSTM": "C3", "SNIPER-INTRA": "C0", "SNIPER-INTER": "C1", "SCI": "C2", "PCA": "C4",
                    "SBCID": "C5"}
         plt.figure(figsize=(12, 10))
-        #plt.tight_layout()
+        # plt.tight_layout()
         plt.xticks(rotation=90, fontsize=20)
         plt.yticks(fontsize=20)
         plt.xlabel("Prediction Target", fontsize=20)
@@ -232,7 +302,7 @@ class PlotFns:
         plt.plot('Tasks', 'SBCID', data=df_main, marker='s', markersize=16, color="C5", linewidth=3, linestyle='dashed',
                  label="SBCID")
         plt.legend(fontsize=18)
-        #plt.savefig("/home/kevindsouza/Downloads/map.png")
+        # plt.savefig("/home/kevindsouza/Downloads/map.png")
         plt.show()
 
         pass
@@ -321,7 +391,6 @@ class PlotFns:
                  label="GM12878 (Aiden 4DN, 300M)")
         plt.plot('Tasks', 'GM12878_low2', data=df_main, marker='*', markersize=16, color="C5", linewidth=3,
                  label="GM12878 (Aiden 4DN, 216M)")
-
 
         plt.legend(fontsize=18)
         plt.show()
@@ -533,8 +602,10 @@ class PlotFns:
         fig, (ax1, ax2) = plt.subplots(1, 2, sharey=True, figsize=(14, 8))
 
         ax1.plot(pos, r1_hiclstm_gm, marker='o', markersize=16, color='C0', linewidth=3, label='GM12878 (Rao 2014, 3B)')
-        ax1.plot(pos, r1_hiclstm_h1, marker='D', markersize=16, color='C1', linewidth=3, label='H1hESC (Dekker 4DN, 2.5B)')
-        ax1.plot(pos, r1_hiclstm_wtc, marker='^', markersize=16, color='C2', linewidth=3, label='WTC11 (Dekker 4DN, 1.3B)')
+        ax1.plot(pos, r1_hiclstm_h1, marker='D', markersize=16, color='C1', linewidth=3,
+                 label='H1hESC (Dekker 4DN, 2.5B)')
+        ax1.plot(pos, r1_hiclstm_wtc, marker='^', markersize=16, color='C2', linewidth=3,
+                 label='WTC11 (Dekker 4DN, 1.3B)')
         ax1.plot(pos, r1_hiclstm_hff, marker='v', markersize=16, color='C4', linewidth=3,
                  label='HFFhTERT (Dekker 4DN, 354M)')
         ax1.plot(pos, r1_hiclstm_gmlow, marker='s', markersize=16, color='C3', linewidth=3,
@@ -543,8 +614,10 @@ class PlotFns:
                  label='GM12878 (Aiden 4DN, 216M)')
 
         ax2.plot(pos, r2_hiclstm_gm, marker='o', markersize=16, color='C0', linewidth=3, label='GM12878 (Rao 2014, 3B)')
-        ax2.plot(pos, r2_hiclstm_h1, marker='D', markersize=16, color='C1', linewidth=3, label='H1hESC (Dekker 4DN, 2.5B)')
-        ax2.plot(pos, r2_hiclstm_wtc, marker='^', markersize=16, color='C2', linewidth=3, label='WTC11 (Dekker 4DN, 1.3B)')
+        ax2.plot(pos, r2_hiclstm_h1, marker='D', markersize=16, color='C1', linewidth=3,
+                 label='H1hESC (Dekker 4DN, 2.5B)')
+        ax2.plot(pos, r2_hiclstm_wtc, marker='^', markersize=16, color='C2', linewidth=3,
+                 label='WTC11 (Dekker 4DN, 1.3B)')
         ax2.plot(pos, r2_hiclstm_hff, marker='v', markersize=16, color='C4', linewidth=3,
                  label='HFFhTERT (Dekker 4DN, 354M)')
         ax2.plot(pos, r2_hiclstm_gmlow, marker='s', markersize=16, color='C3', linewidth=3,
