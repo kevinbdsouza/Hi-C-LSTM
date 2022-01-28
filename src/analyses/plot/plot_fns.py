@@ -232,7 +232,7 @@ class PlotFns:
 
             # legend
             plt.rcParams.update({'font.size': 22})
-            plt.legend(methods, bbox_to_anchor=([0.01, 1, 0, 0]), ncol=6, frameon=False, fontsize=14)
+            plt.legend(methods, bbox_to_anchor=([0.02, 1, 0, 0]), ncol=6, frameon=False, fontsize=14)
 
             # remove spines
             ax.spines['right'].set_visible(False)
