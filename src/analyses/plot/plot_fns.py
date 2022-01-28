@@ -244,7 +244,7 @@ class PlotFns:
 
             # legend
             plt.rcParams.update({'font.size': 22})
-            plt.legend(tasks, bbox_to_anchor=([0.02, 1, 0, 0]), ncol=4, frameon=False, fontsize=14)
+            plt.legend(tasks, bbox_to_anchor=([0.02, 1, 0, 0]), ncol=5, frameon=False, fontsize=14)
 
             # remove spines
             ax.spines['right'].set_visible(False)
@@ -253,8 +253,8 @@ class PlotFns:
             ax.spines['bottom'].set_visible(False)
 
             # format x ticks
-            xticks = np.arange(0, 36.1, 4)
-            xlabels = ['{}'.format(i) for i in np.arange(0, 36.1, 4)]
+            xticks = np.arange(0, 48.1, 4)
+            xlabels = ['{}'.format(i) for i in np.arange(0, 48.1, 4)]
             plt.xticks(xticks, xlabels, fontsize=20)
 
             # adjust limits and draw grid lines
