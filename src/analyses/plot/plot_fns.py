@@ -175,7 +175,7 @@ class PlotFns:
                  "Non-loop Domains", "Loop Domains", "Subcompartments"]
 
         methods = ["Hi-C-LSTM", "SNIPER-INTRA", "SNIPER-INTER", "SCI", "PCA", "SBCID"]
-        colors = ['C3', 'C0', 'C1', 'C2', 'C4', 'C5']
+        colors = ['C3', 'C0', 'C1', 'C2', 'C4', 'C5', 'C6', 'C7', 'C8']
 
         if cell == "GM12878":
             lstm_values_all_tasks = np.load(self.path + "lstm_values_all_tasks.npy")
@@ -239,7 +239,7 @@ class PlotFns:
 
             # legend
             plt.rcParams.update({'font.size': 22})
-            plt.legend(methods, bbox_to_anchor=([0.02, 1, 0, 0]), ncol=6, frameon=False, fontsize=14)
+            plt.legend(methods, bbox_to_anchor=([0.02, 1, 0, 0]), ncol=9, frameon=False, fontsize=14)
 
             # remove spines
             ax.spines['right'].set_visible(False)
