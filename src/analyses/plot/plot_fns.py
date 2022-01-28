@@ -948,7 +948,6 @@ class PlotFns:
         df_main = pd.DataFrame(columns=["pos", "CTCF_Cohesin_KO_Loop", "Convergent_CTCF", "Divergent_CTCF",
                                         "CTCF_KO_nl", "ZNF143_KO", "FOXG1_KO", "SOX2_KO", "XBP1_KO"])
         df_main["pos"] = pos
-        # df_main["No KO"] = predicted_probs
         df_main["CTCF_Cohesin_KO_Loop"] = ctcfko_diff
         df_main["Convergent_CTCF"] = convctcf_diff
         df_main["Divergent_CTCF"] = divctcf_diff
@@ -957,6 +956,8 @@ class PlotFns:
         df_main["FOXG1_KO"] = foxgko_diff
         df_main["SOX2_KO"] = soxko_diff
         df_main["XBP1_KO"] = xbpko_diff
+        df_main["RAD21_KO"] = radko_diff
+        df_main["SMC3_KO"] = smcko_diff
 
         plt.figure(figsize=(12, 10))
         plt.xticks(rotation=90, fontsize=20)
@@ -978,9 +979,9 @@ class PlotFns:
         plt.plot('pos', 'SOX2_KO', data=df_main, marker='x', markersize=16, color="C6", linewidth=3, label="SOX2 KO")
         plt.plot('pos', 'XBP1_KO', data=df_main, marker='+', markersize=16, color="C7", linewidth=3, label="XBP1 KO")
 
-        #plt.plot('pos', 'RAD21 KO', data=df_main, marker='s', markersize=16, color="C2", linewidth=3,
-        #         linestyle='dashdot', label="RAD21 KO")
-        #plt.plot('pos', 'SMC3 KO', data=df_main, marker='^', markersize=16, color="C4", linewidth=3, label="SMC3 KO")
+        plt.plot('pos', 'RAD21_KO', data=df_main, marker='s', markersize=16, color="C8", linewidth=3,
+                 linestyle='dashdot', label="RAD21 KO (Non-loop)")
+        plt.plot('pos', 'SMC3_KO', data=df_main, marker='^', markersize=16, color="C9", linewidth=3, label="SMC3 KO (Non-loop)")
         plt.legend(fontsize=18)
         plt.show()
 
