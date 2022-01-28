@@ -222,9 +222,9 @@ class PlotFns:
             df_main[
                 "SBCID"] = sbcid_values_all_tasks + sbcid_auroc_all_tasks + sbcid_accuracy_all_tasks + sbcid_fscore_all_tasks
 
-        df_main.to_csv(self.path + "%s_metrics_df.csv" % (cell), sep="\t")
-        # df_main = pd.read_csv(self.path + "%s_metrics_df.csv" % (cell), sep="\t")
-        # df_main = df_main.drop(['Unnamed: 0'], axis=1)
+        #df_main.to_csv(self.path + "%s_metrics_df.csv" % (cell), sep="\t")
+        df_main = pd.read_csv(self.path + "%s_metrics_df.csv" % (cell), sep="\t")
+        df_main = df_main.drop(['Unnamed: 0'], axis=1)
 
         def plot_stackedbar(df_main, tasks, colors):
             # df_main = df_main.set_index("Tasks")
