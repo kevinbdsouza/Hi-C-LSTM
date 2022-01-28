@@ -926,6 +926,12 @@ class PlotFns:
         radko_probs = np.load(self.path + "radko_probs.npy")
         smcko_probs = np.load(self.path + "smcko_probs.npy")
 
+        ctcfko_probs_nl = np.load(self.path + "ctcfko_probs_nl.npy")
+        znfko_probs = np.load(self.path + "znfko_probs.npy")
+        foxgko_probs = np.load(self.path + "foxgko_probs.npy")
+        soxko_probs = np.load(self.path + "soxko_probs.npy")
+        xbpko_probs = np.load(self.path + "xbpko_probs.npy")
+
         # control - KO
         ctcfko_diff = ctcfko_probs - predicted_probs
         convctcf_diff = convctcf_probs - predicted_probs
@@ -933,28 +939,45 @@ class PlotFns:
         radko_diff = radko_probs - predicted_probs
         smcko_diff = smcko_probs - predicted_probs
 
-        df_main = pd.DataFrame(columns=["pos", "CTCF KO", "Convergent CTCF", "Divergent CTCF", "RAD21 KO", "SMC3 KO"])
+        ctcfnl_diff = ctcfko_probs_nl - predicted_probs
+        znfko_diff = znfko_probs - predicted_probs
+        foxgko_diff = foxgko_probs - predicted_probs
+        soxko_diff = soxko_probs - predicted_probs
+        xbpko_diff = xbpko_probs - predicted_probs
+
+        df_main = pd.DataFrame(columns=["pos", "CTCF_Cohesin_KO_Loop", "Convergent_CTCF", "Divergent_CTCF",
+                                        "CTCF_KO_nl", "ZNF143_KO", "FOXG1_KO", "SOX2_KO", "XBP1_KO"])
         df_main["pos"] = pos
         # df_main["No KO"] = predicted_probs
-        df_main["CTCF KO"] = ctcfko_diff
-        df_main["Convergent CTCF"] = convctcf_diff
-        df_main["Divergent CTCF"] = divctcf_diff
-        df_main["RAD21 KO"] = radko_diff
-        df_main["SMC3 KO"] = smcko_diff
+        df_main["CTCF_Cohesin_KO_Loop"] = ctcfko_diff
+        df_main["Convergent_CTCF"] = convctcf_diff
+        df_main["Divergent_CTCF"] = divctcf_diff
+        df_main["CTCF_KO_nl"] = ctcfnl_diff
+        df_main["ZNF143_KO"] = znfko_diff
+        df_main["FOXG1_KO"] = foxgko_diff
+        df_main["SOX2_KO"] = soxko_diff
+        df_main["XBP1_KO"] = xbpko_diff
 
-        palette = {"CTCF KO": "C0", "Convergent CTCF": "C5", "Divergent CTCF": "C1", "RAD21 KO": "C2",
-                   "SMC3 KO": "C4"}
         plt.figure(figsize=(10, 8))
         plt.xticks(rotation=90, fontsize=20)
         plt.yticks(fontsize=20)
         plt.xlabel("Distance between positions in Mbp", fontsize=20)
         plt.ylabel("Average Difference in Contact Strength \n (KO - No KO)", fontsize=20)
         # plt.plot('pos', 'No KO', data=df_main, marker='o', markersize=14, color="C3", linewidth=2, label="No KO")
-        plt.plot('pos', 'CTCF KO', data=df_main, marker='o', markersize=16, color="C0", linewidth=3, label="CTCF+Cohesin KO")
-        plt.plot('pos', 'Convergent CTCF', data=df_main, marker='*', markersize=16, color="C5", linewidth=3,
+        plt.plot('pos', 'CTCF_Cohesin_KO_Loop', data=df_main, marker='o', markersize=16, color="C0", linewidth=3, label="CTCF+Cohesin KO (Loop)")
+        plt.plot('pos', 'Convergent_CTCF', data=df_main, marker='*', markersize=16, color="C5", linewidth=3,
                  linestyle='dotted', label="Div->Conv CTCF")
-        plt.plot('pos', 'Divergent CTCF', data=df_main, marker='D', markersize=16, color="C1", linewidth=3,
+        plt.plot('pos', 'Divergent_CTCF', data=df_main, marker='D', markersize=16, color="C1", linewidth=3,
                  linestyle='dashed', label="Conv->Div CTCF")
+        plt.plot('pos', 'CTCF_KO_nl', data=df_main, marker='s', markersize=16, color="C2", linewidth=3,
+                 linestyle='dotted', label="CTCF KO (Non-loop)")
+        plt.plot('pos', 'ZNF143_KO', data=df_main, marker='^', markersize=16, color="C3", linewidth=3,
+                 linestyle='dashed', label="ZNF143 KO")
+        plt.plot('pos', 'FOXG1_KO', data=df_main, marker='v', markersize=16, color="C4", linewidth=3,
+                 linestyle='dashdot', label="FOXG1 KO")
+        plt.plot('pos', 'SOX2_KO', data=df_main, marker='x', markersize=16, color="C6", linewidth=3, label="SOX2 KO")
+        plt.plot('pos', 'XBP1_KO', data=df_main, marker='+', markersize=16, color="C7", linewidth=3, label="XBP1 KO")
+
         #plt.plot('pos', 'RAD21 KO', data=df_main, marker='s', markersize=16, color="C2", linewidth=3,
         #         linestyle='dashdot', label="RAD21 KO")
         #plt.plot('pos', 'SMC3 KO', data=df_main, marker='^', markersize=16, color="C4", linewidth=3, label="SMC3 KO")
