@@ -222,7 +222,7 @@ class PlotFns:
             fields = df_main.columns.tolist()
 
             # figure and axis
-            fig, ax = plt.subplots(1, figsize=(12, 10))
+            fig, ax = plt.subplots(1, figsize=(14, 12))
 
             # plot bars
             left = len(df_main) * [0]
@@ -232,7 +232,7 @@ class PlotFns:
 
             # legend
             plt.rcParams.update({'font.size': 22})
-            plt.legend(methods, bbox_to_anchor=([0.03, 1, 0, 0]), ncol=6, frameon=False, fontsize=14)
+            plt.legend(methods, bbox_to_anchor=([0.01, 1, 0, 0]), ncol=6, frameon=False, fontsize=14)
 
             # remove spines
             ax.spines['right'].set_visible(False)
