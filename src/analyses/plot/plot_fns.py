@@ -222,7 +222,8 @@ class PlotFns:
         df_main = df_main.drop(['Unnamed: 0'], axis=1)
 
         def plot_stackedbar(df_main, methods, colors):
-            df_main = df_main.set_index("Tasks")
+            #df_main = df_main.set_index("Tasks")
+            df_main = df_main.T
             fields = df_main.columns.tolist()
 
             # figure and axis
