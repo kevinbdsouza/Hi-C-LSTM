@@ -958,7 +958,7 @@ class PlotFns:
         df_main["SOX2_KO"] = soxko_diff
         df_main["XBP1_KO"] = xbpko_diff
 
-        plt.figure(figsize=(10, 8))
+        plt.figure(figsize=(12, 8))
         plt.xticks(rotation=90, fontsize=20)
         plt.yticks(fontsize=20)
         plt.xlabel("Distance between positions in Mbp", fontsize=20)
