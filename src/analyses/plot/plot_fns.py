@@ -312,8 +312,9 @@ class PlotFns:
         df_main["PCA"] = pca_values_all_tasks
         df_main["SBCID"] = sbcid_values_all_tasks
 
-        palette = {"Hi-C-LSTM": "C3", "SNIPER-INTRA": "C0", "SNIPER-INTER": "C1", "SCI": "C2", "PCA": "C4",
-                   "SBCID": "C5"}
+        df_main = pd.read_csv(self.path + "%s_metrics_df.csv" % (cell), sep="\t")
+        df_main = df_main.drop(['Unnamed: 0'], axis=1)
+
         plt.figure(figsize=(12, 10))
         # plt.tight_layout()
         plt.xticks(rotation=90, fontsize=20)
@@ -1068,8 +1069,8 @@ if __name__ == "__main__":
     cfg = config.Config()
     plot_ob = PlotFns(cfg)
 
-    # plot_ob.plot_combined(cell = "GM12878")
-    plot_ob.plot_combined_all(cell="GM12878")
+    plot_ob.plot_combined(cell = "GM12878")
+    # plot_ob.plot_combined_all(cell="GM12878")
     # plot_ob.plot_mAP_celltypes()
     # plot_ob.plot_auroc_celltypes()
     # plot_ob.plot_auroc()
