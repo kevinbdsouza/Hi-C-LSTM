@@ -260,6 +260,8 @@ class PlotFns:
 
         plot_stackedbar(df_main, methods, colors)
 
+        print("done")
+
         pass
 
     def plot_combined(self, cell):
