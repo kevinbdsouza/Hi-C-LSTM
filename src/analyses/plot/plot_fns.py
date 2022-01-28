@@ -244,7 +244,7 @@ class PlotFns:
 
             # legend
             plt.rcParams.update({'font.size': 22})
-            plt.legend(tasks, bbox_to_anchor=([0.02, 1, 0, 0]), ncol=5, frameon=False, fontsize=14)
+            plt.legend(tasks, bbox_to_anchor=([0.02, 1, 0, 0]), ncol=6, frameon=False, fontsize=14)
 
             # remove spines
             ax.spines['right'].set_visible(False)
@@ -260,6 +260,7 @@ class PlotFns:
             # adjust limits and draw grid lines
             plt.ylim(-0.5, ax.get_yticks()[-1] + 0.5)
             ax.xaxis.grid(color='gray', linestyle='dashed')
+            plt.xlabel("Prediction Target", fontsize=20)
             plt.ylabel("Cumulative Prediction Score", fontsize=20)
 
             plt.show()
@@ -316,7 +317,7 @@ class PlotFns:
         df_main["PCA"] = pca_values_all_tasks
         df_main["SBCID"] = sbcid_values_all_tasks
 
-        df_main = pd.read_csv(self.path + "%s_metrics_df.csv" % (cell), sep="\t")
+        df_main = pd.read_csv(self.path + "%s_map_df.csv" % (cell), sep="\t")
         df_main = df_main.drop(['Unnamed: 0'], axis=1)
 
         plt.figure(figsize=(12, 10))
@@ -1074,8 +1075,8 @@ if __name__ == "__main__":
     cfg = config.Config()
     plot_ob = PlotFns(cfg)
 
-    #plot_ob.plot_combined(cell = "GM12878")
-    plot_ob.plot_combined_all(cell="GM12878")
+    plot_ob.plot_combined(cell = "GM12878")
+    # plot_ob.plot_combined_all(cell="GM12878")
     # plot_ob.plot_mAP_celltypes()
     # plot_ob.plot_auroc_celltypes()
     # plot_ob.plot_auroc()
