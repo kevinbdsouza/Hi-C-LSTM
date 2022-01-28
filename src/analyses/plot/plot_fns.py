@@ -950,14 +950,14 @@ class PlotFns:
         plt.xlabel("Distance between positions in Mbp", fontsize=20)
         plt.ylabel("Average Difference in Contact Strength \n (KO - No KO)", fontsize=20)
         # plt.plot('pos', 'No KO', data=df_main, marker='o', markersize=14, color="C3", linewidth=2, label="No KO")
-        plt.plot('pos', 'CTCF KO', data=df_main, marker='o', markersize=16, color="C0", linewidth=3, label="CTCF KO")
+        plt.plot('pos', 'CTCF KO', data=df_main, marker='o', markersize=16, color="C0", linewidth=3, label="CTCF+Cohesin KO")
         plt.plot('pos', 'Convergent CTCF', data=df_main, marker='*', markersize=16, color="C5", linewidth=3,
                  linestyle='dotted', label="Div->Conv CTCF")
         plt.plot('pos', 'Divergent CTCF', data=df_main, marker='D', markersize=16, color="C1", linewidth=3,
                  linestyle='dashed', label="Conv->Div CTCF")
-        plt.plot('pos', 'RAD21 KO', data=df_main, marker='s', markersize=16, color="C2", linewidth=3,
-                 linestyle='dashdot', label="RAD21 KO")
-        plt.plot('pos', 'SMC3 KO', data=df_main, marker='^', markersize=16, color="C4", linewidth=3, label="SMC3 KO")
+        #plt.plot('pos', 'RAD21 KO', data=df_main, marker='s', markersize=16, color="C2", linewidth=3,
+        #         linestyle='dashdot', label="RAD21 KO")
+        #plt.plot('pos', 'SMC3 KO', data=df_main, marker='^', markersize=16, color="C4", linewidth=3, label="SMC3 KO")
         plt.legend(fontsize=18)
         plt.show()
 
@@ -1074,7 +1074,7 @@ if __name__ == "__main__":
     cfg = config.Config()
     plot_ob = PlotFns(cfg)
 
-    plot_ob.plot_combined(cell = "GM12878")
+    #plot_ob.plot_combined(cell = "GM12878")
     # plot_ob.plot_combined_all(cell="GM12878")
     # plot_ob.plot_mAP_celltypes()
     # plot_ob.plot_auroc_celltypes()
@@ -1090,7 +1090,7 @@ if __name__ == "__main__":
     # plot_ob.plot_r2_celltypes()
     # plot_ob.plot_symmetry()
 
-    # plot_ob.plot_knockout_results()
+    plot_ob.plot_knockout_results()
     # plot_ob.plot_knockout_tfs()
     # plot_ob.pr_curves()
 
