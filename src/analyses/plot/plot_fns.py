@@ -270,9 +270,12 @@ class PlotFns:
         pass
 
     def plot_combined(self, cell):
+        #tasks = ["Gene Expression", "Replication Timing", "Enhancers", "TSS", "PE-Interactions", "FIREs",
+        #         "Non-loop Domains", "Loop Domains", "Subcompartments"]
+
         tasks = ["Gene Expression", "Replication Timing", "Enhancers", "TSS", "PE-Interactions", "FIREs",
-                 "Non-loop Domains",
-                 "Loop Domains", "Subcompartments"]
+                 "TADs", "subTADs", "Loop Domains", "TAD Boundaries", "subTAD Boundaries", "Subcompartments"]
+        colors = ['C3', 'C0', 'C1', 'C2', 'C4', 'C5', 'C6', 'C7', 'C8', 'C9', 'C10', 'C11']
 
         if cell == "GM12878":
             lstm_values_all_tasks = np.load(self.path + "gm_accuracy_all_tasks.npy")
