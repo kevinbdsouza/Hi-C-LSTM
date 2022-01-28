@@ -218,10 +218,10 @@ class PlotFns:
             df_main["SBCID"] = sbcid_values_all_tasks + sbcid_auroc_all_tasks + sbcid_accuracy_all_tasks + sbcid_fscore_all_tasks
 
         # df_main.to_csv(self.path + "%s_metrics_df.csv" % (cell), sep="\t")
-        df_main = pd.read_csv(self.path + "%s_metrics_df.csv" % (cell), sep="\t")
-        df_main = df_main.drop(['Unnamed: 0'], axis=1)
+        #df_main = pd.read_csv(self.path + "%s_metrics_df.csv" % (cell), sep="\t")
+        # df_main = df_main.drop(['Unnamed: 0'], axis=1)
 
-        def plot_stackedbar(df_main, methods, colors):
+        def plot_stackedbar(df_main, tasks, colors):
             #df_main = df_main.set_index("Tasks")
             df_main = df_main.T
             df_main.columns = df_main.iloc[0]
@@ -229,7 +229,7 @@ class PlotFns:
             fields = df_main.columns.tolist()
 
             # figure and axis
-            fig, ax = plt.subplots(1, figsize=(14, 12))
+            fig, ax = plt.subplots(1, figsize=(20, 12))
 
             # plot bars
             left = len(df_main) * [0]
@@ -239,7 +239,7 @@ class PlotFns:
 
             # legend
             plt.rcParams.update({'font.size': 22})
-            plt.legend(methods, bbox_to_anchor=([0.02, 1, 0, 0]), ncol=9, frameon=False, fontsize=14)
+            plt.legend(tasks, bbox_to_anchor=([0.02, 1, 0, 0]), ncol=4, frameon=False, fontsize=14)
 
             # remove spines
             ax.spines['right'].set_visible(False)
@@ -248,8 +248,8 @@ class PlotFns:
             ax.spines['bottom'].set_visible(False)
 
             # format x ticks
-            xticks = np.arange(0, 24.1, 4)
-            xlabels = ['{}'.format(i) for i in np.arange(0, 24.1, 4)]
+            xticks = np.arange(0, 36.1, 4)
+            xlabels = ['{}'.format(i) for i in np.arange(0, 36.1, 4)]
             plt.xticks(xticks, xlabels, fontsize=20)
 
             # adjust limits and draw grid lines
@@ -258,7 +258,7 @@ class PlotFns:
 
             plt.show()
 
-        plot_stackedbar(df_main, methods, colors)
+        plot_stackedbar(df_main, tasks, colors)
 
         print("done")
 
@@ -270,12 +270,12 @@ class PlotFns:
                  "Loop Domains", "Subcompartments"]
 
         if cell == "GM12878":
-            lstm_values_all_tasks = np.load(self.path + "lstm_values_all_tasks.npy")
-            sniper_intra_values_all_tasks = np.load(self.path + "sniper_intra_values_all_tasks.npy")
-            sniper_inter_values_all_tasks = np.load(self.path + "sniper_inter_values_all_tasks.npy")
-            graph_values_all_tasks = np.load(self.path + "graph_values_all_tasks.npy")
-            pca_values_all_tasks = np.load(self.path + "pca_values_all_tasks.npy")
-            sbcid_values_all_tasks = np.load(self.path + "sbcid_values_all_tasks.npy")
+            lstm_values_all_tasks = np.load(self.path + "gm_accuracy_all_tasks.npy")
+            sniper_intra_values_all_tasks = np.load(self.path + "gm_sniper_intra_accuracy_all_tasks.npy")
+            sniper_inter_values_all_tasks = np.load(self.path + "gm_sniper_inter_accuracy_all_tasks.npy")
+            graph_values_all_tasks = np.load(self.path + "gm_graph_accuracy_all_tasks.npy")
+            pca_values_all_tasks = np.load(self.path + "gm_pca_accuracy_all_tasks.npy")
+            sbcid_values_all_tasks = np.load(self.path + "gm_sbcid_accuracy_all_tasks.npy")
         elif cell == "H1hESC":
             lstm_values_all_tasks = np.load(self.path + "h1_values_all_tasks.npy")
             sniper_intra_values_all_tasks = np.load(self.path + "sniper_intra_h1_all_tasks.npy")
@@ -1063,7 +1063,7 @@ if __name__ == "__main__":
     cfg = config.Config()
     plot_ob = PlotFns(cfg)
 
-    # plot_ob.plot_combined(cell = "HFFhTERT")
+    # plot_ob.plot_combined(cell = "GM12878")
     plot_ob.plot_combined_all(cell = "GM12878")
     # plot_ob.plot_mAP_celltypes()
     # plot_ob.plot_auroc_celltypes()
