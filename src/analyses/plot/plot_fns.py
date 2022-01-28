@@ -206,16 +206,20 @@ class PlotFns:
             pca_fscore_all_tasks = np.load(self.path + "gm_pca_fscore_all_tasks.npy")
             sbcid_fscore_all_tasks = np.load(self.path + "gm_sbcid_fscore_all_tasks.npy")
 
-        df_main = pd.DataFrame(
-            columns=["Tasks", "Hi-C-LSTM", "SNIPER-INTRA", "SNIPER-INTER", "SCI", "PCA",
-                     "SBCID"])
-        df_main["Tasks"] = tasks
-        df_main["Hi-C-LSTM"] = lstm_values_all_tasks + lstm_auroc_all_tasks + lstm_accuracy_all_tasks + lstm_fscore_all_tasks
-        df_main["SNIPER-INTRA"] = sniper_intra_values_all_tasks + sniper_intra_auroc_all_tasks + sniper_intra_accuracy_all_tasks + sniper_intra_fscore_all_tasks
-        df_main["SNIPER-INTER"] = sniper_inter_values_all_tasks + sniper_inter_auroc_all_tasks + sniper_inter_accuracy_all_tasks + sniper_inter_fscore_all_tasks
-        df_main["SCI"] = graph_values_all_tasks + graph_auroc_all_tasks + graph_accuracy_all_tasks + graph_fscore_all_tasks
-        df_main["PCA"] = pca_values_all_tasks + pca_auroc_all_tasks + pca_accuracy_all_tasks + pca_fscore_all_tasks
-        df_main["SBCID"] = sbcid_values_all_tasks + sbcid_auroc_all_tasks + sbcid_accuracy_all_tasks + sbcid_fscore_all_tasks
+            df_main = pd.DataFrame(
+                columns=["Tasks", "Hi-C-LSTM", "SNIPER-INTRA", "SNIPER-INTER", "SCI", "PCA",
+                         "SBCID"])
+            df_main["Tasks"] = tasks
+            df_main["Hi-C-LSTM"] = lstm_values_all_tasks + lstm_auroc_all_tasks + lstm_accuracy_all_tasks + lstm_fscore_all_tasks
+            df_main["SNIPER-INTRA"] = sniper_intra_values_all_tasks + sniper_intra_auroc_all_tasks + sniper_intra_accuracy_all_tasks + sniper_intra_fscore_all_tasks
+            df_main["SNIPER-INTER"] = sniper_inter_values_all_tasks + sniper_inter_auroc_all_tasks + sniper_inter_accuracy_all_tasks + sniper_inter_fscore_all_tasks
+            df_main["SCI"] = graph_values_all_tasks + graph_auroc_all_tasks + graph_accuracy_all_tasks + graph_fscore_all_tasks
+            df_main["PCA"] = pca_values_all_tasks + pca_auroc_all_tasks + pca_accuracy_all_tasks + pca_fscore_all_tasks
+            df_main["SBCID"] = sbcid_values_all_tasks + sbcid_auroc_all_tasks + sbcid_accuracy_all_tasks + sbcid_fscore_all_tasks
+
+        # df_main.to_csv(self.path + "%s_metrics_df.csv" % (cell), sep="\t")
+        df_main = pd.read_csv(self.path + "%s_metrics_df.csv" % (cell), sep="\t")
+        df_main = df_main.drop(['Unnamed: 0'], axis=1)
 
         def plot_stackedbar(df_main, methods, colors):
             df_main = df_main.set_index("Tasks")
