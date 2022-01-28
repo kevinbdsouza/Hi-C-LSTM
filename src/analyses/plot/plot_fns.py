@@ -172,10 +172,10 @@ class PlotFns:
 
     def plot_combined_all(self, cell):
         tasks = ["Gene Expression", "Replication Timing", "Enhancers", "TSS", "PE-Interactions", "FIREs",
-                 "Non-loop Domains", "Loop Domains", "Subcompartments"]
+                 "TADs", "subTADs", "Loop Domains", "TAD Boundaries", "subTAD Boundaries", "Subcompartments"]
 
         methods = ["Hi-C-LSTM", "SNIPER-INTRA", "SNIPER-INTER", "SCI", "PCA", "SBCID"]
-        colors = ['C3', 'C0', 'C1', 'C2', 'C4', 'C5', 'C6', 'C7', 'C8']
+        colors = ['C3', 'C0', 'C1', 'C2', 'C4', 'C5', 'C6', 'C7', 'C8', 'C9', 'C10', 'C11']
 
         if cell == "GM12878":
             lstm_values_all_tasks = np.load(self.path + "lstm_values_all_tasks.npy")
@@ -210,19 +210,24 @@ class PlotFns:
                 columns=["Tasks", "Hi-C-LSTM", "SNIPER-INTRA", "SNIPER-INTER", "SCI", "PCA",
                          "SBCID"])
             df_main["Tasks"] = tasks
-            df_main["Hi-C-LSTM"] = lstm_values_all_tasks + lstm_auroc_all_tasks + lstm_accuracy_all_tasks + lstm_fscore_all_tasks
-            df_main["SNIPER-INTRA"] = sniper_intra_values_all_tasks + sniper_intra_auroc_all_tasks + sniper_intra_accuracy_all_tasks + sniper_intra_fscore_all_tasks
-            df_main["SNIPER-INTER"] = sniper_inter_values_all_tasks + sniper_inter_auroc_all_tasks + sniper_inter_accuracy_all_tasks + sniper_inter_fscore_all_tasks
-            df_main["SCI"] = graph_values_all_tasks + graph_auroc_all_tasks + graph_accuracy_all_tasks + graph_fscore_all_tasks
+            df_main[
+                "Hi-C-LSTM"] = lstm_values_all_tasks + lstm_auroc_all_tasks + lstm_accuracy_all_tasks + lstm_fscore_all_tasks
+            df_main[
+                "SNIPER-INTRA"] = sniper_intra_values_all_tasks + sniper_intra_auroc_all_tasks + sniper_intra_accuracy_all_tasks + sniper_intra_fscore_all_tasks
+            df_main[
+                "SNIPER-INTER"] = sniper_inter_values_all_tasks + sniper_inter_auroc_all_tasks + sniper_inter_accuracy_all_tasks + sniper_inter_fscore_all_tasks
+            df_main[
+                "SCI"] = graph_values_all_tasks + graph_auroc_all_tasks + graph_accuracy_all_tasks + graph_fscore_all_tasks
             df_main["PCA"] = pca_values_all_tasks + pca_auroc_all_tasks + pca_accuracy_all_tasks + pca_fscore_all_tasks
-            df_main["SBCID"] = sbcid_values_all_tasks + sbcid_auroc_all_tasks + sbcid_accuracy_all_tasks + sbcid_fscore_all_tasks
+            df_main[
+                "SBCID"] = sbcid_values_all_tasks + sbcid_auroc_all_tasks + sbcid_accuracy_all_tasks + sbcid_fscore_all_tasks
 
-        # df_main.to_csv(self.path + "%s_metrics_df.csv" % (cell), sep="\t")
-        #df_main = pd.read_csv(self.path + "%s_metrics_df.csv" % (cell), sep="\t")
+        df_main.to_csv(self.path + "%s_metrics_df.csv" % (cell), sep="\t")
+        # df_main = pd.read_csv(self.path + "%s_metrics_df.csv" % (cell), sep="\t")
         # df_main = df_main.drop(['Unnamed: 0'], axis=1)
 
         def plot_stackedbar(df_main, tasks, colors):
-            #df_main = df_main.set_index("Tasks")
+            # df_main = df_main.set_index("Tasks")
             df_main = df_main.T
             df_main.columns = df_main.iloc[0]
             df_main = df_main.drop(["Tasks"], axis=0)
@@ -1064,7 +1069,7 @@ if __name__ == "__main__":
     plot_ob = PlotFns(cfg)
 
     # plot_ob.plot_combined(cell = "GM12878")
-    plot_ob.plot_combined_all(cell = "GM12878")
+    plot_ob.plot_combined_all(cell="GM12878")
     # plot_ob.plot_mAP_celltypes()
     # plot_ob.plot_auroc_celltypes()
     # plot_ob.plot_auroc()
