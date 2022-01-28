@@ -260,6 +260,7 @@ class PlotFns:
             # adjust limits and draw grid lines
             plt.ylim(-0.5, ax.get_yticks()[-1] + 0.5)
             ax.xaxis.grid(color='gray', linestyle='dashed')
+            plt.ylabel("Cumulative Prediction Score", fontsize=20)
 
             plt.show()
 
@@ -323,7 +324,8 @@ class PlotFns:
         plt.xticks(rotation=90, fontsize=20)
         plt.yticks(fontsize=20)
         plt.xlabel("Prediction Target", fontsize=20)
-        plt.ylabel("mAP ", fontsize=20)
+        #plt.ylabel("mAP ", fontsize=20)
+        plt.ylabel("Cumulative Prediction Score", fontsize=20)
         plt.plot('Tasks', 'Hi-C-LSTM', data=df_main, marker='o', markersize=16, color="C3", linewidth=3,
                  label="Hi-C-LSTM")
         plt.plot('Tasks', 'SNIPER-INTRA', data=df_main, marker='*', markersize=16, color="C0", linewidth=3,
