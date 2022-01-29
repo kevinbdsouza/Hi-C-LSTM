@@ -196,13 +196,13 @@ if __name__ == '__main__':
         #foxg1_ko = np.load(cfg.output_directory + "foxg1_ko.npy")
         #simple_plot(foxg1_ko)
 
-        #foxg1_ko = np.load(cfg.output_directory + "tal1_wt.npy")
-        #simple_plot(foxg1_ko)
+        tal1_wt = np.load(cfg.output_directory + "tal1_wt.npy")
+        simple_plot(tal1_wt)
         #pred_data = pd.read_csv(cfg.output_directory + "%s_predictions_chr.csv" % (cell), sep="\t")
         #plot_tal1_lmo2(pred_data)
 
-        tal_ko = pd.read_csv(cfg.hic_path + cell +"/talko_tal_df.txt", sep="\t")
-        plot_heatmaps(tal_ko)
+        #tal_ko = pd.read_csv(cfg.hic_path + cell +"/talko_tal_df.txt", sep="\t")
+        #plot_heatmaps(tal_ko)
 
     print("done")
 
