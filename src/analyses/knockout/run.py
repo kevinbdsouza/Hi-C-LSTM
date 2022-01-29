@@ -312,11 +312,11 @@ if __name__ == '__main__':
     model.load_weights()
 
     # test_chr = list(range(21, 23))
-    test_chr = [14]
+    test_chr = [1]
 
     for chr in test_chr:
         print('Testing Start Chromosome: {}'.format(chr))
-        pred_data = pd.read_csv(cfg.output_directory + "shuffle_%s_predictions_chr%s.csv" % (cell, str(chr)), sep="\t")
+        # pred_data = pd.read_csv(cfg.output_directory + "shuffle_%s_predictions_chr%s.csv" % (cell, str(chr)), sep="\t")
         # ko_pred_df = pd.read_csv(cfg.output_directory + "shuffle_%s_afko_chr%s.csv" % (cell, str(chr)), sep="\t")
         ko_ob = Knockout(cfg, cell, chr)
 
@@ -324,11 +324,11 @@ if __name__ == '__main__':
         # ko_pred_df, mean_diff = ko_ob.perform_ko(model, pred_data, indices)
         # ko_pred_df = ko_ob.normalize_embed_predict(model, pred_data)
 
-        # tal_data, lmo2_data = ko_ob.tal_lmo2_preprocess()
+        tal_data, lmo2_data = ko_ob.tal_lmo2_preprocess()
         # ko_ob.train_tal1_lmo2(model, cfg, model_name)
         # ko_ob.test_tal1_lmo2(model, cfg)
 
-        ko_ob.tf_ko(model, pred_data)
+        #ko_ob.tf_ko(model, pred_data)
 
 
 
