@@ -200,7 +200,7 @@ if __name__ == '__main__':
         #pred_data = pd.read_csv(cfg.output_directory + "%s_predictions_chr.csv" % (cell), sep="\t")
         #plot_tal1_lmo2(pred_data)
 
-        tal_ko = pd.read_csv(cfg.hic_path + cell +"/tal1ko_tal_df.txt", sep="\t")
+        tal_ko = pd.read_csv(cfg.hic_path + cell +"/talko_tal_df.txt", sep="\t")
         plot_heatmaps(tal_ko)
 
     print("done")
