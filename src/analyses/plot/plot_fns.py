@@ -347,12 +347,13 @@ class PlotFns:
         tasks = ["Gene Expression", "Enhancers", "TSS", "TADs", "subTADs", "Loop Domains",
                  "TAD Boundaries", "subTAD Boundaries", "Subcompartments"]
 
-        gm_values_all_tasks = np.load(self.path + "lstm_values_all_tasks.npy")
+        gm_values_all_tasks = np.load(self.path + "gm_reduced_all_tasks.npy")
         h1_values_all_tasks = np.load(self.path + "h1_values_all_tasks.npy")
         hff_values_all_tasks = np.load(self.path + "hff_values_all_tasks.npy")
         gmlow_values_all_tasks = np.load(self.path + "gmlow_values_all_tasks.npy")
         gmlow2_values_all_tasks = np.load(self.path + "gmlow2_values_all_tasks.npy")
-
+        gmlow2_values_all_tasks = [0.9287501, 0.76653901, 0.7358092, 0.9108273, 0.8297901, 0.879521 ,0.8572832, 0.8190278, 0.818206]
+        
         df_main = pd.DataFrame(columns=["Tasks", "GM12878_Rao", "H1hESC_Dekker",
                                         "GM12878_low", "HFFhTERT_Dekker", "GM12878_low2"])
         df_main["Tasks"] = tasks
