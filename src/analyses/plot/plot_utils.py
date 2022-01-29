@@ -185,11 +185,15 @@ if __name__ == '__main__':
         plot_r2(comb_r2_df)
         '''
 
+        '''
         pred_data = pd.read_csv(cfg.output_directory + "shuffle_%s_predictions_chr%s.csv" % (cell, str(chr)), sep="\t")
         plot_foxg1(pred_data)
         foxg1_data = pd.read_csv(cfg.output_directory + "shuffle_%s_afko_chr%s.csv" % (cell, str(chr)), sep="\t")
         plot_foxg1(foxg1_data)
+        '''
 
+        foxg1_ko = np.load(cfg.output_directory + "foxg1_ko.npy")
+        simple_plot(foxg1_ko)
         # pred_data = pd.read_csv(cfg.output_directory + "%s_predictions_chr.csv" % (cell), sep="\t")
         # plot_tal1_lmo2(pred_data)
 
