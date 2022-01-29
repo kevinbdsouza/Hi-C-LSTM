@@ -1,6 +1,7 @@
 import pandas as pd
 import numpy as np
 import seaborn as sns
+from training.data_utils import contactProbabilities
 #import matplotlib as mpl
 
 #mpl.use('module://backend_interagg')
@@ -19,7 +20,7 @@ def plot_heatmaps(data):
     cols = np.array(data["j"]).astype(int)
 
     hic_mat = np.zeros((nr, nr))
-    hic_mat[rows, cols] = np.array(data["v"])
+    hic_mat[rows, cols] = np.array(contactProbabilities(data["v"]))
     hic_upper = np.triu(hic_mat)
     hic_mat[cols, rows] = np.array(data["pred"])
     hic_lower = np.tril(hic_mat)
