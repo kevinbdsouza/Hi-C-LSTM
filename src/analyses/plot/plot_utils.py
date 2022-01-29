@@ -62,8 +62,8 @@ def plot_tal1_lmo2(data):
     tal_data = data.loc[data["i"] < 5000]
     lmo2_data = data.loc[data["i"] > 5000]
 
-    # plot_heatmaps(tal_data)
-    plot_heatmaps(lmo2_data)
+    plot_heatmaps(tal_data)
+    # plot_heatmaps(lmo2_data)
     pass
 
 
@@ -195,10 +195,10 @@ if __name__ == '__main__':
         #foxg1_ko = np.load(cfg.output_directory + "foxg1_ko.npy")
         #simple_plot(foxg1_ko)
 
-        foxg1_ko = np.load(cfg.output_directory + "tal1_wt.npy")
-        simple_plot(foxg1_ko)
-        #pred_data = pd.read_csv(cfg.output_directory + "%s_predictions_chr.csv" % (cell), sep="\t")
-        #plot_tal1_lmo2(pred_data)
+        #foxg1_ko = np.load(cfg.output_directory + "tal1_wt.npy")
+        #simple_plot(foxg1_ko)
+        pred_data = pd.read_csv(cfg.output_directory + "%s_predictions_chr.csv" % (cell), sep="\t")
+        plot_tal1_lmo2(pred_data)
 
     print("done")
 
