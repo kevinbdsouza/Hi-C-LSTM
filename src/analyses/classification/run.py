@@ -430,7 +430,7 @@ if __name__ == '__main__':
         logging.info("Downstream start Chromosome: {}".format(chr))
 
         # running test model to get embeddings
-        test_model(model, cfg, cell, chr)
+        #test_model(model, cfg, cell, chr)
 
         downstream_ob = DownstreamTasks(cfg, chr, mode='lstm')
 
