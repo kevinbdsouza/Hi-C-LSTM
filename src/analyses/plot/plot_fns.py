@@ -353,7 +353,7 @@ class PlotFns:
         gmlow_values_all_tasks = np.load(self.path + "gmlow_values_all_tasks.npy")
         gmlow2_values_all_tasks = np.load(self.path + "gmlow2_values_all_tasks.npy")
         gmlow2_values_all_tasks = [0.9287501, 0.76653901, 0.7358092, 0.9108273, 0.8297901, 0.879521 ,0.8572832, 0.8190278, 0.818206]
-        
+
         df_main = pd.DataFrame(columns=["Tasks", "GM12878_Rao", "H1hESC_Dekker",
                                         "GM12878_low", "HFFhTERT_Dekker", "GM12878_low2"])
         df_main["Tasks"] = tasks
