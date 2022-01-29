@@ -76,20 +76,21 @@ def simple_plot(hic_win):
     plt.show()
     '''
 
+    '''
     sns.set_theme()
     ax = sns.heatmap(hic_win, cmap="Reds", vmin=0, vmax=1)
     ax.set_yticks([])
     ax.set_xticks([])
     plt.show()
-
     '''
+
     sns.set_theme()
     rdgn = sns.diverging_palette(h_neg=220, h_pos=14, s=79, l=55, sep=3, as_cmap=True)
-    sns.heatmap(tal1_diff, cmap=rdgn, center=0.00, cbar=True)
+    sns.heatmap(hic_win, cmap=rdgn, center=0.00, cbar=True)
     plt.yticks([])
     plt.xticks([])
     plt.show()
-    '''
+
     pass
 
 
@@ -205,8 +206,9 @@ if __name__ == '__main__':
         #foxg1_ko = np.load(cfg.output_directory + "foxg1_ko.npy")
         #simple_plot(foxg1_ko)
 
-        tal1_wt = np.load(cfg.output_directory + "tal1_wt.npy")
+        tal1_wt = np.load(cfg.output_directory + "tal1_diff.npy")
         simple_plot(tal1_wt)
+        print("done")
         #pred_data = pd.read_csv(cfg.output_directory + "%s_predictions_chr.csv" % (cell), sep="\t")
         #plot_tal1_lmo2(pred_data)
 
