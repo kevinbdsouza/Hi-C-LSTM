@@ -344,23 +344,20 @@ class PlotFns:
         pass
 
     def plot_mAP_celltypes(self):
-        tasks = ["Gene Expression", "Replication Timing", "Enhancers", "TSS", "PE-Interactions", "FIREs",
-                 "Non-loop Domains",
-                 "Loop Domains", "Subcompartments"]
+        tasks = ["Gene Expression", "Enhancers", "TSS", "TADs", "subTADs", "Loop Domains",
+                 "TAD Boundaries", "subTAD Boundaries", "Subcompartments"]
 
         gm_values_all_tasks = np.load(self.path + "lstm_values_all_tasks.npy")
         h1_values_all_tasks = np.load(self.path + "h1_values_all_tasks.npy")
         hff_values_all_tasks = np.load(self.path + "hff_values_all_tasks.npy")
-        wtc_values_all_tasks = np.load(self.path + "wtc_values_all_tasks.npy")
         gmlow_values_all_tasks = np.load(self.path + "gmlow_values_all_tasks.npy")
         gmlow2_values_all_tasks = np.load(self.path + "gmlow2_values_all_tasks.npy")
 
-        df_main = pd.DataFrame(columns=["Tasks", "GM12878_Rao", "H1hESC_Dekker", "WTC11_Dekker",
+        df_main = pd.DataFrame(columns=["Tasks", "GM12878_Rao", "H1hESC_Dekker",
                                         "GM12878_low", "HFFhTERT_Dekker", "GM12878_low2"])
         df_main["Tasks"] = tasks
         df_main["GM12878_Rao"] = gm_values_all_tasks
         df_main["H1hESC_Dekker"] = h1_values_all_tasks
-        df_main["WTC11_Dekker"] = wtc_values_all_tasks
         df_main["GM12878_low"] = gmlow_values_all_tasks
         df_main["GM12878_low2"] = gmlow2_values_all_tasks
         df_main["HFFhTERT_Dekker"] = hff_values_all_tasks
@@ -374,8 +371,6 @@ class PlotFns:
                  label="GM12878 (Rao 2014, 3B)")
         plt.plot('Tasks', 'H1hESC_Dekker', data=df_main, marker='D', markersize=16, color="C1", linewidth=3,
                  label="H1hESC (Dekker 4DN, 2.5B)")
-        plt.plot('Tasks', 'WTC11_Dekker', data=df_main, marker='^', markersize=16, color="C2", linewidth=3,
-                 label="WTC11 (Dekker 4DN, 1.3B)")
         plt.plot('Tasks', 'HFFhTERT_Dekker', data=df_main, marker='v', markersize=16, color="C4", linewidth=3,
                  label="HFFhTERT (Dekker 4DN, 354M)")
         plt.plot('Tasks', 'GM12878_low', data=df_main, marker='s', markersize=16, color="C3", linewidth=3,
@@ -383,7 +378,7 @@ class PlotFns:
         plt.plot('Tasks', 'GM12878_low2', data=df_main, marker='*', markersize=16, color="C5", linewidth=3,
                  label="GM12878 (Aiden 4DN, 216M)")
         plt.legend(fontsize=18)
-        plt.savefig("/home/kevindsouza/Downloads/map_cells.png")
+        #plt.savefig("/home/kevindsouza/Downloads/map_cells.png")
         plt.show()
 
         pass
@@ -1100,7 +1095,7 @@ if __name__ == "__main__":
 
     #plot_ob.plot_combined(cell = "GM12878")
     # plot_ob.plot_combined_all(cell="GM12878")
-    # plot_ob.plot_mAP_celltypes()
+    plot_ob.plot_mAP_celltypes()
     # plot_ob.plot_auroc_celltypes()
     # plot_ob.plot_auroc()
 
@@ -1114,7 +1109,7 @@ if __name__ == "__main__":
     # plot_ob.plot_r2_celltypes()
     # plot_ob.plot_symmetry()
 
-    plot_ob.plot_knockout_results()
+    # plot_ob.plot_knockout_results()
     # plot_ob.plot_knockout_tfs()
     # plot_ob.pr_curves()
 

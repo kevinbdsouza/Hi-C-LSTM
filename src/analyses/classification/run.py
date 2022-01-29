@@ -10,6 +10,7 @@ from analyses.classification.loops import Loops
 from analyses.classification.domains import Domains
 from analyses.classification.subcompartments import Subcompartments
 import matplotlib as mpl
+
 mpl.use('module://backend_interagg')
 import matplotlib.pyplot as plt
 from training.model import SeqLSTM
@@ -417,6 +418,7 @@ if __name__ == '__main__':
         columns=["chr", "Gene Expression", "Replication Timing", "Enhancers", "TSS", "PE-Interactions",
                  "FIREs", "Non-loop Domains", "Loop Domains"])
 
+    gene_map, pe_map, fire_map, rep_map, loops_map, domains_map, enhancers_map, tss_map = 0, 0, 0, 0, 0, 0, 0, 0
     cell = cfg.cell
     model_name = "shuffle_" + cell
 
@@ -430,7 +432,7 @@ if __name__ == '__main__':
         logging.info("Downstream start Chromosome: {}".format(chr))
 
         # running test model to get embeddings
-        #test_model(model, cfg, cell, chr)
+        # test_model(model, cfg, cell, chr)
 
         downstream_ob = DownstreamTasks(cfg, chr, mode='lstm')
 
@@ -446,7 +448,7 @@ if __name__ == '__main__':
 
         domains_map = downstream_ob.run_domains(cfg)
 
-        # mapdict_subcomp = downstream_ob.run_sub_compartments(cfg)
+        mapdict_subcomp = downstream_ob.run_sub_compartments(cfg)
 
         enhancers_map = downstream_ob.run_p_and_e(cfg)
 
