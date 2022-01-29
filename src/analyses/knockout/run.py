@@ -29,6 +29,8 @@ class Knockout():
         self.sizes = np.load(self.sizes_path, allow_pickle=True).item()
         self.file_path = os.path.join(cfg.downstream_dir, "ctcf")
         self.hek_file = cfg.hic_path + cfg.cell + "/HEK239T-WT.matrix"
+        self.tal1ko_file = cfg.hic_path + cfg.cell + "/Tal1KO.matrix"
+        self.lmo2ko_file = cfg.hic_path + cfg.cell + "/Lmo2KO.matrix"
 
     def alter_index(self, embed_rows):
         if self.chr == 1:
@@ -197,7 +199,9 @@ class Knockout():
         return loc_list, chr_list
 
     def tal_lmo2_preprocess(self):
-        hek_mat = pd.read_csv(self.hek_file, sep="\t")
+        #hek_mat = pd.read_csv(self.hek_file, sep="\t")
+        hek_mat = pd.read_csv(self.tal1ko_file, sep="\t")
+
         index, chr_list = self.change_index(list(hek_mat.index))
         columns, _ = self.change_index(hek_mat.columns)
 
