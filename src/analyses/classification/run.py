@@ -9,8 +9,8 @@ from analyses.classification.pe_interactions import PeInteractions
 from analyses.classification.loops import Loops
 from analyses.classification.domains import Domains
 from analyses.classification.subcompartments import Subcompartments
-#import matplotlib as mpl
-#mpl.use('module://backend_interagg')
+import matplotlib as mpl
+mpl.use('module://backend_interagg')
 import matplotlib.pyplot as plt
 from training.model import SeqLSTM
 import torch

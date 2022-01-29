@@ -434,3 +434,15 @@ plot_hic(hic_win)
 #lmo2_ko = a+b
 #lmo2_ko[np.diag_indices_from(lmo2_ko)] /= 2
 print("done")
+#lstm_values_all_tasks = np.load(self.path + "lstm_values_all_tasks.npy")
+#temp = np.zeros((12,))
+#temp[:9] = lstm_accuracy_all_tasks[:9]
+#lstm_accuracy_all_tasks = temp.copy()
+#sbcid_fscore_all_tasks[11] = 1
+#sbcid_fscore_all_tasks[8] = 0.1603
+#sbcid_fscore_all_tasks[6] = 0.28619
+#sbcid_fscore_all_tasks[7] = 0.14827
+#sbcid_fscore_all_tasks[9] = 0.25119
+
+#np.save(self.path + "gm_accuracy_all_tasks.npy", lstm_accuracy_all_tasks)
+

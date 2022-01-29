@@ -979,9 +979,9 @@ class PlotFns:
         plt.plot('pos', 'SOX2_KO', data=df_main, marker='x', markersize=16, color="C6", linewidth=3, label="SOX2 KO")
         plt.plot('pos', 'XBP1_KO', data=df_main, marker='+', markersize=16, color="C7", linewidth=3, label="XBP1 KO")
 
-        plt.plot('pos', 'RAD21_KO', data=df_main, marker='s', markersize=16, color="C8", linewidth=3,
+        plt.plot('pos', 'RAD21_KO', data=df_main, marker='1', markersize=16, color="C8", linewidth=3,
                  linestyle='dashdot', label="RAD21 KO (Non-loop)")
-        plt.plot('pos', 'SMC3_KO', data=df_main, marker='^', markersize=16, color="C9", linewidth=3, label="SMC3 KO (Non-loop)")
+        plt.plot('pos', 'SMC3_KO', data=df_main, marker='2', markersize=16, color="C9", linewidth=3, label="SMC3 KO (Non-loop)")
         plt.legend(fontsize=18)
         plt.show()
 
