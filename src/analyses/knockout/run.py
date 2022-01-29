@@ -200,7 +200,7 @@ class Knockout():
 
     def tal_lmo2_preprocess(self):
         #hek_mat = pd.read_csv(self.hek_file, sep="\t")
-        hek_mat = pd.read_csv(self.tal1ko_file, sep="\t")
+        hek_mat = pd.read_csv(self.lmo2ko_file, sep="\t")
 
         index, chr_list = self.change_index(list(hek_mat.index))
         columns, _ = self.change_index(hek_mat.columns)
