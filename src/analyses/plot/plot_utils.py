@@ -2,9 +2,9 @@ import pandas as pd
 import numpy as np
 import seaborn as sns
 from training.data_utils import contactProbabilities
-#import matplotlib as mpl
+# import matplotlib as mpl
 
-#mpl.use('module://backend_interagg')
+# mpl.use('module://backend_interagg')
 import training.config as config
 import matplotlib.pyplot as plt
 from mpl_toolkits import mplot3d
@@ -181,10 +181,11 @@ def plot_r2(comb_r2_df):
 
     pass
 
+
 def scatter_tal_lm(diff_mat):
     pred = np.tril(diff_mat)
     pred = pred.flatten(order='C')
-    pred_nz = pred[pred!=0]
+    pred_nz = pred[pred != 0]
 
     og = np.triu(diff_mat)
     og = og.flatten(order='F')
@@ -197,6 +198,7 @@ def scatter_tal_lm(diff_mat):
     plt.ylabel('(KO - WT) Predicted', fontsize=20)
     plt.show()
     print("done")
+
 
 def barplot_tal_lm():
     tal_og = np.load(cfg.output_directory + "tal1og_difflist.npy")
@@ -218,7 +220,10 @@ def barplot_tal_lm():
         tallm_df = tallm_df.append(temp)
 
     sns.barplot(x="label", y="data", data=tallm_df, ci="sd")
-    #sns.swarmplot(x="label", y="data", data=tallm_df, zorder=10, color='black')
+    plt.xticks(rotation=90, labelsize=20)
+    plt.yticks(labelsize=20)
+    plt.xlabel('Data', fontsize=20)
+    plt.ylabel('Contact Strengths', fontsize=20)
     plt.show()
     print("done")
 
@@ -244,18 +249,18 @@ if __name__ == '__main__':
         plot_foxg1(foxg1_data)
         '''
 
-        #foxg1_ko = np.load(cfg.output_directory + "foxg1_ko.npy")
-        #simple_plot(foxg1_ko)
+        # foxg1_ko = np.load(cfg.output_directory + "foxg1_ko.npy")
+        # simple_plot(foxg1_ko)
 
-        #tal1_diff = np.load(cfg.output_directory + "tal1_diff.npy")
-        #scatter_tal_lm(tal1_diff)
+        # tal1_diff = np.load(cfg.output_directory + "tal1_diff.npy")
+        # scatter_tal_lm(tal1_diff)
         barplot_tal_lm()
         print("done")
-        #pred_data = pd.read_csv(cfg.output_directory + "%s_predictions_chr.csv" % (cell), sep="\t")
-        #plot_tal1_lmo2(pred_data)
+        # pred_data = pd.read_csv(cfg.output_directory + "%s_predictions_chr.csv" % (cell), sep="\t")
+        # plot_tal1_lmo2(pred_data)
 
-        #tal_ko = pd.read_csv(cfg.hic_path + cell +"/talko_tal_df.txt", sep="\t")
-        #plot_heatmaps(tal_ko)
+        # tal_ko = pd.read_csv(cfg.hic_path + cell +"/talko_tal_df.txt", sep="\t")
+        # plot_heatmaps(tal_ko)
 
     print("done")
 
