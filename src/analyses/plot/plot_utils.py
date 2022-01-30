@@ -212,8 +212,10 @@ def barplot_tal_lm():
     label_lists = ["tal_og", "tal_pred", "lmo2_og", "lmo2_pred"]
     tallm_df = pd.DataFrame(columns=["data", "label"])
     for i, l in enumerate(label_lists):
-        tallm_df["data"] = data_lists[i]
-        tallm_df["label"] = l
+        temp = pd.DataFrame(columns=["data", "label"])
+        temp["data"] = data_lists[i]
+        temp["label"] = l
+        tallm_df = tallm_df.append(temp)
 
     sns.barplot(x="label", y="data", data=tallm_df, ci="sd")
     sns.swarmplot(x="label", y="data", data=tallm_df, zorder=10, color='black')
