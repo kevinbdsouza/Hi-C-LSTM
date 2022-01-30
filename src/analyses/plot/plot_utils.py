@@ -183,11 +183,11 @@ def plot_r2(comb_r2_df):
 
 def scatter_tal_lm(diff_mat):
     pred = np.tril(diff_mat)
-    pred = pred.flatten(pred)
+    pred = pred.flatten()
     pred_nz = pred[pred!=0]
 
     og = np.triu(diff_mat)
-    og = pred.flatten(og)
+    og = pred.flatten()
     og_nz = og[og != 0]
 
     plt.scatter(og_nz, pred_nz, marker='o', markersize=14)
