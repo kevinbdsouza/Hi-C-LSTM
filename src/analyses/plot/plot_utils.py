@@ -198,6 +198,28 @@ def scatter_tal_lm(diff_mat):
     plt.show()
     print("done")
 
+def barplot_tal_lm():
+    tal_og = np.load(cfg.output_directory + "tal1og_difflist.npy")
+    tal_pred = np.load(cfg.output_directory + "tal1pred_difflist.npy")
+
+    lmo2_og = np.load(cfg.output_directory + "lmo2og_difflist.npy")
+    lmo2_pred = np.load(cfg.output_directory + "lmo2pred_difflist.npy")
+
+    sns.set(font_scale=1.8)
+    sns.set_style(style='white')
+
+    data_lists = [tal_og, tal_pred, lmo2_og, lmo2_pred]
+    label_lists = ["tal_og", "tal_pred", "lmo2_og", "lmo2_pred"]
+    tallm_df = pd.DataFrame(columns=["data", "label"])
+    for i, l in enumerate(label_lists):
+        tallm_df["data"] = data_lists[i]
+        tallm_df["label"] = l
+
+    sns.barplot(x="label", y="data", data=tallm_df, ci="sd")
+    sns.swarmplot(x="label", y="data", data=tallm_df, zorder=10, color='black')
+    plt.show()
+    print("done")
+
 
 if __name__ == '__main__':
     plot_chr = list(range(1, 2))
@@ -223,8 +245,9 @@ if __name__ == '__main__':
         #foxg1_ko = np.load(cfg.output_directory + "foxg1_ko.npy")
         #simple_plot(foxg1_ko)
 
-        tal1_diff = np.load(cfg.output_directory + "tal1_diff.npy")
-        scatter_tal_lm(tal1_diff)
+        #tal1_diff = np.load(cfg.output_directory + "tal1_diff.npy")
+        #scatter_tal_lm(tal1_diff)
+        barplot_tal_lm()
         print("done")
         #pred_data = pd.read_csv(cfg.output_directory + "%s_predictions_chr.csv" % (cell), sep="\t")
         #plot_tal1_lmo2(pred_data)
