@@ -183,14 +183,16 @@ def plot_r2(comb_r2_df):
 
 def scatter_tal_lm(diff_mat):
     pred = np.tril(diff_mat)
-    pred = pred.flatten()
+    pred = pred.flatten(order='C')
     pred_nz = pred[pred!=0]
 
     og = np.triu(diff_mat)
-    og = og.flatten()
+    og = og.flatten(order='F')
     og_nz = og[og != 0]
 
     plt.scatter(og_nz, pred_nz, marker='o')
+    plt.tick_params(axis="x", labelsize=20, length=0)
+    plt.tick_params(axis="y", labelsize=20)
     plt.xlabel('(KO - WT) Original', fontsize=20)
     plt.ylabel('(KO - WT) Predicted', fontsize=20)
     plt.show()
