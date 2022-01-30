@@ -127,6 +127,7 @@ class PlotFns:
         return hic_mat, st
 
     def simple_plot(self, hic_win):
+        '''
         plt.imshow(hic_win, cmap='hot', interpolation='nearest')
         plt.yticks([])
         plt.xticks([])
@@ -137,14 +138,13 @@ class PlotFns:
         ax.set_yticks([])
         ax.set_xticks([])
         plt.show()
-        '''
         pass
 
     def ctcf_dots(self, hic_mat, st, chr):
         dom_ob = Domains(cfg, self.cfg.cell, chr)
         dom_data = dom_ob.get_domain_data()
 
-        th = 41
+        th = 82
         mean_map_og = np.zeros((th, th))
         mean_map_pred = np.zeros((th, th))
         num = 0
@@ -158,8 +158,8 @@ class PlotFns:
                 continue
             else:
                 num += 1
-                hic_win_og = hic_mat[x1:x1 + th, y2 - th:y2]
-                hic_win_pred = hic_mat[x1 - th:x1, y1:y1 + th]
+                hic_win_og = hic_mat[x1 - th:x1 + th, y2 - th:y2 + th]
+                hic_win_pred = hic_mat[x2 - th:x2 + th, y1 - th:y1 + th]
                 mean_map_og = mean_map_og + hic_win_og
                 mean_map_pred = mean_map_pred + hic_win_pred
 
