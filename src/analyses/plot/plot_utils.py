@@ -218,7 +218,7 @@ def barplot_tal_lm():
         tallm_df = tallm_df.append(temp)
 
     sns.barplot(x="label", y="data", data=tallm_df, ci="sd")
-    sns.swarmplot(x="label", y="data", data=tallm_df, zorder=10, color='black')
+    #sns.swarmplot(x="label", y="data", data=tallm_df, zorder=10, color='black')
     plt.show()
     print("done")
 
