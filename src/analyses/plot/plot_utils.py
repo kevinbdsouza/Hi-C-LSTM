@@ -190,7 +190,7 @@ def scatter_tal_lm(diff_mat):
     og = pred.flatten()
     og_nz = og[og != 0]
 
-    plt.scatter(og_nz, pred_nz, marker='o', markersize=14)
+    plt.scatter(og_nz, pred_nz, marker='o')
     plt.xlabel('(KO - WT) Original', fontsize=20)
     plt.ylabel('(KO - WT) Predicted', fontsize=20)
     plt.show()
