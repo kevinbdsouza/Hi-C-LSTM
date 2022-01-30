@@ -144,9 +144,9 @@ class PlotFns:
         dom_ob = Domains(cfg, self.cfg.cell, chr)
         dom_data = dom_ob.get_domain_data()
 
-        th = 82
-        mean_map_og = np.zeros((th, th))
-        mean_map_pred = np.zeros((th, th))
+        th = 41
+        mean_map_og = np.zeros((2*th, 2*th))
+        mean_map_pred = np.zeros((2*th, 2*th))
         num = 0
         for n in range(len(dom_data)):
             x1 = dom_data.loc[n]["x1"] - st + get_cumpos(self.cfg, chr)
