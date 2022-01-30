@@ -207,7 +207,7 @@ def barplot_tal_lm():
     lmo2_og = np.load(cfg.output_directory + "lmo2og_difflist.npy")
     lmo2_pred = np.load(cfg.output_directory + "lmo2pred_difflist.npy")
 
-    plt.figure(figsize=(10, 8))
+    plt.figure(figsize=(12, 10))
     sns.set(font_scale=1.8)
     sns.set_style(style='white')
 
@@ -254,8 +254,8 @@ if __name__ == '__main__':
 
         # tal1_diff = np.load(cfg.output_directory + "tal1_diff.npy")
         # scatter_tal_lm(tal1_diff)
-        barplot_tal_lm()
-        print("done")
+        # barplot_tal_lm()
+
         # pred_data = pd.read_csv(cfg.output_directory + "%s_predictions_chr.csv" % (cell), sep="\t")
         # plot_tal1_lmo2(pred_data)
 

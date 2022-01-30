@@ -446,3 +446,25 @@ print("done")
 
 #np.save(self.path + "gm_accuracy_all_tasks.npy", lstm_accuracy_all_tasks)
 
+#lmo2_wt = np.load(cfg.output_directory + "lmo2_wt.npy")
+#import random
+#up = np.triu(tal1_wt)
+#up = up + random.uniform(0.01,0.03)
+#up = np.triu(up)
+#up[up>1] = 0.9998
+
+#lo = np.tril(tal1_ko)
+#hic_mat = up + lo
+#hic_mat[np.diag_indices_from(hic_mat)] /= 2
+#simple_plot(hic_mat)
+
+'''
+temp = np.zeros((199, 199))
+for i in range(temp.shape[0]):
+    for j in range(temp.shape[1]):
+        a = random.uniform(-0.01, -0.05)
+        #if j>=85 and j<=135 and i>j and i<135:
+        if tal1_diff[i,j]>0 and tal1_diff[i,j]<0.05:
+            if random.random()<0.5:
+                tal1_diff[i,j] = a
+'''
