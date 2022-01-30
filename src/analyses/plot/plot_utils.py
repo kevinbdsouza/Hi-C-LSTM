@@ -221,7 +221,6 @@ def barplot_tal_lm():
 
     sns.barplot(x="label", y="data", data=tallm_df, ci="sd")
     plt.xticks(rotation=90)
-    plt.yticks(labelsize=20)
     plt.xlabel('Data', fontsize=20)
     plt.ylabel('Contact Strengths', fontsize=20)
     plt.show()
