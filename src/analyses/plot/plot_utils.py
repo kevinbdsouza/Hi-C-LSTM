@@ -181,6 +181,21 @@ def plot_r2(comb_r2_df):
 
     pass
 
+def scatter_tal_lm(diff_mat):
+    pred = np.tril(diff_mat)
+    pred = pred.flatten(pred)
+    pred_nz = pred[pred!=0]
+
+    og = np.triu(diff_mat)
+    og = pred.flatten(og)
+    og_nz = og[og != 0]
+
+    plt.scatter(og_nz, pred_nz, marker='o', markersize=14)
+    plt.xlabel('(KO - WT) Original', fontsize=20)
+    plt.ylabel('(KO - WT) Predicted', fontsize=20)
+    plt.show()
+    print("done")
+
 
 if __name__ == '__main__':
     plot_chr = list(range(1, 2))
@@ -206,8 +221,8 @@ if __name__ == '__main__':
         #foxg1_ko = np.load(cfg.output_directory + "foxg1_ko.npy")
         #simple_plot(foxg1_ko)
 
-        tal1_wt = np.load(cfg.output_directory + "tal1_diff.npy")
-        simple_plot(tal1_wt)
+        tal1_diff = np.load(cfg.output_directory + "tal1_diff.npy")
+        scatter_tal_lm(tal1_diff)
         print("done")
         #pred_data = pd.read_csv(cfg.output_directory + "%s_predictions_chr.csv" % (cell), sep="\t")
         #plot_tal1_lmo2(pred_data)
