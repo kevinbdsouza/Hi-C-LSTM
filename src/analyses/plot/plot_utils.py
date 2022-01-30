@@ -187,7 +187,7 @@ def scatter_tal_lm(diff_mat):
     pred_nz = pred[pred!=0]
 
     og = np.triu(diff_mat)
-    og = pred.flatten()
+    og = og.flatten()
     og_nz = og[og != 0]
 
     plt.scatter(og_nz, pred_nz, marker='o')
