@@ -207,11 +207,12 @@ def barplot_tal_lm():
     lmo2_og = np.load(cfg.output_directory + "lmo2og_difflist.npy")
     lmo2_pred = np.load(cfg.output_directory + "lmo2pred_difflist.npy")
 
+    plt.figure(figsize=(10, 8))
     sns.set(font_scale=1.8)
     sns.set_style(style='white')
 
     data_lists = [tal_og, tal_pred, lmo2_og, lmo2_pred]
-    label_lists = ["tal_og", "tal_pred", "lmo2_og", "lmo2_pred"]
+    label_lists = ["TAL1 Original (KO - WT)", "TAL1 Predicted (KO - WT)", "LMO2 Original (KO - WT)", "LMO2 Predicted (KO - WT)"]
     tallm_df = pd.DataFrame(columns=["data", "label"])
     for i, l in enumerate(label_lists):
         temp = pd.DataFrame(columns=["data", "label"])
