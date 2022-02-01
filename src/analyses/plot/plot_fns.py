@@ -223,7 +223,7 @@ class PlotFns:
             sniper_inter_auroc_all_tasks = np.load(self.path + "sniper_inter_auroc_h1_all_tasks.npy")
             graph_auroc_all_tasks = np.load(self.path + "graph_auroc_h1_all_tasks.npy")
             pca_auroc_all_tasks = np.load(self.path + "pca_auroc_h1_all_tasks.npy")
-            sbcid_auroc_all_tasks = np.load(self.path + "sbcid_auroc_all_tasks.npy")
+            sbcid_auroc_all_tasks = np.load(self.path + "sbcid_auroc_h1_all_tasks.npy")
 
             lstm_accuracy_all_tasks = np.load(self.path + "h1_accuracy_all_tasks.npy")
             sniper_intra_accuracy_all_tasks = np.load(self.path + "sniper_intra_accuracy_h1_all_tasks.npy")
