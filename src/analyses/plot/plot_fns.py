@@ -298,7 +298,7 @@ class PlotFns:
             plt.xlabel("Prediction Target", fontsize=20)
             plt.ylabel("Cumulative Prediction Score", fontsize=20)
 
-            plt.savefig("/home/kevindsouza/Downloads/GM12878_metrics.png")
+            plt.savefig("/home/kevindsouza/Downloads/H1hESC_metrics.png")
 
         plot_stackedbar(df_main, tasks, colors)
 
@@ -1133,7 +1133,7 @@ if __name__ == "__main__":
     plot_ob = PlotFns(cfg)
 
     # plot_ob.plot_combined(cell = "GM12878")
-    plot_ob.plot_combined_all(cell="GM12878")
+    plot_ob.plot_combined_all(cell="H1hESC")
     # plot_ob.plot_mAP_celltypes()
     # plot_ob.plot_auroc_celltypes()
     # plot_ob.plot_auroc()
