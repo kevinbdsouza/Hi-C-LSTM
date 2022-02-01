@@ -269,7 +269,7 @@ class PlotFns:
             fields = df_main.columns.tolist()
 
             # figure and axis
-            fig, ax = plt.subplots(1, figsize=(20, 12))
+            fig, ax = plt.subplots(1, figsize=(22, 12))
 
             # plot bars
             left = len(df_main) * [0]
@@ -1133,7 +1133,7 @@ if __name__ == "__main__":
     plot_ob = PlotFns(cfg)
 
     # plot_ob.plot_combined(cell = "GM12878")
-    plot_ob.plot_combined_all(cell="H1hESC")
+    plot_ob.plot_combined_all(cell="GM12878")
     # plot_ob.plot_mAP_celltypes()
     # plot_ob.plot_auroc_celltypes()
     # plot_ob.plot_auroc()
