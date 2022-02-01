@@ -298,7 +298,7 @@ class PlotFns:
             plt.xlabel("Prediction Target", fontsize=20)
             plt.ylabel("Cumulative Prediction Score", fontsize=20)
 
-            plt.savefig("/home/kevindsouza/Downloads/H1hESC_metrics.png")
+            plt.savefig("/home/kevindsouza/Downloads/GM12878_metrics.png")
 
         plot_stackedbar(df_main, tasks, colors)
 
