@@ -307,14 +307,11 @@ class PlotFns:
         pass
 
     def plot_combined(self, cell):
-        # tasks = ["Gene Expression", "Replication Timing", "Enhancers", "TSS", "PE-Interactions", "FIREs",
-        #         "Non-loop Domains", "Loop Domains", "Subcompartments"]
-
-        tasks = ["Gene Expression", "Replication Timing", "Enhancers", "TSS", "PE-Interactions", "FIREs",
-                 "TADs", "subTADs", "Loop Domains", "TAD Boundaries", "subTAD Boundaries", "Subcompartments"]
-        colors = ['C3', 'C0', 'C1', 'C2', 'C4', 'C5', 'C6', 'C7', 'C8', 'C9', 'C10', 'C11']
-
         if cell == "GM12878":
+            tasks = ["Gene Expression", "Replication Timing", "Enhancers", "TSS", "PE-Interactions", "FIREs",
+                     "TADs", "subTADs", "Loop Domains", "TAD Boundaries", "subTAD Boundaries", "Subcompartments"]
+            colors = ['C3', 'C0', 'C1', 'C2', 'C4', 'C5', 'C6', 'C7', 'C8', 'C9', 'C10', 'C11']
+
             lstm_values_all_tasks = np.load(self.path + "gm_accuracy_all_tasks.npy")
             sniper_intra_values_all_tasks = np.load(self.path + "gm_sniper_intra_accuracy_all_tasks.npy")
             sniper_inter_values_all_tasks = np.load(self.path + "gm_sniper_inter_accuracy_all_tasks.npy")
@@ -322,6 +319,10 @@ class PlotFns:
             pca_values_all_tasks = np.load(self.path + "gm_pca_accuracy_all_tasks.npy")
             sbcid_values_all_tasks = np.load(self.path + "gm_sbcid_accuracy_all_tasks.npy")
         elif cell == "H1hESC":
+            tasks = ["Gene Expression", "Enhancers", "TSS", "TADs", "subTADs", "Loop Domains", "TAD Boundaries",
+                     "subTAD Boundaries", "Subcompartments"]
+            colors = ['C3', 'C1', 'C2', 'C6', 'C7', 'C8', 'C9', 'C10', 'C11']
+
             lstm_values_all_tasks = np.load(self.path + "h1_values_all_tasks.npy")
             sniper_intra_values_all_tasks = np.load(self.path + "sniper_intra_h1_all_tasks.npy")
             sniper_inter_values_all_tasks = np.load(self.path + "sniper_inter_h1_all_tasks.npy")
@@ -329,19 +330,16 @@ class PlotFns:
             pca_values_all_tasks = np.load(self.path + "pca_h1_all_tasks.npy")
             sbcid_values_all_tasks = np.load(self.path + "sbcid_h1_all_tasks.npy")
         elif cell == "HFFhTERT":
+            tasks = ["Gene Expression", "Enhancers", "TSS", "TADs", "subTADs", "Loop Domains", "TAD Boundaries",
+                     "subTAD Boundaries", "Subcompartments"]
+            colors = ['C3', 'C1', 'C2', 'C6', 'C7', 'C8', 'C9', 'C10', 'C11']
+
             lstm_values_all_tasks = np.load(self.path + "hff_values_all_tasks.npy")
             sniper_intra_values_all_tasks = np.load(self.path + "sniper_intra_hff_all_tasks.npy")
             sniper_inter_values_all_tasks = np.load(self.path + "sniper_inter_hff_all_tasks.npy")
             graph_values_all_tasks = np.load(self.path + "graph_hff_all_tasks.npy")
             pca_values_all_tasks = np.load(self.path + "pca_hff_all_tasks.npy")
             sbcid_values_all_tasks = np.load(self.path + "sbcid_hff_all_tasks.npy")
-        elif cell == "WTC11":
-            lstm_values_all_tasks = np.load(self.path + "wtc_values_all_tasks.npy")
-            sniper_intra_values_all_tasks = np.load(self.path + "sniper_intra_wtc_all_tasks.npy")
-            sniper_inter_values_all_tasks = np.load(self.path + "sniper_inter_wtc_all_tasks.npy")
-            graph_values_all_tasks = np.load(self.path + "graph_wtc_all_tasks.npy")
-            pca_values_all_tasks = np.load(self.path + "pca_wtc_all_tasks.npy")
-            sbcid_values_all_tasks = np.load(self.path + "sbcid_wtc_all_tasks.npy")
 
         df_main = pd.DataFrame(columns=["Tasks", "Hi-C-LSTM", "SNIPER-INTRA", "SNIPER-INTER", "SCI", "PCA", "SBCID"])
         df_main["Tasks"] = tasks
@@ -352,7 +350,7 @@ class PlotFns:
         df_main["PCA"] = pca_values_all_tasks
         df_main["SBCID"] = sbcid_values_all_tasks
 
-        df_main = pd.read_csv(self.path + "%s_metrics_df.csv" % (cell), sep="\t")
+        df_main = pd.read_csv(self.path + "%s_map_df.csv" % (cell), sep="\t")
         df_main = df_main.drop(['Unnamed: 0'], axis=1)
 
         plt.figure(figsize=(12, 10))
@@ -373,8 +371,8 @@ class PlotFns:
         plt.plot('Tasks', 'SBCID', data=df_main, marker='s', markersize=16, color="C5", linewidth=3, linestyle='dashed',
                  label="SBCID")
         plt.legend(fontsize=18)
-        # plt.savefig("/home/kevindsouza/Downloads/map.png")
-        plt.show()
+        plt.savefig("/home/kevindsouza/Downloads/map.png")
+        #plt.show()
 
         pass
 
@@ -1132,8 +1130,8 @@ if __name__ == "__main__":
     cfg = config.Config()
     plot_ob = PlotFns(cfg)
 
-    # plot_ob.plot_combined(cell = "GM12878")
-    plot_ob.plot_combined_all(cell="H1hESC")
+    plot_ob.plot_combined(cell = "GM12878")
+    # plot_ob.plot_combined_all(cell="H1hESC")
     # plot_ob.plot_mAP_celltypes()
     # plot_ob.plot_auroc_celltypes()
     # plot_ob.plot_auroc()
