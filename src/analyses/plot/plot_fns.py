@@ -219,25 +219,25 @@ class PlotFns:
             sbcid_values_all_tasks = np.load(self.path + "sbcid_h1_all_tasks.npy")
 
             lstm_auroc_all_tasks = np.load(self.path + "h1_auroc_all_tasks.npy")
-            sniper_intra_auroc_all_tasks = np.load(self.path + "sniper_intra_auroc_all_tasks.npy")
-            sniper_inter_auroc_all_tasks = np.load(self.path + "sniper_inter_auroc_all_tasks.npy")
-            graph_auroc_all_tasks = np.load(self.path + "graph_auroc_all_tasks.npy")
-            pca_auroc_all_tasks = np.load(self.path + "pca_auroc_all_tasks.npy")
+            sniper_intra_auroc_all_tasks = np.load(self.path + "sniper_intra_auroc_h1_all_tasks.npy")
+            sniper_inter_auroc_all_tasks = np.load(self.path + "sniper_inter_auroc_h1_all_tasks.npy")
+            graph_auroc_all_tasks = np.load(self.path + "graph_auroc_h1_all_tasks.npy")
+            pca_auroc_all_tasks = np.load(self.path + "pca_auroc_h1_all_tasks.npy")
             sbcid_auroc_all_tasks = np.load(self.path + "sbcid_auroc_all_tasks.npy")
 
-            lstm_accuracy_all_tasks = np.load(self.path + "gm_accuracy_all_tasks.npy")
-            sniper_intra_accuracy_all_tasks = np.load(self.path + "gm_sniper_intra_accuracy_all_tasks.npy")
-            sniper_inter_accuracy_all_tasks = np.load(self.path + "gm_sniper_inter_accuracy_all_tasks.npy")
-            graph_accuracy_all_tasks = np.load(self.path + "gm_graph_accuracy_all_tasks.npy")
-            pca_accuracy_all_tasks = np.load(self.path + "gm_pca_accuracy_all_tasks.npy")
-            sbcid_accuracy_all_tasks = np.load(self.path + "gm_sbcid_accuracy_all_tasks.npy")
+            lstm_accuracy_all_tasks = np.load(self.path + "h1_accuracy_all_tasks.npy")
+            sniper_intra_accuracy_all_tasks = np.load(self.path + "sniper_intra_accuracy_h1_all_tasks.npy")
+            sniper_inter_accuracy_all_tasks = np.load(self.path + "sniper_inter_accuracy_h1_all_tasks.npy")
+            graph_accuracy_all_tasks = np.load(self.path + "graph_accuracy_h1_all_tasks.npy")
+            pca_accuracy_all_tasks = np.load(self.path + "pca_accuracy_h1_all_tasks.npy")
+            sbcid_accuracy_all_tasks = np.load(self.path + "sbcid_accuracy_h1_all_tasks.npy")
 
-            lstm_fscore_all_tasks = np.load(self.path + "gm_fscore_all_tasks.npy")
-            sniper_intra_fscore_all_tasks = np.load(self.path + "gm_sniper_intra_fscore_all_tasks.npy")
-            sniper_inter_fscore_all_tasks = np.load(self.path + "gm_sniper_inter_fscore_all_tasks.npy")
-            graph_fscore_all_tasks = np.load(self.path + "gm_graph_fscore_all_tasks.npy")
-            pca_fscore_all_tasks = np.load(self.path + "gm_pca_fscore_all_tasks.npy")
-            sbcid_fscore_all_tasks = np.load(self.path + "gm_sbcid_fscore_all_tasks.npy")
+            lstm_fscore_all_tasks = np.load(self.path + "h1_fscore_all_tasks.npy")
+            sniper_intra_fscore_all_tasks = np.load(self.path + "sniper_intra_fscore_h1_all_tasks.npy")
+            sniper_inter_fscore_all_tasks = np.load(self.path + "sniper_inter_fscore_h1_all_tasks.npy")
+            graph_fscore_all_tasks = np.load(self.path + "graph_fscore_h1_all_tasks.npy")
+            pca_fscore_all_tasks = np.load(self.path + "pca_fscore_h1_all_tasks.npy")
+            sbcid_fscore_all_tasks = np.load(self.path + "sbcid_fscore_h1_all_tasks.npy")
 
 
         df_main = pd.DataFrame(
@@ -258,8 +258,8 @@ class PlotFns:
 
         #df_main.to_csv(self.path + "%s_metrics_df.csv" % (cell), sep="\t")
 
-        # df_main = pd.read_csv(self.path + "%s_metrics_df.csv" % (cell), sep="\t")
-        # df_main = df_main.drop(['Unnamed: 0'], axis=1)
+        #df_main = pd.read_csv(self.path + "%s_metrics_df.csv" % (cell), sep="\t")
+        #df_main = df_main.drop(['Unnamed: 0'], axis=1)
 
         def plot_stackedbar(df_main, tasks, colors):
             # df_main = df_main.set_index("Tasks")
@@ -298,7 +298,7 @@ class PlotFns:
             plt.xlabel("Prediction Target", fontsize=20)
             plt.ylabel("Cumulative Prediction Score", fontsize=20)
 
-            plt.show()
+            plt.savefig("/home/kevindsouza/Downloads/H1hESC_metrics.png")
 
         plot_stackedbar(df_main, tasks, colors)
 
