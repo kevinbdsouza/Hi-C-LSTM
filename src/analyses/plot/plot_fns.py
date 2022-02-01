@@ -386,7 +386,6 @@ class PlotFns:
         hff_values_all_tasks = np.load(self.path + "hff_values_all_tasks.npy")
         gmlow_values_all_tasks = np.load(self.path + "gmlow_values_all_tasks.npy")
         gmlow2_values_all_tasks = np.load(self.path + "gmlow2_values_all_tasks.npy")
-        #gmlow2_values_all_tasks = [0.9287501, 0.76653901, 0.7358092, 0.9108273, 0.8297901, 0.879521, 0.8572832, 0.8190278, 0.818206]
 
         df_main = pd.DataFrame(columns=["Tasks", "GM12878_Rao", "H1hESC_Dekker",
                                         "GM12878_low", "HFFhTERT_Dekker", "GM12878_low2"])
@@ -413,6 +412,7 @@ class PlotFns:
         plt.plot('Tasks', 'GM12878_low2', data=df_main, marker='*', markersize=16, color="C5", linewidth=3,
                  label="GM12878 (Aiden 4DN, 216M)")
         plt.legend(fontsize=18)
+        plt.subplots_adjust(bottom=0.35)
         plt.savefig("/home/kevindsouza/Downloads/map_cells.png")
         #plt.show()
 
