@@ -890,7 +890,7 @@ class PlotFns:
         plt.legend(loc='upper right', fontsize=20)
         '''
 
-        plt.savefig("/home/kevindsouza/Downloads/r2_hff.png")
+        plt.savefig("/home/kevindsouza/Downloads/r2_wtc.png")
         plt.show()
 
         print("done")
@@ -1144,7 +1144,7 @@ if __name__ == "__main__":
     # plot_ob.plot_xgb()
     # plot_ob.plot_gbr()
 
-    plot_ob.plot_r2(cell = "HFFhTERT")
+    plot_ob.plot_r2(cell = "WTC11")
     # plot_ob.plot_r2_celltypes()
     # plot_ob.plot_symmetry()
 
