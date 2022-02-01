@@ -232,7 +232,7 @@ class PlotFns:
             pca_accuracy_all_tasks = np.load(self.path + "pca_accuracy_h1_all_tasks.npy")
             sbcid_accuracy_all_tasks = np.load(self.path + "sbcid_accuracy_h1_all_tasks.npy")
 
-            lstm_fscore_all_tasks = np.load(self.path + "h1_fscore_all_tasks.npy")
+            lstm_fscore_all_tasks = np.load(self.path + "lstm_fscore_h1_all_tasks.npy")
             sniper_intra_fscore_all_tasks = np.load(self.path + "sniper_intra_fscore_h1_all_tasks.npy")
             sniper_inter_fscore_all_tasks = np.load(self.path + "sniper_inter_fscore_h1_all_tasks.npy")
             graph_fscore_all_tasks = np.load(self.path + "graph_fscore_h1_all_tasks.npy")
