@@ -256,19 +256,19 @@ class PlotFns:
             pca_auroc_all_tasks = np.load(self.path + "pca_auroc_hff_all_tasks.npy")
             sbcid_auroc_all_tasks = np.load(self.path + "sbcid_auroc_hff_all_tasks.npy")
 
-            lstm_accuracy_all_tasks = np.load(self.path + "h1_accuracy_all_tasks.npy")
-            sniper_intra_accuracy_all_tasks = np.load(self.path + "sniper_intra_accuracy_h1_all_tasks.npy")
-            sniper_inter_accuracy_all_tasks = np.load(self.path + "sniper_inter_accuracy_h1_all_tasks.npy")
-            graph_accuracy_all_tasks = np.load(self.path + "graph_accuracy_h1_all_tasks.npy")
-            pca_accuracy_all_tasks = np.load(self.path + "pca_accuracy_h1_all_tasks.npy")
-            sbcid_accuracy_all_tasks = np.load(self.path + "sbcid_accuracy_h1_all_tasks.npy")
+            lstm_accuracy_all_tasks = np.load(self.path + "hff_accuracy_all_tasks.npy")
+            sniper_intra_accuracy_all_tasks = np.load(self.path + "sniper_intra_accuracy_hff_all_tasks.npy")
+            sniper_inter_accuracy_all_tasks = np.load(self.path + "sniper_inter_accuracy_hff_all_tasks.npy")
+            graph_accuracy_all_tasks = np.load(self.path + "graph_accuracy_hff_all_tasks.npy")
+            pca_accuracy_all_tasks = np.load(self.path + "pca_accuracy_hff_all_tasks.npy")
+            sbcid_accuracy_all_tasks = np.load(self.path + "sbcid_accuracy_hff_all_tasks.npy")
 
-            lstm_fscore_all_tasks = np.load(self.path + "lstm_fscore_h1_all_tasks.npy")
-            sniper_intra_fscore_all_tasks = np.load(self.path + "sniper_intra_fscore_h1_all_tasks.npy")
-            sniper_inter_fscore_all_tasks = np.load(self.path + "sniper_inter_fscore_h1_all_tasks.npy")
-            graph_fscore_all_tasks = np.load(self.path + "graph_fscore_h1_all_tasks.npy")
-            pca_fscore_all_tasks = np.load(self.path + "pca_fscore_h1_all_tasks.npy")
-            sbcid_fscore_all_tasks = np.load(self.path + "sbcid_fscore_h1_all_tasks.npy")
+            lstm_fscore_all_tasks = np.load(self.path + "lstm_fscore_hff_all_tasks.npy")
+            sniper_intra_fscore_all_tasks = np.load(self.path + "sniper_intra_fscore_hff_all_tasks.npy")
+            sniper_inter_fscore_all_tasks = np.load(self.path + "sniper_inter_fscore_hff_all_tasks.npy")
+            graph_fscore_all_tasks = np.load(self.path + "graph_fscore_hff_all_tasks.npy")
+            pca_fscore_all_tasks = np.load(self.path + "pca_fscore_hff_all_tasks.npy")
+            sbcid_fscore_all_tasks = np.load(self.path + "sbcid_fscore_hff_all_tasks.npy")
 
 
         df_main = pd.DataFrame(
@@ -287,7 +287,7 @@ class PlotFns:
         df_main[
             "SBCID"] = sbcid_values_all_tasks + sbcid_auroc_all_tasks + sbcid_accuracy_all_tasks + sbcid_fscore_all_tasks
 
-        #df_main.to_csv(self.path + "%s_metrics_df.csv" % (cell), sep="\t")
+        df_main.to_csv(self.path + "%s_metrics_df.csv" % (cell), sep="\t")
 
         #df_main = pd.read_csv(self.path + "%s_metrics_df.csv" % (cell), sep="\t")
         #df_main = df_main.drop(['Unnamed: 0'], axis=1)
