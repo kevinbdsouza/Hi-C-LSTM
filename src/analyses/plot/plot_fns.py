@@ -1131,9 +1131,9 @@ if __name__ == "__main__":
     cfg = config.Config()
     plot_ob = PlotFns(cfg)
 
-    plot_ob.plot_combined(cell = "H1hESC")
+    # plot_ob.plot_combined(cell = "H1hESC")
     # plot_ob.plot_combined_all(cell="H1hESC")
-    # plot_ob.plot_mAP_celltypes()
+    plot_ob.plot_mAP_celltypes()
     # plot_ob.plot_auroc_celltypes()
     # plot_ob.plot_auroc()
 
