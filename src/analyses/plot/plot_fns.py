@@ -1017,7 +1017,8 @@ class PlotFns:
         plt.plot('pos', 'SMC3_KO', data=df_main, marker='2', markersize=16, color="C9", linewidth=3,
                  label="SMC3 KO (Non-loop)")
         plt.legend(fontsize=18)
-        plt.show()
+        plt.savefig("/home/kevindsouza/Downloads/ko_average.png")
+        # plt.show()
 
         pass
 
@@ -1144,11 +1145,11 @@ if __name__ == "__main__":
     # plot_ob.plot_xgb()
     # plot_ob.plot_gbr()
 
-    plot_ob.plot_r2(cell = "WTC11")
+    # plot_ob.plot_r2(cell = "WTC11")
     # plot_ob.plot_r2_celltypes()
     # plot_ob.plot_symmetry()
 
-    # plot_ob.plot_knockout_results()
+    plot_ob.plot_knockout_results()
     # plot_ob.plot_knockout_tfs()
     # plot_ob.pr_curves()
 
