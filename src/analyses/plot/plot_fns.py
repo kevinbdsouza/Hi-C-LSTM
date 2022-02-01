@@ -371,6 +371,7 @@ class PlotFns:
         plt.plot('Tasks', 'SBCID', data=df_main, marker='s', markersize=16, color="C5", linewidth=3, linestyle='dashed',
                  label="SBCID")
         plt.legend(fontsize=18)
+        plt.subplots_adjust(bottom=0.35)
         plt.savefig("/home/kevindsouza/Downloads/map.png")
         #plt.show()
 
@@ -1130,7 +1131,7 @@ if __name__ == "__main__":
     cfg = config.Config()
     plot_ob = PlotFns(cfg)
 
-    plot_ob.plot_combined(cell = "GM12878")
+    plot_ob.plot_combined(cell = "H1hESC")
     # plot_ob.plot_combined_all(cell="H1hESC")
     # plot_ob.plot_mAP_celltypes()
     # plot_ob.plot_auroc_celltypes()
