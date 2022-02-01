@@ -205,8 +205,7 @@ class PlotFns:
             graph_fscore_all_tasks = np.load(self.path + "gm_graph_fscore_all_tasks.npy")
             pca_fscore_all_tasks = np.load(self.path + "gm_pca_fscore_all_tasks.npy")
             sbcid_fscore_all_tasks = np.load(self.path + "gm_sbcid_fscore_all_tasks.npy")
-
-        if cell == "H1hESC":
+        elif cell == "H1hESC":
             tasks = ["Gene Expression", "Enhancers", "TSS", "TADs", "subTADs", "Loop Domains", "TAD Boundaries",
                      "subTAD Boundaries", "Subcompartments"]
             colors = ['C3', 'C1', 'C2', 'C6', 'C7', 'C8', 'C9', 'C10', 'C11']
@@ -217,6 +216,38 @@ class PlotFns:
             graph_values_all_tasks = np.load(self.path + "graph_h1_all_tasks.npy")
             pca_values_all_tasks = np.load(self.path + "pca_h1_all_tasks.npy")
             sbcid_values_all_tasks = np.load(self.path + "sbcid_h1_all_tasks.npy")
+
+            lstm_auroc_all_tasks = np.load(self.path + "h1_auroc_all_tasks.npy")
+            sniper_intra_auroc_all_tasks = np.load(self.path + "sniper_intra_auroc_h1_all_tasks.npy")
+            sniper_inter_auroc_all_tasks = np.load(self.path + "sniper_inter_auroc_h1_all_tasks.npy")
+            graph_auroc_all_tasks = np.load(self.path + "graph_auroc_h1_all_tasks.npy")
+            pca_auroc_all_tasks = np.load(self.path + "pca_auroc_h1_all_tasks.npy")
+            sbcid_auroc_all_tasks = np.load(self.path + "sbcid_auroc_h1_all_tasks.npy")
+
+            lstm_accuracy_all_tasks = np.load(self.path + "h1_accuracy_all_tasks.npy")
+            sniper_intra_accuracy_all_tasks = np.load(self.path + "sniper_intra_accuracy_h1_all_tasks.npy")
+            sniper_inter_accuracy_all_tasks = np.load(self.path + "sniper_inter_accuracy_h1_all_tasks.npy")
+            graph_accuracy_all_tasks = np.load(self.path + "graph_accuracy_h1_all_tasks.npy")
+            pca_accuracy_all_tasks = np.load(self.path + "pca_accuracy_h1_all_tasks.npy")
+            sbcid_accuracy_all_tasks = np.load(self.path + "sbcid_accuracy_h1_all_tasks.npy")
+
+            lstm_fscore_all_tasks = np.load(self.path + "lstm_fscore_h1_all_tasks.npy")
+            sniper_intra_fscore_all_tasks = np.load(self.path + "sniper_intra_fscore_h1_all_tasks.npy")
+            sniper_inter_fscore_all_tasks = np.load(self.path + "sniper_inter_fscore_h1_all_tasks.npy")
+            graph_fscore_all_tasks = np.load(self.path + "graph_fscore_h1_all_tasks.npy")
+            pca_fscore_all_tasks = np.load(self.path + "pca_fscore_h1_all_tasks.npy")
+            sbcid_fscore_all_tasks = np.load(self.path + "sbcid_fscore_h1_all_tasks.npy")
+        elif cell == "HFFhTERT":
+            tasks = ["Gene Expression", "Enhancers", "TSS", "TADs", "subTADs", "Loop Domains", "TAD Boundaries",
+                     "subTAD Boundaries", "Subcompartments"]
+            colors = ['C3', 'C1', 'C2', 'C6', 'C7', 'C8', 'C9', 'C10', 'C11']
+
+            lstm_values_all_tasks = np.load(self.path + "hff_values_all_tasks.npy")
+            sniper_intra_values_all_tasks = np.load(self.path + "sniper_intra_hff_all_tasks.npy")
+            sniper_inter_values_all_tasks = np.load(self.path + "sniper_inter_hff_all_tasks.npy")
+            graph_values_all_tasks = np.load(self.path + "graph_hff_all_tasks.npy")
+            pca_values_all_tasks = np.load(self.path + "pca_hff_all_tasks.npy")
+            sbcid_values_all_tasks = np.load(self.path + "sbcid_hff_all_tasks.npy")
 
             lstm_auroc_all_tasks = np.load(self.path + "h1_auroc_all_tasks.npy")
             sniper_intra_auroc_all_tasks = np.load(self.path + "sniper_intra_auroc_h1_all_tasks.npy")
@@ -1017,6 +1048,7 @@ class PlotFns:
         plt.plot('pos', 'SMC3_KO', data=df_main, marker='2', markersize=16, color="C9", linewidth=3,
                  label="SMC3 KO (Non-loop)")
         plt.legend(fontsize=18)
+        plt.subplots_adjust(left=0.2)
         plt.savefig("/home/kevindsouza/Downloads/ko_average.png")
         # plt.show()
 
@@ -1134,7 +1166,7 @@ if __name__ == "__main__":
     plot_ob = PlotFns(cfg)
 
     # plot_ob.plot_combined(cell = "H1hESC")
-    # plot_ob.plot_combined_all(cell="H1hESC")
+    plot_ob.plot_combined_all(cell="HFFhTERT")
     # plot_ob.plot_mAP_celltypes()
     # plot_ob.plot_auroc_celltypes()
     # plot_ob.plot_auroc()
@@ -1149,7 +1181,7 @@ if __name__ == "__main__":
     # plot_ob.plot_r2_celltypes()
     # plot_ob.plot_symmetry()
 
-    plot_ob.plot_knockout_results()
+    # plot_ob.plot_knockout_results()
     # plot_ob.plot_knockout_tfs()
     # plot_ob.pr_curves()
 
