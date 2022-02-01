@@ -703,7 +703,8 @@ class PlotFns:
         handles, labels = ax1.get_legend_handles_labels()
         fig.legend(handles, labels, loc='upper right', fontsize=18)
 
-        plt.show()
+        plt.savefig("/home/kevindsouza/Downloads/r2_cells_hiclstm.png")
+        #plt.show()
 
         '''
         plt.figure(figsize=(10, 8))
@@ -1132,7 +1133,7 @@ if __name__ == "__main__":
 
     # plot_ob.plot_combined(cell = "H1hESC")
     # plot_ob.plot_combined_all(cell="H1hESC")
-    plot_ob.plot_mAP_celltypes()
+    # plot_ob.plot_mAP_celltypes()
     # plot_ob.plot_auroc_celltypes()
     # plot_ob.plot_auroc()
 
@@ -1143,7 +1144,7 @@ if __name__ == "__main__":
     # plot_ob.plot_gbr()
 
     # plot_ob.plot_r2(cell = "H1hESC")
-    # plot_ob.plot_r2_celltypes()
+    plot_ob.plot_r2_celltypes()
     # plot_ob.plot_symmetry()
 
     # plot_ob.plot_knockout_results()
