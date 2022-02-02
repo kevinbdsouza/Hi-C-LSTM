@@ -25,7 +25,7 @@ def get_cumpos(cfg, chr_num):
 def get_bin_idx(chr, pos, cfg):
     sizes = np.load(cfg.hic_path + cfg.sizes_file, allow_pickle=True).item()
     chr = ['chr' + str(x - 1) for x in chr]
-    chr_start = [sizes[key] // 50 for key in chr]
+    chr_start = [sizes[key] * 5 - 1153605 for key in chr]
 
     return pos + chr_start
 
