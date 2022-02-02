@@ -10,8 +10,8 @@ class Config:
         ##########################################
 
         self.num_chr = 23
-        self.genome_len = 1440455
-        self.resolution = 2000
+        self.genome_len = 28809
+        self.resolution = 100000
 
         ##########################################
         ############ Model Parameters ############
@@ -40,7 +40,7 @@ class Config:
         ############ Input Directories ###########
         ##########################################
 
-        self.cell = "GM12878_2kb"
+        self.cell = "GM12878_100kb"
         self.hic_path = '/data2/hic_lstm/data/'
         self.sizes_file = 'chr_cum_sizes2.npy'
         self.start_end_file = 'starts.npy'
