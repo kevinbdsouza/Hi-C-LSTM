@@ -45,8 +45,8 @@ if __name__ == '__main__':
     cfg = config.Config()
     cell = cfg.cell
     # model_name = sys.argv[1]
-    #model_name = "shuffle_" + cell
-    model_name = "shuffle_GM12878_test"
+    model_name = "shuffle_" + cell
+    #model_name = "shuffle_GM12878_test"
 
     # set up tensorboard logging
     timestr = time.strftime("%Y%m%d-%H%M%S")

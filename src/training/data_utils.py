@@ -225,8 +225,8 @@ def get_data_loader_batch_chr(cfg):
     sample_index_list = []
 
     # chr_list = [2, 22, 10, 12, 7, 3, 16, 11, 20, 4, 19, 15, 18, 8, 14, 6, 17, 21]
-    # chr_list = [2, 22, 10, 12, 3, 16, 11, 20, 4, 19, 9, 15, 5, 18, 8, 14, 6, 17, 13, 21]
-    chr_list = [22, 12, 16, 11, 20, 19, 15, 18, 14, 17, 13, 21]
+    chr_list = [2, 22, 10, 12, 3, 16, 11, 20, 4, 19, 9, 15, 5, 18, 8, 14, 6, 17, 13, 21, 1, 7]
+    #chr_list = [22, 12, 16, 11, 20, 19, 15, 18, 14, 17, 13, 21]
     # chr_list = [19, 22, 20, 21]
 
     for chr in chr_list:
@@ -247,7 +247,8 @@ def get_data_loader_batch_chr(cfg):
 
 
 def save_processed_data(cfg, cell):
-    chr_list = [6, 7, 8, 10, 11, 12, 14, 15, 16, 17, 18, 19, 20, 21, 22]
+    # chr_list = [6, 7, 8, 10, 11, 12, 14, 15, 16, 17, 18, 19, 20, 21, 22]
+    chr_list = [2, 22, 10, 12, 3, 16, 11, 20, 4, 19, 9, 15, 5, 18, 8, 14, 6, 17, 13, 21, 1, 7]
     for chr in chr_list:
         print(chr)
         idx, val, sample_idx = get_data(cfg, cell, chr)

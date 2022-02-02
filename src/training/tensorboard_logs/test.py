@@ -468,3 +468,13 @@ for i in range(temp.shape[0]):
             if random.random()<0.5:
                 tal1_diff[i,j] = a
 '''
+
+'''
+self.cell = "GM12878"
+self.genome_len = 288091
+self.resolution = 10000
+
+self.cell = "GM12878_100kb"
+self.genome_len = 28809
+self.resolution = 100000
+'''
