@@ -313,8 +313,8 @@ def scHiC(cfg, cell):
     full_path = cfg.hic_path + cell + file_name
     full_read_path = cfg.hic_path + cell + reads_file
     pairs = pd.read_csv(full_path, sep="\t",
-                        names=['chrA', 'x1', 'x2', 'chrB', 'y1', 'y2', 'a', 'b', 'c', 'd', 'e', 'f', 'bar1', 'bar2',
-                               'i', 'j', 'k', 'l'])
+                        names=['chrA', 'x1', 'x2', 'chrB', 'y1', 'y2', 'a', 'b', 'c', 'd', 'e', 'bar1', 'bar2', 'l',
+                               'i', 'j', 'k'])
 
     pairs_19 = pairs.loc[pairs["chrA"] == "human_chr19"]
     pairs_20 = pairs.loc[pairs["chrA"] == "human_chr20"]
