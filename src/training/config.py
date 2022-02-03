@@ -21,7 +21,7 @@ class Config:
         self.input_size_lstm = 2 * self.pos_embed_size
         self.hidden_size_lstm = 8
         self.output_size_lstm = 1
-        self.sequence_length = 150  # length of each input sequence
+        self.sequence_length = 50  # length of each input sequence
 
         self.distance_cut_off_mb = int(self.sequence_length / 2)
         # for dense input matrix, takes sequence_length around diagonal for each row
