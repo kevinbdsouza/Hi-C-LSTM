@@ -5,10 +5,12 @@ import torch
 import torch.utils.data
 from torch.nn.utils.rnn import pad_sequence
 import training.config as config
-#import matplotlib as mpl
-#mpl.use('module://backend_interagg')
 
-#matplotlib.use('pdf')
+
+# import matplotlib as mpl
+# mpl.use('module://backend_interagg')
+
+# matplotlib.use('pdf')
 
 
 def get_cumpos(cfg, chr_num):
@@ -226,7 +228,7 @@ def get_data_loader_batch_chr(cfg):
 
     # chr_list = [2, 22, 10, 12, 7, 3, 16, 11, 20, 4, 19, 15, 18, 8, 14, 6, 17, 21]
     # chr_list = [2, 22, 10, 12, 3, 16, 11, 20, 4, 19, 9, 15, 5, 18, 8, 14, 6, 17, 13, 21, 1, 7]
-    #chr_list = [22, 12, 16, 11, 20, 19, 15, 18, 14, 17, 13, 21]
+    # chr_list = [22, 12, 16, 11, 20, 19, 15, 18, 14, 17, 13, 21]
     chr_list = [15, 16, 17, 18, 19, 20, 21]
 
     for chr in chr_list:
@@ -304,14 +306,15 @@ def get_bedfile(sample_index, cfg):
     bedfile = pd.DataFrame({'chr': chr, 'start': start_coord, 'stop': stop_coord})
     return bedfile
 
+
 def scHiC(cfg, cell):
     file_name = "/GSM2254215_ML1.validPairs.txt"
     reads_file = "/GSM2254215_ML1.percentages.txt"
     full_path = cfg.hic_path + cell + file_name
     full_read_path = cfg.hic_path + cell + reads_file
-    pairs = pd.read_csv(full_path, sep="\t", names=['chrA', 'x1', 'x2', 'chrB', 'y1', 'y2', 'a', 'b', 'c', 'd', 'e', 'f', 'bar1', 'bar2', 'i', 'j', 'k', 'l'])
-    reads = pd.read_csv(full_read_path, sep="\t", names=['a', 'b', 'reads_hg19', 'd', 'e', 'f', 'bar1', 'bar2', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q'])
-    reads = reads['reads_hg19', 'bar1', 'bar2']
+    pairs = pd.read_csv(full_path, sep="\t",
+                        names=['chrA', 'x1', 'x2', 'chrB', 'y1', 'y2', 'a', 'b', 'c', 'd', 'e', 'f', 'bar1', 'bar2',
+                               'i', 'j', 'k', 'l'])
 
     pairs_19 = pairs.loc[pairs["chrA"] == "human_chr19"]
     pairs_20 = pairs.loc[pairs["chrA"] == "human_chr20"]
@@ -334,13 +337,18 @@ def scHiC(cfg, cell):
     pairs = pairs_list[3]
     pairs_list = []
 
+    reads = pd.read_csv(full_read_path, sep="\t",
+                        names=['a', 'b', 'reads_hg19', 'd', 'e', 'f', 'bar1', 'bar2', 'i', 'j', 'k', 'l', 'm', 'n', 'o',
+                               'p', 'q'])
+    reads = reads['reads_hg19', 'bar1', 'bar2']
 
     print("done")
 
     pass
 
+
 if __name__ == "__main__":
     cfg = config.Config()
     cell = cfg.cell
-    #save_processed_data(cfg, cell)
+    # save_processed_data(cfg, cell)
     scHiC(cfg, cell)
