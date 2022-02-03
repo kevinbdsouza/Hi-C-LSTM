@@ -307,42 +307,49 @@ def get_bedfile(sample_index, cfg):
     return bedfile
 
 
-def scHiC(cfg, cell):
-    file_name = "/GSM2254215_ML1.validPairs.txt"
-    reads_file = "/GSM2254215_ML1.percentages.txt"
-    full_path = cfg.hic_path + cell + file_name
-    full_read_path = cfg.hic_path + cell + reads_file
-    pairs = pd.read_csv(full_path, sep="\t",
-                        names=['chrA', 'x1', 'x2', 'chrB', 'y1', 'y2', 'a', 'b', 'c', 'd', 'e', 'bar1', 'bar2', 'l',
-                               'i', 'j', 'k'])
+def scHiC_pre(cfg, cell, extract):
+    chr_list = [19, 20, 21, 22]
 
-    pairs_19 = pairs.loc[pairs["chrA"] == "human_chr19"]
-    pairs_20 = pairs.loc[pairs["chrA"] == "human_chr20"]
-    pairs_21 = pairs.loc[pairs["chrA"] == "human_chr21"]
-    pairs = pairs.loc[pairs["chrA"] == "human_chr22"]
+    if extract == "pos":
+        file_name = "/GSM2254215_ML1.validPairs.txt"
+        full_path = cfg.hic_path + cell + file_name
+        pairs = pd.read_csv(full_path, sep="\t",
+                            names=['chrA', 'x1', 'x2', 'chrB', 'y1', 'y2', 'a', 'b', 'c', 'd', 'e', 'bar1', 'bar2', 'l',
+                                   'i', 'j', 'k'])
 
-    pairs_19 = pairs_19.loc[pairs_19["chrB"] == "human_chr19"]
-    pairs_20 = pairs_20.loc[pairs_20["chrB"] == "human_chr20"]
-    pairs_21 = pairs_21.loc[pairs_21["chrB"] == "human_chr21"]
-    pairs = pairs.loc[pairs["chrB"] == "human_chr22"]
+        pairs_19 = pairs.loc[pairs["chrA"] == "human_chr19"]
+        pairs_20 = pairs.loc[pairs["chrA"] == "human_chr20"]
+        pairs_21 = pairs.loc[pairs["chrA"] == "human_chr21"]
+        pairs = pairs.loc[pairs["chrA"] == "human_chr22"]
 
-    pairs_list = [pairs_19, pairs_20, pairs_21, pairs]
-    for i, pair in enumerate(pairs_list):
-        columns = ['x1', 'y1', 'bar1', 'bar2']
-        pairs_list[i] = pairs_list[i][columns]
+        pairs_19 = pairs_19.loc[pairs_19["chrB"] == "human_chr19"]
+        pairs_20 = pairs_20.loc[pairs_20["chrB"] == "human_chr20"]
+        pairs_21 = pairs_21.loc[pairs_21["chrB"] == "human_chr21"]
+        pairs = pairs.loc[pairs["chrB"] == "human_chr22"]
 
-    pairs_19 = pairs_list[0]
-    pairs_20 = pairs_list[1]
-    pairs_21 = pairs_list[2]
-    pairs = pairs_list[3]
-    pairs_list = []
+        pairs_list = [pairs_19, pairs_20, pairs_21, pairs]
+        for i, pair in enumerate(pairs_list):
+            columns = ['x1', 'y1', 'bar1', 'bar2']
+            pairs_list[i] = pairs_list[i][columns]
 
-    reads = pd.read_csv(full_read_path, sep="\t",
-                        names=['a', 'b', 'reads_hg19', 'd', 'e', 'f', 'bar1', 'bar2', 'i', 'j', 'k', 'l', 'm', 'n', 'o',
-                               'p', 'q'])
-    reads = reads['reads_hg19', 'bar1', 'bar2']
+        pairs_19 = pairs_list[0]
+        pairs_20 = pairs_list[1]
+        pairs_21 = pairs_list[2]
+        pairs = pairs_list[3]
+        pairs_list = []
+    elif extract == "reads":
+        reads_file = "/GSM2254215_ML1.percentages.txt"
+        full_read_path = cfg.hic_path + cell + reads_file
+        reads = pd.read_csv(full_read_path, sep="\t",
+                            names=['a', 'b', 'reads_hg19', 'd', 'e', 'f', 'bar1', 'bar2', 'i', 'j', 'k', 'l', 'm', 'n',
+                                   'o',
+                                   'p', 'q'])
+        reads = reads['reads_hg19', 'bar1', 'bar2']
 
-    print("done")
+        for chr in chr_list:
+            pairs = pd.read_csv(cfg.hic_path + cell + '/' + str(chr) + '/' + "pairs_" + str(chr) + '.txt', sep="\t")
+            merged_pairs = pairs.merge(reads, on=["bar1", "bar2"])
+            print("done")
 
     pass
 
@@ -351,4 +358,4 @@ if __name__ == "__main__":
     cfg = config.Config()
     cell = cfg.cell
     # save_processed_data(cfg, cell)
-    scHiC(cfg, cell)
+    scHiC_pre(cfg, cell, extract="reads")
