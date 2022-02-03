@@ -314,4 +314,5 @@ def scHiC(cfg, cell):
 if __name__ == "__main__":
     cfg = config.Config()
     cell = cfg.cell
-    save_processed_data(cfg, cell)
+    #save_processed_data(cfg, cell)
+    scHiC(cfg, cell)
