@@ -249,8 +249,8 @@ def get_data_loader_batch_chr(cfg):
 
 
 def save_processed_data(cfg, cell):
-    # chr_list = [15, 16, 17, 18, 19, 20, 21]
-    chr_list = [2, 22, 10, 12, 3, 16, 11, 20, 4, 19, 9, 15, 5, 18, 8, 14, 6, 17, 13, 21, 1, 7]
+    chr_list = [19, 20, 21, 22]
+    # chr_list = [2, 22, 10, 12, 3, 16, 11, 20, 4, 19, 9, 15, 5, 18, 8, 14, 6, 17, 13, 21, 1, 7]
     for chr in chr_list:
         print(chr)
         idx, val, sample_idx = get_data(cfg, cell, chr)
@@ -349,7 +349,9 @@ def scHiC_pre(cfg, cell, extract):
         for chr in chr_list:
             pairs = pd.read_csv(cfg.hic_path + cell + '/' + str(chr) + '/' + "pairs_" + str(chr) + '.txt', sep="\t")
             merged_pairs = pairs.merge(reads, on=["bar1", "bar2"])
-            print("done")
+            merged_pairs = merged_pairs[["x1", "y1", "reads_hg19"]]
+            merged_pairs = merged_pairs.rename(columns={"x1": "i", "y1": "j", "reads_hg19": "v"})
+            merged_pairs.to_csv(cfg.hic_path + cell + '/' + str(chr) + '/' + "hic_chr" + str(chr) + '.txt', sep="\t")
 
     pass
 
@@ -357,5 +359,5 @@ def scHiC_pre(cfg, cell, extract):
 if __name__ == "__main__":
     cfg = config.Config()
     cell = cfg.cell
-    # save_processed_data(cfg, cell)
-    scHiC_pre(cfg, cell, extract="reads")
+    save_processed_data(cfg, cell)
+    #scHiC_pre(cfg, cell, extract="reads")
