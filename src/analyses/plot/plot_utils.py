@@ -76,22 +76,20 @@ def simple_plot(hic_win):
     plt.show()
     '''
 
-
+    '''
     sns.set_theme()
     ax = sns.heatmap(hic_win, cmap="Reds", vmin=0, vmax=1)
     ax.set_yticks([])
     ax.set_xticks([])
     plt.show()
-
-
     '''
+
     sns.set_theme()
     rdgn = sns.diverging_palette(h_neg=220, h_pos=14, s=79, l=55, sep=3, as_cmap=True)
     sns.heatmap(hic_win, cmap=rdgn, center=0.00, cbar=True)
     plt.yticks([])
     plt.xticks([])
     plt.show()
-    '''
 
     pass
 
