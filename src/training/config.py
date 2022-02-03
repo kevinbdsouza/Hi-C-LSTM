@@ -10,7 +10,7 @@ class Config:
         ##########################################
 
         self.num_chr = 23
-        self.genome_len = 5790
+        self.genome_len = 5762
         self.resolution = 500000
 
         ##########################################
