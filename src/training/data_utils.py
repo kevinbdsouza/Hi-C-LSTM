@@ -307,7 +307,15 @@ def get_bedfile(sample_index, cfg):
 def scHiC(cfg, cell):
     file_name = "/GSM2254215_ML1.validPairs.txt"
     full_path = cfg.hic_path + cell + file_name
-    pairs = pd.read_csv(full_path, sep="\t")
+    pairs = pd.read_csv(full_path, sep="\t", names=['chrA', 'x1', 'x2', 'chrB', 'y1', 'y2', 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l'])
+
+    pairs_19 = pairs.loc[pairs["chrA"] == "human_chr19"]
+    pairs_20 = pairs.loc[pairs["chrA"] == "human_chr20"]
+    pairs_21 = pairs.loc[pairs["chrA"] == "human_chr21"]
+    pairs = pairs.loc[pairs["chrA"] == "human_chr22"]
+    
+
+    print("done")
 
     pass
 
