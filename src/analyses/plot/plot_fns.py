@@ -1001,7 +1001,6 @@ class PlotFns:
         ctcfko_diff = ctcfko_probs - predicted_probs
         convctcf_diff = convctcf_probs - predicted_probs
         divctcf_diff = divctcf_probs - predicted_probs
-        radko_diff = radko_probs - predicted_probs
 
         ctcfnl_diff = ctcfko_probs_nl - predicted_probs
         znfko_diff = znfko_probs - predicted_probs
