@@ -222,11 +222,12 @@ def barplot_tal_lm():
         temp["label"] = l
         tallm_df = tallm_df.append(temp)
 
-    plt.figure()
+    plt.figure(figsize=(14, 12))
     sns.barplot(x="label", y="data", data=tallm_df, ci="sd")
     plt.xticks(rotation=90)
     plt.xlabel('Data', fontsize=20)
     plt.ylabel('Contact Strengths', fontsize=20)
+    plt.subplots_adjust(bottom=0.4)
     # plt.show()
     plt.savefig("/home/kevindsouza/Downloads/bar_tal_lm.png")
     print("done")
@@ -256,9 +257,10 @@ if __name__ == '__main__':
         # foxg1_ko = np.load(cfg.output_directory + "foxg1_ko.npy")
         # simple_plot(foxg1_ko)
 
-        # tal1_diff = np.load(cfg.output_directory + "tal1_diff.npy")
+        tal1_diff = np.load(cfg.output_directory + "tal1_diff.npy")
+        simple_plot(tal1_diff)
         # scatter_tal_lm(tal1_diff)
-        barplot_tal_lm()
+        # barplot_tal_lm()
 
         # pred_data = pd.read_csv(cfg.output_directory + "%s_predictions_chr.csv" % (cell), sep="\t")
         # plot_tal1_lmo2(pred_data)
