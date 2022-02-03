@@ -306,8 +306,12 @@ def get_bedfile(sample_index, cfg):
 
 def scHiC(cfg, cell):
     file_name = "/GSM2254215_ML1.validPairs.txt"
+    reads_file = "/GSM2254215_ML1.percentages.txt"
     full_path = cfg.hic_path + cell + file_name
-    pairs = pd.read_csv(full_path, sep="\t", names=['chrA', 'x1', 'x2', 'chrB', 'y1', 'y2', 'v', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l'])
+    full_read_path = cfg.hic_path + cell + reads_file
+    pairs = pd.read_csv(full_path, sep="\t", names=['chrA', 'x1', 'x2', 'chrB', 'y1', 'y2', 'a', 'b', 'c', 'd', 'e', 'f', 'bar1', 'bar2', 'i', 'j', 'k', 'l'])
+    reads = pd.read_csv(full_path, sep="\t", names=['a', 'b', 'reads_hg19', 'd', 'e', 'f', 'bar1', 'bar2', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q'])
+    reads = reads['reads_hg19', 'bar1', 'bar2']
 
     pairs_19 = pairs.loc[pairs["chrA"] == "human_chr19"]
     pairs_20 = pairs.loc[pairs["chrA"] == "human_chr20"]
@@ -321,7 +325,7 @@ def scHiC(cfg, cell):
 
     pairs_list = [pairs_19, pairs_20, pairs_21, pairs]
     for i, pair in enumerate(pairs_list):
-        columns = ['x1', 'y1', 'v']
+        columns = ['x1', 'y1', 'bar1', 'bar2']
         pairs_list[i] = pairs_list[i][columns]
 
     pairs_19 = pairs_list[0]
