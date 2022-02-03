@@ -304,6 +304,12 @@ def get_bedfile(sample_index, cfg):
     bedfile = pd.DataFrame({'chr': chr, 'start': start_coord, 'stop': stop_coord})
     return bedfile
 
+def scHiC(cfg, cell):
+    file_name = "/GSM2254215_ML1.validPairs.txt"
+    full_path = cfg.hic_path + cell + file_name
+    pairs = pd.read_csv(full_path, sep="\t")
+
+    pass
 
 if __name__ == "__main__":
     cfg = config.Config()
