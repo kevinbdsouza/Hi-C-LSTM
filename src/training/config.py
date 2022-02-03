@@ -10,8 +10,8 @@ class Config:
         ##########################################
 
         self.num_chr = 23
-        self.genome_len = 5762
-        self.resolution = 500000
+        self.genome_len = 286850
+        self.resolution = 2000
 
         ##########################################
         ############ Model Parameters ############
@@ -21,7 +21,7 @@ class Config:
         self.input_size_lstm = 2 * self.pos_embed_size
         self.hidden_size_lstm = 8
         self.output_size_lstm = 1
-        self.sequence_length = 50  # length of each input sequence
+        self.sequence_length = 150  # length of each input sequence
 
         self.distance_cut_off_mb = int(self.sequence_length / 2)
         # for dense input matrix, takes sequence_length around diagonal for each row
@@ -40,7 +40,7 @@ class Config:
         ############ Input Directories ###########
         ##########################################
 
-        self.cell = "GM12878_500kb"
+        self.cell = "GM12878_2kb"
         self.hic_path = '/data2/hic_lstm/data/'
         self.sizes_file = 'chr_cum_sizes2.npy'
         self.start_end_file = 'starts.npy'
