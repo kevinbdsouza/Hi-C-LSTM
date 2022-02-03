@@ -20,7 +20,7 @@ def plot_heatmaps(data):
     cols = np.array(data["j"]).astype(int)
 
     hic_mat = np.zeros((nr, nr))
-    hic_mat[rows, cols] = np.array(contactProbabilities(data["v"]))
+    hic_mat[rows, cols] = np.array(data["v"])
     hic_upper = np.triu(hic_mat)
     hic_mat[cols, rows] = np.array(data["pred"])
     hic_lower = np.tril(hic_mat)
@@ -82,7 +82,7 @@ def simple_plot(hic_win):
     ax.set_yticks([])
     ax.set_xticks([])
     plt.show()
-    
+
 
     '''
     sns.set_theme()
