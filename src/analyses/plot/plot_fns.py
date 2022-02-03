@@ -1165,7 +1165,7 @@ if __name__ == "__main__":
     cfg = config.Config()
     plot_ob = PlotFns(cfg)
 
-    plot_ob.plot_combined(cell = "HFFhTERT")
+    # plot_ob.plot_combined(cell = "HFFhTERT")
     #plot_ob.plot_combined_all(cell="HFFhTERT")
     # plot_ob.plot_mAP_celltypes()
     # plot_ob.plot_auroc_celltypes()
@@ -1175,7 +1175,7 @@ if __name__ == "__main__":
     # plot_ob.plot_hidden(hidden_list)
 
     # plot_ob.plot_xgb()
-    # plot_ob.plot_gbr()
+    plot_ob.plot_gbr()
 
     # plot_ob.plot_r2(cell = "WTC11")
     # plot_ob.plot_r2_celltypes()

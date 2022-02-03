@@ -255,8 +255,8 @@ if __name__ == '__main__':
         # foxg1_ko = np.load(cfg.output_directory + "foxg1_ko.npy")
         # simple_plot(foxg1_ko)
 
-        tal1_diff = np.load(cfg.output_directory + "tal1_diff.npy")
-        simple_plot(tal1_diff)
+        # tal1_diff = np.load(cfg.output_directory + "tal1_diff.npy")
+        # simple_plot(tal1_diff)
         # scatter_tal_lm(tal1_diff)
         # barplot_tal_lm()
 
