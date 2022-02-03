@@ -449,6 +449,40 @@ class PlotFns:
 
         pass
 
+    def plot_mAP_resolutions(self):
+        tasks = ["Gene Expression", "Enhancers", "TADs", "subTADs", "Subcompartments"]
+
+        lstm_2kbp = np.load(self.path + "gm_reduced_all_tasks.npy")
+        lstm_10kbp = np.load(self.path + "gm_reduced_all_tasks.npy")
+        lstm_100kbp = np.load(self.path + "gm_reduced_all_tasks.npy")
+        lstm_500kbp = np.load(self.path + "gm_reduced_all_tasks.npy")
+
+        df_main = pd.DataFrame(columns=["Tasks", "lstm_2kbp", "lstm_10kbp",
+                                        "lstm_100kbp", "lstm_500kbp"])
+        df_main["Tasks"] = tasks
+        df_main["lstm_2kbp"] = lstm_2kbp
+        df_main["lstm_10kbp"] = lstm_10kbp
+        df_main["lstm_100kbp"] = lstm_100kbp
+        df_main["lstm_500kbp"] = lstm_500kbp
+
+        plt.figure(figsize=(12, 10))
+        plt.xticks(rotation=90, fontsize=20)
+        plt.yticks(fontsize=20)
+        plt.xlabel("Prediction Target", fontsize=20)
+        plt.ylabel("mAP ", fontsize=20)
+        plt.plot('Tasks', 'lstm_2kbp', data=df_main, marker='D', markersize=16, color="C1", linewidth=3,
+                 label="2Kbp")
+        plt.plot('Tasks', 'lstm_10kbp', data=df_main, marker='o', markersize=16, color="C0", linewidth=3,
+                 label="10Kbp")
+        plt.plot('Tasks', 'lstm_100kbp', data=df_main, marker='v', markersize=16, color="C2", linewidth=3,
+                 label="100Kbp")
+        plt.plot('Tasks', 'lstm_500kbp', data=df_main, marker='s', markersize=16, color="C3", linewidth=3,
+                 label="500Kbp")
+        plt.legend(fontsize=18)
+        plt.subplots_adjust(bottom=0.35)
+        plt.savefig("/home/kevindsouza/Downloads/map_res.png")
+        pass
+
     def plot_auroc_celltypes(self):
         tasks = ["Gene Expression", "Replication Timing", "Enhancers", "TSS", "PE-Interactions", "FIREs",
                  "Non-loop Domains",
@@ -1163,6 +1197,7 @@ if __name__ == "__main__":
     # plot_ob.plot_combined(cell = "HFFhTERT")
     #plot_ob.plot_combined_all(cell="HFFhTERT")
     # plot_ob.plot_mAP_celltypes()
+    plot_ob.plot_mAP_resolutions()
     # plot_ob.plot_auroc_celltypes()
     # plot_ob.plot_auroc()
 
@@ -1176,7 +1211,7 @@ if __name__ == "__main__":
     # plot_ob.plot_r2_celltypes()
     # plot_ob.plot_symmetry()
 
-    plot_ob.plot_knockout_results()
+    # plot_ob.plot_knockout_results()
     # plot_ob.plot_knockout_tfs()
     # plot_ob.pr_curves()
 
