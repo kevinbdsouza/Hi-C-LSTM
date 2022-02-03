@@ -222,11 +222,12 @@ def barplot_tal_lm():
         temp["label"] = l
         tallm_df = tallm_df.append(temp)
 
+    plt.figure()
     sns.barplot(x="label", y="data", data=tallm_df, ci="sd")
     plt.xticks(rotation=90)
     plt.xlabel('Data', fontsize=20)
     plt.ylabel('Contact Strengths', fontsize=20)
-    plt.show()
+    # plt.show()
     plt.savefig("/home/kevindsouza/Downloads/bar_tal_lm.png")
     print("done")
 
