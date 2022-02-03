@@ -27,7 +27,7 @@ def get_cumpos(cfg, chr_num):
 def get_bin_idx(chr, pos, cfg):
     sizes = np.load(cfg.hic_path + cfg.sizes_file, allow_pickle=True).item()
     chr = ['chr' + str(x - 1) for x in chr]
-    chr_start = [sizes[key] // 50 for key in chr]
+    chr_start = [sizes[key] for key in chr]
 
     return pos + chr_start
 
@@ -229,7 +229,7 @@ def get_data_loader_batch_chr(cfg):
     # chr_list = [2, 22, 10, 12, 7, 3, 16, 11, 20, 4, 19, 15, 18, 8, 14, 6, 17, 21]
     # chr_list = [2, 22, 10, 12, 3, 16, 11, 20, 4, 19, 9, 15, 5, 18, 8, 14, 6, 17, 13, 21, 1, 7]
     # chr_list = [22, 12, 16, 11, 20, 19, 15, 18, 14, 17, 13, 21]
-    chr_list = [15, 16, 17, 18, 19, 20, 21]
+    chr_list = [19, 20, 21, 22]
 
     for chr in chr_list:
         idx = torch.load(cfg.processed_data_dir + 'input_idx_chr' + str(chr) + '.pth')
