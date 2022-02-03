@@ -76,20 +76,22 @@ def simple_plot(hic_win):
     plt.show()
     '''
 
-    '''
+
     sns.set_theme()
     ax = sns.heatmap(hic_win, cmap="Reds", vmin=0, vmax=1)
     ax.set_yticks([])
     ax.set_xticks([])
     plt.show()
-    '''
+    
 
+    '''
     sns.set_theme()
     rdgn = sns.diverging_palette(h_neg=220, h_pos=14, s=79, l=55, sep=3, as_cmap=True)
     sns.heatmap(hic_win, cmap=rdgn, center=0.00, cbar=True)
     plt.yticks([])
     plt.xticks([])
     plt.show()
+    '''
 
     pass
 
@@ -229,7 +231,7 @@ def barplot_tal_lm():
 
 
 if __name__ == '__main__':
-    plot_chr = list(range(1, 2))
+    plot_chr = list(range(21, 22))
     cfg = config.Config()
     cell = cfg.cell
     comb_r2_df = pd.DataFrame(columns=["diff", "r2"])
@@ -261,6 +263,9 @@ if __name__ == '__main__':
 
         # tal_ko = pd.read_csv(cfg.hic_path + cell +"/talko_tal_df.txt", sep="\t")
         # plot_heatmaps(tal_ko)
+
+        pred_data = pd.read_csv(cfg.output_directory + "shuffle_%s_predictions_chr%s.csv" % (cell, str(chr)), sep="\t")
+        plot_heatmaps(pred_data)
 
     print("done")
 
