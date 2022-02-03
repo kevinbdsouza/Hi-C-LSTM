@@ -10,8 +10,8 @@ class Config:
         ##########################################
 
         self.num_chr = 23
-        self.genome_len = 286850
-        self.resolution = 2000
+        self.genome_len = 288091
+        self.resolution = 10000
 
         ##########################################
         ############ Model Parameters ############

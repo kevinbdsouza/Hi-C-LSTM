@@ -307,13 +307,29 @@ def get_bedfile(sample_index, cfg):
 def scHiC(cfg, cell):
     file_name = "/GSM2254215_ML1.validPairs.txt"
     full_path = cfg.hic_path + cell + file_name
-    pairs = pd.read_csv(full_path, sep="\t", names=['chrA', 'x1', 'x2', 'chrB', 'y1', 'y2', 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l'])
+    pairs = pd.read_csv(full_path, sep="\t", names=['chrA', 'x1', 'x2', 'chrB', 'y1', 'y2', 'v', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l'])
 
     pairs_19 = pairs.loc[pairs["chrA"] == "human_chr19"]
     pairs_20 = pairs.loc[pairs["chrA"] == "human_chr20"]
     pairs_21 = pairs.loc[pairs["chrA"] == "human_chr21"]
     pairs = pairs.loc[pairs["chrA"] == "human_chr22"]
-    
+
+    pairs_19 = pairs_19.loc[pairs_19["chrB"] == "human_chr19"]
+    pairs_20 = pairs_20.loc[pairs_20["chrB"] == "human_chr20"]
+    pairs_21 = pairs_21.loc[pairs_21["chrB"] == "human_chr21"]
+    pairs = pairs.loc[pairs["chrB"] == "human_chr22"]
+
+    pairs_list = [pairs_19, pairs_20, pairs_21, pairs]
+    for i, pair in enumerate(pairs_list):
+        columns = ['x1', 'y1', 'v']
+        pairs_list[i] = pairs_list[i][columns]
+
+    pairs_19 = pairs_list[0]
+    pairs_20 = pairs_list[1]
+    pairs_21 = pairs_list[2]
+    pairs = pairs_list[3]
+    pairs_list = []
+
 
     print("done")
 
