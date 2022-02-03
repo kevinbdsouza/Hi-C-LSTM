@@ -266,8 +266,8 @@ if __name__ == '__main__':
         # tal_ko = pd.read_csv(cfg.hic_path + cell +"/talko_tal_df.txt", sep="\t")
         # plot_heatmaps(tal_ko)
 
-        # pred_data = pd.read_csv(cfg.output_directory + "shuffle_%s_predictions_chr%s.csv" % (cell, str(chr)), sep="\t")
-        # plot_heatmaps(pred_data)
+        pred_data = pd.read_csv(cfg.output_directory + "shuffle_%s_predictions_chr%s.csv" % (cell, str(chr)), sep="\t")
+        plot_heatmaps(pred_data)
 
     print("done")
 
