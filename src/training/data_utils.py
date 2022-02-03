@@ -344,7 +344,7 @@ def scHiC_pre(cfg, cell, extract):
                             names=['a', 'b', 'reads_hg19', 'd', 'e', 'f', 'bar1', 'bar2', 'i', 'j', 'k', 'l', 'm', 'n',
                                    'o',
                                    'p', 'q'])
-        reads = reads['reads_hg19', 'bar1', 'bar2']
+        reads = reads[['reads_hg19', 'bar1', 'bar2']]
 
         for chr in chr_list:
             pairs = pd.read_csv(cfg.hic_path + cell + '/' + str(chr) + '/' + "pairs_" + str(chr) + '.txt', sep="\t")
