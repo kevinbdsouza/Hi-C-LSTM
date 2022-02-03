@@ -670,11 +670,13 @@ class PlotFns:
         plt.show()
 
         '''
+        #plt.figure(figsize=(14, 10))
         plt.figure(figsize=(8, 8))
         sns.set(font_scale=1.4)
         plt.xticks(rotation=90, fontsize=14)
         ax = sns.violinplot(x="label", y="ig_val", data=ig_log_df)
         ax.set(xlabel='', ylabel='IG Importance')
+        #plt.subplots_adjust(bottom=0.4)
         plt.show()
         '''
 
@@ -988,7 +990,6 @@ class PlotFns:
         convctcf_probs = np.load(self.path + "convctcf_probs.npy")
         divctcf_probs = np.load(self.path + "divctcf_probs.npy")
         radko_probs = np.load(self.path + "radko_probs.npy")
-        smcko_probs = np.load(self.path + "smcko_probs.npy")
 
         ctcfko_probs_nl = np.load(self.path + "ctcfko_probs_nl.npy")
         znfko_probs = np.load(self.path + "znfko_probs.npy")
@@ -1001,7 +1002,6 @@ class PlotFns:
         convctcf_diff = convctcf_probs - predicted_probs
         divctcf_diff = divctcf_probs - predicted_probs
         radko_diff = radko_probs - predicted_probs
-        smcko_diff = smcko_probs - predicted_probs
 
         ctcfnl_diff = ctcfko_probs_nl - predicted_probs
         znfko_diff = znfko_probs - predicted_probs
@@ -1010,18 +1010,16 @@ class PlotFns:
         xbpko_diff = xbpko_probs - predicted_probs
 
         df_main = pd.DataFrame(columns=["pos", "CTCF_Cohesin_KO_Loop", "Convergent_CTCF", "Divergent_CTCF",
-                                        "CTCF_KO_nl", "ZNF143_KO", "FOXG1_KO", "SOX2_KO", "XBP1_KO"])
+                                        "CTCF_Cohesin_KO_nl", "ZNF143_KO", "FOXG1_KO", "SOX2_KO", "XBP1_KO"])
         df_main["pos"] = pos
         df_main["CTCF_Cohesin_KO_Loop"] = ctcfko_diff
         df_main["Convergent_CTCF"] = convctcf_diff
         df_main["Divergent_CTCF"] = divctcf_diff
-        df_main["CTCF_KO_nl"] = ctcfnl_diff
+        df_main["CTCF_Cohesin_KO_nl"] = ctcfnl_diff
         df_main["ZNF143_KO"] = znfko_diff
         df_main["FOXG1_KO"] = foxgko_diff
         df_main["SOX2_KO"] = soxko_diff
         df_main["XBP1_KO"] = xbpko_diff
-        df_main["RAD21_KO"] = radko_diff
-        df_main["SMC3_KO"] = smcko_diff
 
         plt.figure(figsize=(12, 10))
         plt.xticks(rotation=90, fontsize=20)
@@ -1035,19 +1033,16 @@ class PlotFns:
                  linestyle='dotted', label="Div->Conv CTCF")
         plt.plot('pos', 'Divergent_CTCF', data=df_main, marker='D', markersize=16, color="C1", linewidth=3,
                  linestyle='dashed', label="Conv->Div CTCF")
-        plt.plot('pos', 'CTCF_KO_nl', data=df_main, marker='s', markersize=16, color="C2", linewidth=3,
-                 linestyle='dotted', label="CTCF KO (Non-loop)")
         plt.plot('pos', 'ZNF143_KO', data=df_main, marker='^', markersize=16, color="C3", linewidth=3,
                  linestyle='dashed', label="ZNF143 KO")
         plt.plot('pos', 'FOXG1_KO', data=df_main, marker='v', markersize=16, color="C4", linewidth=3,
                  linestyle='dashdot', label="FOXG1 KO")
         plt.plot('pos', 'SOX2_KO', data=df_main, marker='x', markersize=16, color="C6", linewidth=3, label="SOX2 KO")
         plt.plot('pos', 'XBP1_KO', data=df_main, marker='+', markersize=16, color="C7", linewidth=3, label="XBP1 KO")
+        plt.plot('pos', 'CTCF_Cohesin_KO_nl', data=df_main, marker='s', markersize=16, color="C2", linewidth=3,
+                 linestyle='dotted', label="CTCF+Cohesin KO (Non-loop)")
 
-        plt.plot('pos', 'RAD21_KO', data=df_main, marker='1', markersize=16, color="C8", linewidth=3,
-                 linestyle='dashdot', label="RAD21 KO (Non-loop)")
-        plt.plot('pos', 'SMC3_KO', data=df_main, marker='2', markersize=16, color="C9", linewidth=3,
-                 label="SMC3 KO (Non-loop)")
+
         plt.legend(fontsize=18)
         plt.subplots_adjust(left=0.2)
         plt.savefig("/home/kevindsouza/Downloads/ko_average.png")
@@ -1176,13 +1171,13 @@ if __name__ == "__main__":
     # plot_ob.plot_hidden(hidden_list)
 
     # plot_ob.plot_xgb()
-    plot_ob.plot_gbr()
+    # plot_ob.plot_gbr()
 
     # plot_ob.plot_r2(cell = "WTC11")
     # plot_ob.plot_r2_celltypes()
     # plot_ob.plot_symmetry()
 
-    # plot_ob.plot_knockout_results()
+    plot_ob.plot_knockout_results()
     # plot_ob.plot_knockout_tfs()
     # plot_ob.pr_curves()
 
