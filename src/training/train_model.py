@@ -11,7 +11,7 @@ from training.model import SeqLSTM
 from training.data_utils import get_data_loader, get_bedfile, get_data_loader_batch_chr
 
 device = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
-
+os.environ["CUDA_LAUNCH_BLOCKING"] = "1"
 
 def train_model(cfg, model_name, cell, writer):
     # initalize model
