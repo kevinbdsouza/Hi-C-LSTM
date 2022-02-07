@@ -287,10 +287,10 @@ class PlotFns:
         df_main[
             "SBCID"] = sbcid_values_all_tasks + sbcid_auroc_all_tasks + sbcid_accuracy_all_tasks + sbcid_fscore_all_tasks
 
-        df_main.to_csv(self.path + "%s_metrics_df.csv" % (cell), sep="\t")
+        # df_main.to_csv(self.path + "%s_metrics_df.csv" % (cell), sep="\t")
 
-        #df_main = pd.read_csv(self.path + "%s_metrics_df.csv" % (cell), sep="\t")
-        #df_main = df_main.drop(['Unnamed: 0'], axis=1)
+        df_main = pd.read_csv(self.path + "%s_metrics_df.csv" % (cell), sep="\t")
+        df_main = df_main.drop(['Unnamed: 0'], axis=1)
 
         def plot_stackedbar(df_main, tasks, colors):
             # df_main = df_main.set_index("Tasks")
@@ -452,10 +452,10 @@ class PlotFns:
     def plot_mAP_resolutions(self):
         tasks = ["Gene Expression", "Enhancers", "TADs", "subTADs", "Subcompartments"]
 
-        lstm_2kbp = np.load(self.path + "gm_reduced_all_tasks.npy")
-        lstm_10kbp = np.load(self.path + "gm_reduced_all_tasks.npy")
-        lstm_100kbp = np.load(self.path + "gm_reduced_all_tasks.npy")
-        lstm_500kbp = np.load(self.path + "gm_reduced_all_tasks.npy")
+        lstm_2kbp = np.load(self.path + "lstm_gm_2kbp.npy")
+        lstm_10kbp = np.load(self.path + "lstm_gm_10kbp.npy")
+        lstm_100kbp = np.load(self.path + "lstm_gm_100kbp.npy")
+        lstm_500kbp = np.load(self.path + "lstm_gm_500kbp.npy")
 
         df_main = pd.DataFrame(columns=["Tasks", "lstm_2kbp", "lstm_10kbp",
                                         "lstm_100kbp", "lstm_500kbp"])
@@ -1195,9 +1195,9 @@ if __name__ == "__main__":
     plot_ob = PlotFns(cfg)
 
     # plot_ob.plot_combined(cell = "HFFhTERT")
-    #plot_ob.plot_combined_all(cell="HFFhTERT")
+    plot_ob.plot_combined_all(cell="GM12878")
     # plot_ob.plot_mAP_celltypes()
-    plot_ob.plot_mAP_resolutions()
+    # plot_ob.plot_mAP_resolutions()
     # plot_ob.plot_auroc_celltypes()
     # plot_ob.plot_auroc()
 
