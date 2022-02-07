@@ -483,7 +483,7 @@ class PlotFns:
         plt.xticks(rotation=90, fontsize=20)
         plt.yticks(fontsize=20)
         plt.xlabel("Prediction Target", fontsize=20)
-        plt.ylabel("mAP ", fontsize=20)
+        plt.ylabel("Cumulative Prediction Score", fontsize=20)
         plt.plot('Tasks', 'lstm_2kbp', data=df_main, marker='D', markersize=16, color="C1", linewidth=3,
                  label="2Kbp")
         plt.plot('Tasks', 'lstm_10kbp', data=df_main, marker='o', markersize=16, color="C0", linewidth=3,
@@ -1210,8 +1210,8 @@ if __name__ == "__main__":
 
     # plot_ob.plot_combined(cell = "HFFhTERT")
     # plot_ob.plot_combined_all(cell="GM12878")
-    plot_ob.plot_mAP_celltypes()
-    # plot_ob.plot_mAP_resolutions()
+    # plot_ob.plot_mAP_celltypes()
+    plot_ob.plot_mAP_resolutions()
     # plot_ob.plot_auroc_celltypes()
     # plot_ob.plot_auroc()
 
