@@ -40,7 +40,7 @@ class Config:
         ############ Input Directories ###########
         ##########################################
 
-        self.cell = "scHiC"
+        self.cell = "GM12878"
         self.hic_path = '/data2/hic_lstm/data/'
         self.sizes_file = 'chr_cum_sizes2.npy'
         self.start_end_file = 'starts.npy'
