@@ -413,10 +413,24 @@ class PlotFns:
                  "TAD Boundaries", "subTAD Boundaries", "Subcompartments"]
 
         gm_values_all_tasks = np.load(self.path + "gm_reduced_all_tasks.npy")
+        gm_auroc_all_tasks = np.load(self.path + "gm_auroc_all_tasks.npy")
+        gm_accuracy_all_tasks = np.load(self.path + "gm_accuracy_all_tasks.npy")
+        gm_fscore_all_tasks = np.load(self.path + "gm_fscore_all_tasks.npy")
+
         h1_values_all_tasks = np.load(self.path + "h1_values_all_tasks.npy")
+        h1_auroc_all_tasks = np.load(self.path + "h1_auroc_all_tasks.npy")
+        h1_accuracy_all_tasks = np.load(self.path + "h1_accuracy_all_tasks.npy")
+        h1_fscore_all_tasks = np.load(self.path + "lstm_fscore_h1_all_tasks.npy")
+
         hff_values_all_tasks = np.load(self.path + "hff_values_all_tasks.npy")
+        hff_auroc_all_tasks = np.load(self.path + "hff_auroc_all_tasks.npy")
+        hff_accuracy_all_tasks = np.load(self.path + "hff_accuracy_all_tasks.npy")
+        hff_fscore_all_tasks = np.load(self.path + "lstm_fscore_hff_all_tasks.npy")
+
         gmlow_values_all_tasks = np.load(self.path + "gmlow_values_all_tasks.npy")
         gmlow2_values_all_tasks = np.load(self.path + "gmlow2_values_all_tasks.npy")
+
+
 
         df_main = pd.DataFrame(columns=["Tasks", "GM12878_Rao", "H1hESC_Dekker",
                                         "GM12878_low", "HFFhTERT_Dekker", "GM12878_low2"])
@@ -1195,8 +1209,8 @@ if __name__ == "__main__":
     plot_ob = PlotFns(cfg)
 
     # plot_ob.plot_combined(cell = "HFFhTERT")
-    plot_ob.plot_combined_all(cell="GM12878")
-    # plot_ob.plot_mAP_celltypes()
+    # plot_ob.plot_combined_all(cell="GM12878")
+    plot_ob.plot_mAP_celltypes()
     # plot_ob.plot_mAP_resolutions()
     # plot_ob.plot_auroc_celltypes()
     # plot_ob.plot_auroc()
