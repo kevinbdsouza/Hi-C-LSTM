@@ -413,9 +413,9 @@ class PlotFns:
                  "TAD Boundaries", "subTAD Boundaries", "Subcompartments"]
 
         gm_values_all_tasks = np.load(self.path + "gm_reduced_all_tasks.npy")
-        gm_auroc_all_tasks = np.load(self.path + "gm_auroc_all_tasks.npy")
-        gm_accuracy_all_tasks = np.load(self.path + "gm_accuracy_all_tasks.npy")
-        gm_fscore_all_tasks = np.load(self.path + "gm_fscore_all_tasks.npy")
+        gm_auroc_reduced = np.load(self.path + "gm_auroc_reduced.npy")
+        gm_accuracy_reduced = np.load(self.path + "gm_accuracy_reduced.npy")
+        gm_fscore_all_tasks = np.load(self.path + "gm_fscore_reduced.npy")
 
         h1_values_all_tasks = np.load(self.path + "h1_values_all_tasks.npy")
         h1_auroc_all_tasks = np.load(self.path + "h1_auroc_all_tasks.npy")
@@ -427,19 +427,19 @@ class PlotFns:
         hff_accuracy_all_tasks = np.load(self.path + "hff_accuracy_all_tasks.npy")
         hff_fscore_all_tasks = np.load(self.path + "lstm_fscore_hff_all_tasks.npy")
 
-        gmlow_values_all_tasks = np.load(self.path + "gmlow_values_all_tasks.npy")
-        gmlow2_values_all_tasks = np.load(self.path + "gmlow2_values_all_tasks.npy")
+        gmlow_values_all_tasks = np.load(self.path + "gmlow_metrics_all_tasks.npy")
+        gmlow2_values_all_tasks = np.load(self.path + "gmlow2_metrics_all_tasks.npy")
 
 
 
         df_main = pd.DataFrame(columns=["Tasks", "GM12878_Rao", "H1hESC_Dekker",
                                         "GM12878_low", "HFFhTERT_Dekker", "GM12878_low2"])
         df_main["Tasks"] = tasks
-        df_main["GM12878_Rao"] = gm_values_all_tasks
-        df_main["H1hESC_Dekker"] = h1_values_all_tasks
+        df_main["GM12878_Rao"] = gm_values_all_tasks + gm_auroc_reduced + gm_accuracy_reduced + gm_fscore_all_tasks
+        df_main["H1hESC_Dekker"] = h1_values_all_tasks + h1_auroc_all_tasks + h1_accuracy_all_tasks + h1_fscore_all_tasks
         df_main["GM12878_low"] = gmlow_values_all_tasks
         df_main["GM12878_low2"] = gmlow2_values_all_tasks
-        df_main["HFFhTERT_Dekker"] = hff_values_all_tasks
+        df_main["HFFhTERT_Dekker"] = hff_values_all_tasks + hff_auroc_all_tasks + hff_accuracy_all_tasks + hff_fscore_all_tasks
 
         plt.figure(figsize=(12, 10))
         plt.xticks(rotation=90, fontsize=20)
