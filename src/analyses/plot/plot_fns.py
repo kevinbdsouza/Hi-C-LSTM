@@ -1211,7 +1211,7 @@ if __name__ == "__main__":
     # plot_ob.plot_combined(cell = "HFFhTERT")
     # plot_ob.plot_combined_all(cell="GM12878")
     # plot_ob.plot_mAP_celltypes()
-    plot_ob.plot_mAP_resolutions()
+    # plot_ob.plot_mAP_resolutions()
     # plot_ob.plot_auroc_celltypes()
     # plot_ob.plot_auroc()
 
@@ -1232,11 +1232,11 @@ if __name__ == "__main__":
     # plot_ob.plot_feature_signal()
     # plot_ob.plot_pred_range()
 
-    '''
+
     chr = 21
     pred_data = pd.read_csv(cfg.output_directory + "shuffle_%s_predictions_chr%s.csv" % (cfg.cell, str(chr)), sep="\t")
     hic_mat, st = plot_ob.plot_heatmaps(pred_data)
     plot_ob.ctcf_dots(hic_mat, st, chr)
-    '''
+
 
     print("done")
