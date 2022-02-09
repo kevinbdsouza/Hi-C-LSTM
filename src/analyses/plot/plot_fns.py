@@ -166,7 +166,7 @@ class PlotFns:
         mean_map_og = mean_map_og / num
         mean_map_pred = mean_map_pred / num
         self.simple_plot(mean_map_og)
-        self.simple_plot(mean_map_pred)
+        self.simple_plot(mean_map_pred.T)
 
         pass
 

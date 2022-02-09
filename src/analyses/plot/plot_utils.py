@@ -200,6 +200,33 @@ def scatter_tal_lm(diff_mat):
     print("done")
 
 
+def hist_2d(og, pred):
+    x_min = np.min(og)
+    x_max = np.max(og)
+
+    y_min = np.min(pred)
+    y_max = np.max(pred)
+
+    x_bins = np.linspace(x_min, x_max, 50)
+    y_bins = np.linspace(y_min, y_max, 50)
+
+    # Creating plot
+    plt.figure(figsize=(10, 8))
+    plt.hist2d(og, pred, bins=[x_bins, y_bins])
+
+    plt.xticks(fontsize=18)
+    plt.xlim([0, 0.1])
+    plt.yticks(fontsize=18)
+    plt.ylim([0.004, 0.1])
+    plt.xlabel('LMO2 KO - WT (Original)', fontsize=20)
+    plt.ylabel('LMO2 KO - WT (Predicted)', fontsize=20)
+
+    # show plot
+    plt.tight_layout()
+    plt.savefig("/home/kevindsouza/Downloads/lmo2_hist.png")
+    pass
+
+
 def barplot_tal_lm():
     tal_og = np.load(cfg.output_directory + "tal1og_difflist.npy")
     tal_pred = np.load(cfg.output_directory + "tal1pred_difflist.npy")
@@ -212,7 +239,8 @@ def barplot_tal_lm():
     sns.set_style(style='white')
 
     data_lists = [tal_og, tal_pred, lmo2_og, lmo2_pred]
-    label_lists = ["TAL1 Original (KO - WT)", "TAL1 Predicted (KO - WT)", "LMO2 Original (KO - WT)", "LMO2 Predicted (KO - WT)"]
+    label_lists = ["TAL1 Original (KO - WT)", "TAL1 Predicted (KO - WT)", "LMO2 Original (KO - WT)",
+                   "LMO2 Predicted (KO - WT)"]
     tallm_df = pd.DataFrame(columns=["data", "label"])
     for i, l in enumerate(label_lists):
         temp = pd.DataFrame(columns=["data", "label"])
@@ -252,13 +280,13 @@ if __name__ == '__main__':
         plot_foxg1(foxg1_data)
         '''
 
-        # foxg1_ko = np.load(cfg.output_directory + "foxg1_ko.npy")
+        foxg1_ko = np.load(cfg.output_directory + "foxg1_ko.npy")
         # simple_plot(foxg1_ko)
 
         # tal1_diff = np.load(cfg.output_directory + "tal1_diff.npy")
         # simple_plot(tal1_diff)
         # scatter_tal_lm(tal1_diff)
-        barplot_tal_lm()
+        #barplot_tal_lm()
 
         # pred_data = pd.read_csv(cfg.output_directory + "%s_predictions_chr.csv" % (cell), sep="\t")
         # plot_tal1_lmo2(pred_data)
@@ -266,8 +294,8 @@ if __name__ == '__main__':
         # tal_ko = pd.read_csv(cfg.hic_path + cell +"/talko_tal_df.txt", sep="\t")
         # plot_heatmaps(tal_ko)
 
-        #pred_data = pd.read_csv(cfg.output_directory + "shuffle_%s_predictions_chr%s.csv" % (cell, str(chr)), sep="\t")
-        #plot_heatmaps(pred_data)
+        # pred_data = pd.read_csv(cfg.output_directory + "shuffle_%s_predictions_chr%s.csv" % (cell, str(chr)), sep="\t")
+        # plot_heatmaps(pred_data)
 
     print("done")
 
