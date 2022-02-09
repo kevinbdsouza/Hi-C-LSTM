@@ -235,6 +235,8 @@ def barplot_tal_lm():
     lmo2_og = np.load(cfg.output_directory + "lmo2og_difflist.npy")
     lmo2_pred = np.load(cfg.output_directory + "lmo2pred_difflist.npy")
 
+    hist_2d(lmo2_og, lmo2_pred)
+
     plt.figure(figsize=(12, 10))
     sns.set(font_scale=1.8)
     sns.set_style(style='white')
@@ -275,8 +277,8 @@ if __name__ == '__main__':
         '''
 
 
-        pred_data = pd.read_csv(cfg.output_directory + "shuffle_%s_predictions_chr%s.csv" % (cell, str(chr)), sep="\t")
-        plot_foxg1(pred_data)
+        #pred_data = pd.read_csv(cfg.output_directory + "shuffle_%s_predictions_chr%s.csv" % (cell, str(chr)), sep="\t")
+        #plot_foxg1(pred_data)
         '''
         foxg1_data = pd.read_csv(cfg.output_directory + "shuffle_%s_afko_chr%s.csv" % (cell, str(chr)), sep="\t")
         plot_foxg1(foxg1_data)
@@ -288,7 +290,7 @@ if __name__ == '__main__':
         # tal1_diff = np.load(cfg.output_directory + "tal1_diff.npy")
         # simple_plot(tal1_diff)
         # scatter_tal_lm(tal1_diff)
-        #barplot_tal_lm()
+        barplot_tal_lm()
 
         # pred_data = pd.read_csv(cfg.output_directory + "%s_predictions_chr.csv" % (cell), sep="\t")
         # plot_tal1_lmo2(pred_data)
