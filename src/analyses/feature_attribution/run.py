@@ -204,7 +204,7 @@ if __name__ == '__main__':
     model.load_weights()
 
     # test_chr = list(range(5, 11))
-    test_chr = [9]
+    test_chr = [14]
 
     for chr in test_chr:
         print('Testing Start Chromosome: {}'.format(chr))
@@ -220,6 +220,6 @@ if __name__ == '__main__':
         # ig_filtered_df = captum_analyze_elements(cfg, chr, ig_df, mode="ctcf")
 
         # ig_filtered_df = ig_filtered_df.loc[ig_filtered_df["ig"] >= 0.5]
-        plot_gbr(ig_filtered_df)
+        # plot_gbr(ig_filtered_df)
 
     print("done")
