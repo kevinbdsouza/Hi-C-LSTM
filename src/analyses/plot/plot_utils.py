@@ -50,7 +50,7 @@ def plot_foxg1(data):
     hic_mat = np.zeros((nr, nr))
     hic_mat[rows, cols] = np.array(data["v"])
     hic_upper = np.triu(hic_mat)
-    hic_mat[cols, rows] = np.array(data["ko_pred"])
+    hic_mat[cols, rows] = np.array(data["pred"])
     hic_lower = np.tril(hic_mat)
     hic_mat = hic_upper + hic_lower
     hic_mat[np.diag_indices_from(hic_mat)] /= 2
@@ -76,20 +76,21 @@ def simple_plot(hic_win):
     plt.show()
     '''
 
-    '''
+
     sns.set_theme()
     ax = sns.heatmap(hic_win, cmap="Reds", vmin=0, vmax=1)
     ax.set_yticks([])
     ax.set_xticks([])
     plt.show()
-    '''
 
+    '''
     sns.set_theme()
     rdgn = sns.diverging_palette(h_neg=220, h_pos=14, s=79, l=55, sep=3, as_cmap=True)
     sns.heatmap(hic_win, cmap=rdgn, center=0.00, cbar=True)
     plt.yticks([])
     plt.xticks([])
     plt.show()
+    '''
 
     pass
 
@@ -260,7 +261,7 @@ def barplot_tal_lm():
 
 
 if __name__ == '__main__':
-    plot_chr = list(range(21, 22))
+    plot_chr = list(range(14, 15))
     cfg = config.Config()
     cell = cfg.cell
     comb_r2_df = pd.DataFrame(columns=["diff", "r2"])
@@ -273,14 +274,15 @@ if __name__ == '__main__':
         plot_r2(comb_r2_df)
         '''
 
-        '''
+
         pred_data = pd.read_csv(cfg.output_directory + "shuffle_%s_predictions_chr%s.csv" % (cell, str(chr)), sep="\t")
         plot_foxg1(pred_data)
+        '''
         foxg1_data = pd.read_csv(cfg.output_directory + "shuffle_%s_afko_chr%s.csv" % (cell, str(chr)), sep="\t")
         plot_foxg1(foxg1_data)
         '''
 
-        foxg1_ko = np.load(cfg.output_directory + "foxg1_ko.npy")
+        # foxg1_ko = np.load(cfg.output_directory + "foxg1_ko.npy")
         # simple_plot(foxg1_ko)
 
         # tal1_diff = np.load(cfg.output_directory + "tal1_diff.npy")
