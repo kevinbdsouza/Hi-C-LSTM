@@ -1076,10 +1076,10 @@ class PlotFns:
         # plt.plot('pos', 'No KO', data=df_main, marker='o', markersize=14, color="C3", linewidth=2, label="No KO")
         plt.plot('pos', 'CTCF_Cohesin_KO_Loop', data=df_main, marker='o', markersize=16, color="C0", linewidth=3,
                  label="CTCF+Cohesin KO (Loop)")
-        plt.plot('pos', 'Convergent_CTCF', data=df_main, marker='*', markersize=16, color="C5", linewidth=3,
-                 linestyle='dotted', label="Div->Conv CTCF")
         plt.plot('pos', 'CTCF_Cohesin_KO_nl', data=df_main, marker='s', markersize=16, color="C2", linewidth=3,
                  linestyle='dotted', label="CTCF+Cohesin KO (Non-loop)")
+        plt.plot('pos', 'Convergent_CTCF', data=df_main, marker='*', markersize=16, color="C5", linewidth=3,
+                 linestyle='dotted', label="Div->Conv CTCF")
         plt.plot('pos', 'Divergent_CTCF', data=df_main, marker='D', markersize=16, color="C1", linewidth=3,
                  linestyle='dashed', label="Conv->Div CTCF")
         plt.plot('pos', 'ZNF143_KO', data=df_main, marker='^', markersize=16, color="C3", linewidth=3,
