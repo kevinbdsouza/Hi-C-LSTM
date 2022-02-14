@@ -1078,6 +1078,8 @@ class PlotFns:
                  label="CTCF+Cohesin KO (Loop)")
         plt.plot('pos', 'Convergent_CTCF', data=df_main, marker='*', markersize=16, color="C5", linewidth=3,
                  linestyle='dotted', label="Div->Conv CTCF")
+        plt.plot('pos', 'CTCF_Cohesin_KO_nl', data=df_main, marker='s', markersize=16, color="C2", linewidth=3,
+                 linestyle='dotted', label="CTCF+Cohesin KO (Non-loop)")
         plt.plot('pos', 'Divergent_CTCF', data=df_main, marker='D', markersize=16, color="C1", linewidth=3,
                  linestyle='dashed', label="Conv->Div CTCF")
         plt.plot('pos', 'ZNF143_KO', data=df_main, marker='^', markersize=16, color="C3", linewidth=3,
@@ -1086,8 +1088,6 @@ class PlotFns:
                  linestyle='dashdot', label="FOXG1 KO")
         plt.plot('pos', 'SOX2_KO', data=df_main, marker='x', markersize=16, color="C6", linewidth=3, label="SOX2 KO")
         plt.plot('pos', 'XBP1_KO', data=df_main, marker='+', markersize=16, color="C7", linewidth=3, label="XBP1 KO")
-        plt.plot('pos', 'CTCF_Cohesin_KO_nl', data=df_main, marker='s', markersize=16, color="C2", linewidth=3,
-                 linestyle='dotted', label="CTCF+Cohesin KO (Non-loop)")
 
 
         plt.legend(fontsize=18)
@@ -1219,13 +1219,13 @@ if __name__ == "__main__":
     # plot_ob.plot_hidden(hidden_list)
 
     # plot_ob.plot_xgb()
-    plot_ob.plot_gbr()
+    # plot_ob.plot_gbr()
 
     # plot_ob.plot_r2(cell = "WTC11")
     # plot_ob.plot_r2_celltypes()
     # plot_ob.plot_symmetry()
 
-    # plot_ob.plot_knockout_results()
+    plot_ob.plot_knockout_results()
     # plot_ob.plot_knockout_tfs()
     # plot_ob.pr_curves()
 
