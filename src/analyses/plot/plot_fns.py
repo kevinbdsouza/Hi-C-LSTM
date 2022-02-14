@@ -1219,7 +1219,7 @@ if __name__ == "__main__":
     # plot_ob.plot_hidden(hidden_list)
 
     # plot_ob.plot_xgb()
-    # plot_ob.plot_gbr()
+    plot_ob.plot_gbr()
 
     # plot_ob.plot_r2(cell = "WTC11")
     # plot_ob.plot_r2_celltypes()
@@ -1232,11 +1232,11 @@ if __name__ == "__main__":
     # plot_ob.plot_feature_signal()
     # plot_ob.plot_pred_range()
 
-
+    '''
     chr = 21
     pred_data = pd.read_csv(cfg.output_directory + "shuffle_%s_predictions_chr%s.csv" % (cfg.cell, str(chr)), sep="\t")
     hic_mat, st = plot_ob.plot_heatmaps(pred_data)
     plot_ob.ctcf_dots(hic_mat, st, chr)
-
+    '''
 
     print("done")

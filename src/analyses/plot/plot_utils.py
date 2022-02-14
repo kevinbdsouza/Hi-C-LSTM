@@ -213,7 +213,7 @@ def hist_2d(og, pred):
 
     # Creating plot
     plt.figure(figsize=(10, 8))
-    plt.hist2d(og, pred, bins=[x_bins, y_bins])
+    hist, _, _, _ = plt.hist2d(og, pred, bins=[x_bins, y_bins])
 
     plt.xticks(fontsize=18)
     plt.xlim([0, 0.1])
