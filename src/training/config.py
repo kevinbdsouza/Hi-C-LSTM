@@ -14,7 +14,7 @@ class Config:
         self.num_chr = 23
         self.genome_len = 288091
         self.resolution = 10000
-        self.chr_train_list = random.shuffle(list(range(1, 23)))
+        self.chr_train_list = list(range(1, 23))
         self.chr_test_lsit = list(range(1, 23))
 
         "Model Paramters"
