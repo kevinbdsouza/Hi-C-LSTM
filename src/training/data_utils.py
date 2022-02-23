@@ -11,7 +11,7 @@ def get_cumpos(cfg, chr_num):
     get_bin_idx(cfg, chr_num) -> int
     Returns cumulative index upto the end of the previous chromosome.
     Args:
-        cfg (): the configuration to use for the experiment.
+        cfg (Config): the configuration to use for the experiment.
         chr_num (int): the current chromosome.
     """
     sizes = np.load(cfg.hic_path + cfg.sizes_file, allow_pickle=True).item()
@@ -31,7 +31,7 @@ def get_bin_idx(chr, pos, cfg):
     Args:
         chr (iterable): the chromosome the bin belongs to.
         pos (List): List of positions to be converted.
-        cfg (): the configuration to use for the experiment.
+        cfg (Config): the configuration to use for the experiment.
     """
     sizes = np.load(cfg.hic_path + cfg.sizes_file, allow_pickle=True).item()
     chr = ['chr' + str(x - 1) for x in chr]
@@ -47,7 +47,7 @@ def get_genomic_coord(chr, bin_idx, cfg):
     Args:
         chr (iterable): the chromosome the bin belongs to.
         bin_idx (List): List of bin ids to be converted.
-        cfg (): the configuration to use for the experiment.
+        cfg (Config): the configuration to use for the experiment.
     """
     sizes = np.load(cfg.hic_path + cfg.sizes_file, allow_pickle=True).item()
     chr = ['chr' + str(x - 1) for x in chr]
@@ -64,7 +64,7 @@ def load_hic(cfg, cell, chr):
     Supports only those cell types for which Hi-C txt files exist.
     To check how to create the Hi-C txt file, refer to the documentation.
     Args:
-        cfg (): the configuration to use for the experiment.
+        cfg (Config): the configuration to use for the experiment.
         cell (string): the cell type to extract Hi-C from.
         chr (int): the chromosome to extract Hi-C from.
     Raises:
@@ -89,7 +89,7 @@ def get_samples_sparse(data, chr, cfg):
     Args:
         data (DataFrame): the extracted Hi-C data.
         chr (int): the chromosome to extract Hi-C from.
-        cfg (): the configuration to use for the experiment.
+        cfg (Config): the configuration to use for the experiment.
     """
     data = data.apply(pd.to_numeric)
     nrows = max(data['i'].max(), data['j'].max()) + 1
@@ -207,7 +207,7 @@ def get_data(cfg, cell, chr):
     Supports only those cell types for which Hi-C txt files exist.
     To check how to create the Hi-C txt file, refer to the documentation.
     Args:
-        cfg (): the configuration to use for the experiment.
+        cfg (Config): the configuration to use for the experiment.
         cell (string): the cell type to extract Hi-C from.
         chr (int): the chromosome to extract Hi-C from.
     Raises:
@@ -228,7 +228,7 @@ def get_data_loader_chr(cfg, chr):
     Supports only those chromosomes for which processed data exists.
     Create processed data by calling the save_processed_data function.
     Args:
-        cfg (): the configuration to use for the experiment.
+        cfg (Config): the configuration to use for the experiment.
         chr (int): the chromosome to load Hi-C data for.
     Raises:
         Error: Processed data does not exist for chromosome.
@@ -255,7 +255,7 @@ def get_data_loader_batch_chr(cfg):
     Supports only those chromosomes for which processed data exists.
     Create processed data by calling the save_processed_data function.
     Args:
-        cfg (): the configuration to use for the experiment.
+        cfg (Config): the configuration to use for the experiment.
     Raises:
         Error: Processed data does not exist for chromosome.
         Skips: Skips chromosome if error during data loading
@@ -292,7 +292,7 @@ def save_processed_data(cfg, cell):
     Supports only those cell types for which Hi-C txt files exist.
     To check how to create the Hi-C txt file, refer to the documentation.
     Args:
-        cfg (): the configuration to use for the experiment.
+        cfg (Config): the configuration to use for the experiment.
         cell (string): the cell type to extract Hi-C from.
     Raises:
         Error: Hi-C txt file does not exist or error during Juicer extraction.
@@ -314,7 +314,7 @@ def scHiC_preprocess(cfg, cell):
     Creates a DataFrame corresponding pairwise hg19 contact values.
     Saves the resulting DataFrame in the ScHiC data directory.
     Args:
-        cfg (): the configuration to use for the experiment.
+        cfg (Config): the configuration to use for the experiment.
         cell (string): the cell type to extract Hi-C from.
         """
 

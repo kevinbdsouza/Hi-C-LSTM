@@ -17,7 +17,7 @@ def train_model(cfg, model_name, writer):
     Args:
         cfg (Config): the configuration to use for the experiment.
         model_name (string): The model name that needs to be used to load model or create new model
-        writer:
+        writer (SummaryWriter): tensorboard summary writer
     """
 
     "Initalize model and load model wrights if they exist"
