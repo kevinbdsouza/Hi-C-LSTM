@@ -19,10 +19,9 @@ class HiC_R2():
     Includes methods that help you do this.
     """
 
-    def __init__(self, cfg, chr, mode):
+    def __init__(self, cfg, chr):
         self.cfg = cfg
         self.cell = cfg.cell
-        self.mode = mode
         self.hic_path = cfg.hic_path
         self.chr = chr
         self.res = cfg.resolution

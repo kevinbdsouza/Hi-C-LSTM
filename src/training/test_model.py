@@ -25,7 +25,7 @@ def test_model(model, cfg, chr):
     predictions, test_error, values, pred_df, error_list = model.test(data_loader)
 
     "save predictions"
-    pred_df.to_csv(cfg.output_directory + "shuffle_%s_predictions_chr%s.csv" % (cfg.cell, str(chr)), sep="\t")
+    pred_df.to_csv(cfg.output_directory + "hiclstm_%s_predictions_chr%s.csv" % (cfg.cell, str(chr)), sep="\t")
 
 
 if __name__ == '__main__':

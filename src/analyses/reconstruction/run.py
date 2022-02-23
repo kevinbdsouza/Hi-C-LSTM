@@ -10,7 +10,7 @@ device = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
 pd.options.mode.chained_assignment = None
 
 
-def full_hiclstm_representations(cfg):
+def full_hiclstm_representations(cfg, chr):
     """
     Scipt to save representations from an existing fully trained Hi-C_LSTM model,
     and run representations though fully trained Hi-C-LSTM decoder and save predictions.
@@ -43,15 +43,24 @@ if __name__ == '__main__':
     cfg = Config()
     cell = cfg.cell
 
-    comb_r2_df = pd.DataFrame(columns=["diff", "r2"])
-    for chr in cfg.chr_test_list:
-        hic_r2_ob = HiC_R2(cfg, chr, mode='test')
+    for chr in cfg.decoder_train_list:
+        "run fully trained hiclstm model to save representations"
+        full_hiclstm_representations(cfg, chr)
+
+        hic_r2_ob = HiC_R2(cfg, chr)
 
         "load representations"
         representations, start = hic_r2_ob.get_trained_representations(method="hiclstm")
 
         "train decoder"
         hic_r2_ob.run_decoders(representations, cfg, chr, start, decoder="lstm")
+
+    comb_r2_df = pd.DataFrame(columns=["diff", "r2"])
+    for chr in cfg.decoder_test_list:
+        hic_r2_ob = HiC_R2(cfg, chr)
+
+        "load representations"
+        representations, start = hic_r2_ob.get_trained_representations(method="hiclstm")
 
         "test decoder"
         hic_r2_ob.test_decoders(representations, cfg, chr, start, method="hiclstm", decoder="lstm")
