@@ -1,5 +1,6 @@
 import os
 import pathlib
+import random
 
 
 class Config:
@@ -33,8 +34,10 @@ class Config:
         self.learning_rate = 0.01
         self.num_epochs = 40
         self.batch_size = 210
-        self.max_norm = 10  # for gradient clipping
+        self.max_norm = 10
+        self.hic_smoothing = 8
         self.lstm_nontrain = False
+        self.window_model = False
 
         ##########################################
         ############ Input Directories ###########
@@ -43,8 +46,13 @@ class Config:
         self.cell = "GM12878"
         self.hic_path = '/data2/hic_lstm/data/'
         self.sizes_file = 'chr_cum_sizes2.npy'
+        self.schic_reads_file = "/GSM2254215_ML1.percentages.txt"
+        self.schic_pairs_file = "/GSM2254215_ML1.validPairs.txt"
         self.start_end_file = 'starts.npy'
         self.downstream_dir = "/data2/hic_lstm/downstream"
+        self.model_name = "shuffle_" + self.cell
+        self.chr_train_list = random.shuffle(list(range(1, 23)))
+        self.chr_test_lsit = list(range(1, 23))
 
         ##########################################
         ############ Output Locations ############

@@ -1,19 +1,19 @@
 import numpy as np
 import pandas as pd
-import scipy.sparse
 import torch
 import torch.utils.data
 from torch.nn.utils.rnn import pad_sequence
 import training.config as config
 
 
-# import matplotlib as mpl
-# mpl.use('module://backend_interagg')
-
-# matplotlib.use('pdf')
-
-
 def get_cumpos(cfg, chr_num):
+    """
+    get_bin_idx(cfg, chr_num) -> int
+    Returns cumulative index upto the end of the previous chromosome.
+    Args:
+        cfg (): the configuration to use for the experiment.
+        chr_num (int): the current chromosome.
+    """
     sizes = np.load(cfg.hic_path + cfg.sizes_file, allow_pickle=True).item()
     if chr_num == 1:
         cum_pos = 0
@@ -25,6 +25,14 @@ def get_cumpos(cfg, chr_num):
 
 
 def get_bin_idx(chr, pos, cfg):
+    """
+    get_bin_idx(chr, pos, cfg) -> List
+    Converts genomic coordinates with respect to the given chromosome to cumulative indices.
+    Args:
+        chr (iterable): the chromosome the bin belongs to.
+        pos (List): List of positions to be converted.
+        cfg (): the configuration to use for the experiment.
+    """
     sizes = np.load(cfg.hic_path + cfg.sizes_file, allow_pickle=True).item()
     chr = ['chr' + str(x - 1) for x in chr]
     chr_start = [sizes[key] for key in chr]
@@ -33,6 +41,14 @@ def get_bin_idx(chr, pos, cfg):
 
 
 def get_genomic_coord(chr, bin_idx, cfg):
+    """
+    get_genomic_coord(chr, bin_idx, cfg) -> List
+    Converts cumulative indices to genomic coordinates with respect to the given chromosome.
+    Args:
+        chr (iterable): the chromosome the bin belongs to.
+        bin_idx (List): List of bin ids to be converted.
+        cfg (): the configuration to use for the experiment.
+    """
     sizes = np.load(cfg.hic_path + cfg.sizes_file, allow_pickle=True).item()
     chr = ['chr' + str(x - 1) for x in chr]
     chr_start = [sizes[key] for key in chr]
@@ -41,61 +57,40 @@ def get_genomic_coord(chr, bin_idx, cfg):
 
 
 def load_hic(cfg, cell, chr):
-    data = pd.read_csv("%s%s/%s/hic_chr%s.txt" % (cfg.hic_path, cell, chr, chr), sep="\t", names=['i', 'j', 'v'])
-
-    data = data.dropna()
-    data[['i', 'j']] = data[['i', 'j']] / cfg.resolution
-    data[['i', 'j']] = data[['i', 'j']].astype('int64')
-    return data
-
-
-def get_samples_dense(data, chr, cfg):
-    data = data.apply(pd.to_numeric)
-    data['v'] = data['v'].fillna(0)
-    dist = cfg.distance_cut_off_mb
-    mat = scipy.sparse.coo_matrix((data.v, (data.i, data.j))).tocsr()
-
-    # bin1 = get_bin_idx(chr, 0, cfg)
-    nrows = mat.shape[0]
-
-    values = torch.zeros(nrows, 2 * dist)
-    input_idx = torch.zeros(nrows, 2 * dist, 2)
-
-    for row in range(nrows):
-        # get distance around diagonal
-        start = max(row - dist, 0)
-        stop = min(row + dist, mat.shape[0])
-
-        # get Hi-C values
-        vals = mat[row, start:stop].todense()
-        vals = contactProbabilities(vals)
-        vals = torch.squeeze(torch.from_numpy(vals))
-
-        # get indices for inserting data
-        idx1 = max(0, dist - row)
-        idx2 = idx1 + vals.shape[0]
-
-        # insert values
-        # vals_tmp = torch.zeros(1, 2 * dist)
-        values[row, idx1:idx2] = vals
-
-        # get indices
-        j = torch.tensor(np.arange(start, stop)).unsqueeze(dim=1)
-        i = torch.full(j.shape, fill_value=row)
-        ind = torch.cat((i, j), 1)
-        input_idx[row, idx1:idx2, ] = ind
-
-    # only add datapoint if one of the values is non-zero:
-    nonzero_idx = torch.sum(values, dim=1).nonzero().squeeze()
-    values = values[nonzero_idx,]
-    input_idx = input_idx[nonzero_idx,]
-    sample_index = None
-
-    return input_idx, values, sample_index
+    """
+    load_hic(cfg, cell, chr) -> Dataframe
+    Loads data from Hi-C txt files, converts indices to specified resolution.
+    Supports only those values of resolution that Juicer can extract from Hi-C txt file.
+    Supports only those cell types for which Hi-C txt files exist.
+    To check how to create the Hi-C txt file, refer to the documentation.
+    Args:
+        cfg (): the configuration to use for the experiment.
+        cell (string): the cell type to extract Hi-C from.
+        chr (int): the chromosome to extract Hi-C from.
+    Raises:
+        Error: Hi-C txt file does not exist or error during Juicer extraction.
+        Skips: if error during extraction using Juicer Tools, prints out empty txt file
+    """
+    try:
+        data = pd.read_csv("%s%s/%s/hic_chr%s.txt" % (cfg.hic_path, cell, chr, chr), sep="\t", names=['i', 'j', 'v'])
+        data = data.dropna()
+        data[['i', 'j']] = data[['i', 'j']] / cfg.resolution
+        data[['i', 'j']] = data[['i', 'j']].astype('int64')
+        return data
+    except Exception as e:
+        print("Hi-C txt file does not exist or error during Juicer extraction")
 
 
 def get_samples_sparse(data, chr, cfg):
-    window_model = False
+    """
+    get_samples_sparse(data, chr, cfg) -> List, List
+    Organizes data into input ids and values.
+    Supports varying values of sequence length in the configuration file.
+    Args:
+        data (DataFrame): the extracted Hi-C data.
+        chr (int): the chromosome to extract Hi-C from.
+        cfg (): the configuration to use for the experiment.
+    """
     data = data.apply(pd.to_numeric)
     nrows = max(data['i'].max(), data['j'].max()) + 1
     data['v'] = data['v'].fillna(0)
@@ -103,18 +98,15 @@ def get_samples_sparse(data, chr, cfg):
     data['j_binidx'] = get_bin_idx(np.full(data.shape[0], chr), data['j'], cfg)
 
     values = []
-    frame_end_window = []
     input_idx = []
     nvals_list = []
-    sample_index = []
     for row in range(nrows):
-        # get Hi-C values
         vals = data[data['i'] == row]['v'].values
         nvals = vals.shape[0]
         if nvals == 0:
             continue
         else:
-            vals = contactProbabilities(vals)
+            vals = contactProbabilities(vals, smoothing=cfg.hic_smoothing)
 
         if (nvals > 10):
             nvals_list.append(nvals)
@@ -122,15 +114,15 @@ def get_samples_sparse(data, chr, cfg):
 
             split_vals = list(vals.split(cfg.sequence_length, dim=0))
 
-            # get indices
+            "get indices"
             j = torch.Tensor(data[data['i'] == row]['j_binidx'].values)
             i = torch.Tensor(data[data['i'] == row]['i_binidx'].values)
 
-            # concatenate indices
+            "conactenate indices"
             ind = torch.cat((i.unsqueeze(-1), j.unsqueeze(-1)), 1)
             split_ind = list(torch.split(ind, cfg.sequence_length, dim=0))
 
-            if window_model:
+            if cfg.window_model:
                 dist = cfg.distance_cut_off_mb
                 for i in range(len(split_ind) - 1):
                     win_ind = torch.cat((split_ind[i][-dist:, :], split_ind[i + 1][-dist:, :]),
@@ -142,18 +134,23 @@ def get_samples_sparse(data, chr, cfg):
 
             input_idx = input_idx + split_ind
             values = values + split_vals
-            sample_index.append(ind)
 
+    "pad sequences if shorter than sequence_length"
     values = pad_sequence(values, batch_first=True)
     input_idx = pad_sequence(input_idx, batch_first=True)
 
-    sample_index = np.vstack(sample_index)
-    sample_index = np.concatenate((np.full((sample_index.shape[0], 1), chr), sample_index), 1).astype('int')
-
-    return input_idx, values, sample_index
+    return input_idx, values
 
 
 def window_model(input_idx_list, values_list, input_idx, values):
+    """
+    This function is not fully tested yet. Use only if exploring.
+    :param input_idx_list:
+    :param values_list:
+    :param input_idx:
+    :param values:
+    :return: List, List
+    """
     window = 10
     num_win_list = []
     num_last_list = []
@@ -186,178 +183,170 @@ def window_model(input_idx_list, values_list, input_idx, values):
     return input_idx, values
 
 
-def contactProbabilities(values, delta=1e-10):
+def contactProbabilities(values, smoothing=8, delta=1e-10):
+    """
+    contactProbabilities(values, delta) -> Array
+    Squishes Hi-C values between 0 and 1.
+    Args:
+        values (Array): the Hi-C values.
+        smoothing (int): integer coefficent used to exponentially smoothen Hi-C
+        delta (float): small positive value to avoid divide by 0.
+    """
     coeff = np.nan_to_num(1 / (values + delta))
-    CP = np.power(1 / np.exp(8), coeff)
+    contact_prob = np.power(1 / np.exp(smoothing), coeff)
 
-    return CP
-
-
-def get_samples(data, chr, cfg, dense):
-    if dense:
-        return get_samples_dense(data, chr, cfg)
-    else:
-        return get_samples_sparse(data, chr, cfg)
+    return contact_prob
 
 
 def get_data(cfg, cell, chr):
+    """
+    get_data(cfg, cell, chr) -> List, List
+    Loads data from Hi-C txt files, organizes them into input ids and values.
+    Supports varying values of sequence length in the configuration file.
+    Supports only those values of resolution that Juicer can extract from Hi-C txt file.
+    Supports only those cell types for which Hi-C txt files exist.
+    To check how to create the Hi-C txt file, refer to the documentation.
+    Args:
+        cfg (): the configuration to use for the experiment.
+        cell (string): the cell type to extract Hi-C from.
+        chr (int): the chromosome to extract Hi-C from.
+    Raises:
+        Error: Hi-C txt file does not exist or error during Juicer extraction.
+        Skips: if error during extraction using Juicer Tools, prints out empty txt file
+    """
     data = load_hic(cfg, cell, chr)
-    input_idx, values, sample_index = get_samples(data, chr, cfg, dense=False)
+    input_idx, values = get_samples_sparse(data, chr, cfg)
 
-    return input_idx, values, sample_index
+    return input_idx, values
 
 
 def get_data_loader_chr(cfg, chr):
-    # input_idx, values, sample_index = get_data(cfg, cell, chr)
-    input_idx = torch.load(cfg.processed_data_dir + 'input_idx_chr' + str(chr) + '.pth')
-    values = torch.load(cfg.processed_data_dir + 'values_chr' + str(chr) + '.pth')
-    sample_index = torch.load(cfg.processed_data_dir + 'sample_index_chr' + str(chr) + '.pth')
+    """
+    get_data(cfg, chr) -> DataLoader
+    Uses saved processed input indices and Hi-C values to load single chromosome.
+    Creates DataLoader.
+    Supports only those chromosomes for which processed data exists.
+    Create processed data by calling the save_processed_data function.
+    Args:
+        cfg (): the configuration to use for the experiment.
+        chr (int): the chromosome to load Hi-C data for.
+    Raises:
+        Error: Processed data does not exist for chromosome.
+        """
 
-    # create dataset, dataloader
-    dataset = torch.utils.data.TensorDataset(input_idx.float(), values.float())
-    data_loader = torch.utils.data.DataLoader(dataset=dataset, batch_size=cfg.batch_size, shuffle=False)
+    try:
+        input_idx = torch.load(cfg.processed_data_dir + 'input_idx_chr' + str(chr) + '.pth')
+        values = torch.load(cfg.processed_data_dir + 'values_chr' + str(chr) + '.pth')
 
-    return data_loader, sample_index
+        "create dataloader"
+        dataset = torch.utils.data.TensorDataset(input_idx.float(), values.float())
+        data_loader = torch.utils.data.DataLoader(dataset=dataset, batch_size=cfg.batch_size, shuffle=False)
+        return data_loader
+    except Exception as e:
+        print("Processed data does not exist for chromosome")
 
 
 def get_data_loader_batch_chr(cfg):
+    """
+    get_data(cfg) -> DataLoader
+    Uses saved processed input indices and Hi-C values.
+    Creates DataLoader using all specified chromosomes.
+    Use get_data_loader_chr(cfg, chr) if loading only one chromosome.
+    Supports only those chromosomes for which processed data exists.
+    Create processed data by calling the save_processed_data function.
+    Args:
+        cfg (): the configuration to use for the experiment.
+    Raises:
+        Error: Processed data does not exist for chromosome.
+        Skips: Skips chromosome if error during data loading
+    """
+
     values = torch.empty(0, cfg.sequence_length)
     input_idx = torch.empty(0, cfg.sequence_length, 2)
 
-    sample_index_list = []
+    for chr in cfg.chr_train_list:
+        try:
+            idx = torch.load(cfg.processed_data_dir + 'input_idx_chr' + str(chr) + '.pth')
+            val = torch.load(cfg.processed_data_dir + 'values_chr' + str(chr) + '.pth')
 
-    # chr_list = [2, 22, 10, 12, 7, 3, 16, 11, 20, 4, 19, 15, 18, 8, 14, 6, 17, 21]
-    # chr_list = [2, 22, 10, 12, 3, 16, 11, 20, 4, 19, 9, 15, 5, 18, 8, 14, 6, 17, 13, 21, 1, 7]
-    # chr_list = [22, 12, 16, 11, 20, 19, 15, 18, 14, 17, 13, 21]
-    chr_list = [19, 20, 21, 22]
+            values = torch.cat((values, val.float()), 0)
+            input_idx = torch.cat((input_idx, idx), 0)
+        except Exception as e:
+            print("Processed data does not exist for chromosome")
+            continue
 
-    for chr in chr_list:
-        idx = torch.load(cfg.processed_data_dir + 'input_idx_chr' + str(chr) + '.pth')
-        val = torch.load(cfg.processed_data_dir + 'values_chr' + str(chr) + '.pth')
-        sample_idx = torch.load(cfg.processed_data_dir + 'sample_index_chr' + str(chr) + '.pth')
-
-        values = torch.cat((values, val.float()), 0)
-        input_idx = torch.cat((input_idx, idx), 0)
-        sample_index_list.append(sample_idx)
-
-    sample_index_tensor = np.vstack(sample_index_list)
-    # create dataset, dataloader
+    "create dataloader"
     dataset = torch.utils.data.TensorDataset(input_idx, values)
     data_loader = torch.utils.data.DataLoader(dataset=dataset, batch_size=cfg.batch_size, shuffle=True)
 
-    return data_loader, sample_index_tensor
+    return data_loader
 
 
 def save_processed_data(cfg, cell):
-    chr_list = [19, 20, 21, 22]
-    # chr_list = [2, 22, 10, 12, 3, 16, 11, 20, 4, 19, 9, 15, 5, 18, 8, 14, 6, 17, 13, 21, 1, 7]
-    for chr in chr_list:
-        print(chr)
-        idx, val, sample_idx = get_data(cfg, cell, chr)
+    """
+    save_processed_data(cfg, cell) -> No return object
+    Gets data for Hi-C txt files, organizes them into input ids and values.
+    Saves them in the processed directory.
+    Supports varying values of sequence length in the configuration file.
+    Supports only those values of resolution that Juicer can extract from Hi-C txt file.
+    Supports only those cell types for which Hi-C txt files exist.
+    To check how to create the Hi-C txt file, refer to the documentation.
+    Args:
+        cfg (): the configuration to use for the experiment.
+        cell (string): the cell type to extract Hi-C from.
+    Raises:
+        Error: Hi-C txt file does not exist or error during Juicer extraction.
+        Skips: if error during extraction using Juicer Tools, prints out empty txt file
+    """
+    for chr in cfg.chr_train_list:
+        print("Saving input data for Chr", str(chr), "in the specified processed directory")
 
+        idx, val = get_data(cfg, cell, chr)
         torch.save(idx, cfg.processed_data_dir + 'input_idx_chr' + str(chr) + '.pth')
         torch.save(val, cfg.processed_data_dir + 'values_chr' + str(chr) + '.pth')
-        torch.save(sample_idx, cfg.processed_data_dir + 'sample_index_chr' + str(chr) + '.pth')
-
-    pass
 
 
-def get_data_loader(cfg, cell):
-    # if(len(os.listdir(cfg.processed_data_dir)) != 0):
-    #    #load input data
-    #    input_idx = cfg.processed_data_dir + 'input_idx.pth'
-    #    values = cfg.processed_data_dir + 'values.pth'
-    #    sample_index = cfg.processed_data_dir + 'input_index.pth'
+def scHiC_preprocess(cfg, cell):
+    """
+    scHiC_preprocess(cfg, cell) -> No return object
+    Gets bar codes and positions from pairs file.
+    Matched them with bar codes from percentages file.
+    Creates a DataFrame corresponding pairwise hg19 contact values.
+    Saves the resulting DataFrame in the ScHiC data directory.
+    Args:
+        cfg (): the configuration to use for the experiment.
+        cell (string): the cell type to extract Hi-C from.
+        """
 
-    # else:
-    # create input dataset
-    values = torch.empty(0, cfg.sequence_length)
-    input_idx = torch.empty(0, cfg.sequence_length, 2)
-    sample_index = []
-
-    # for chr in list(range(1, 11)) + list(range(12, 23)):
-    for chr in list(range(1, 23)):
-        idx, val, sample_idx = get_data(cfg, cell, chr)
-
-        values = torch.cat((values, val.float()), 0)
-        input_idx = torch.cat((input_idx, idx), 0)
-        sample_index.append(sample_idx)
-
-    sample_index = np.vstack(sample_index)
-
-    # save input data
-    torch.save(input_idx, cfg.processed_data_dir + 'input_idx.pth')
-    torch.save(values, cfg.processed_data_dir + 'values.pth')
-    torch.save(sample_index, cfg.processed_data_dir + 'input_index.pth')
-
-    # create dataset, dataloader
-    dataset = torch.utils.data.TensorDataset(input_idx, values)
-    data_loader = torch.utils.data.DataLoader(dataset=dataset, batch_size=cfg.batch_size, shuffle=False)
-
-    return data_loader, sample_index
-
-
-def get_bedfile(sample_index, cfg):
-    chr = sample_index[:, 0]
-    bin_idx = sample_index[:, 1]
-    start_coord = get_genomic_coord(chr, bin_idx, cfg)
-    stop_coord = start_coord + cfg.resolution
-
-    bedfile = pd.DataFrame({'chr': chr, 'start': start_coord, 'stop': stop_coord})
-    return bedfile
-
-
-def scHiC_pre(cfg, cell, extract):
     chr_list = [19, 20, 21, 22]
+    columns = ['x1', 'y1', 'bar1', 'bar2']
+    full_pairs_path = cfg.hic_path + cell + cfg.schic_pairs_file
+    pairs = pd.read_csv(full_pairs_path, sep="\t",
+                        names=['chrA', 'x1', 'x2', 'chrB', 'y1', 'y2', 'a', 'b', 'c', 'd', 'e', 'bar1', 'bar2',
+                               'l', 'i', 'j', 'k'])
 
-    if extract == "pos":
-        file_name = "/GSM2254215_ML1.validPairs.txt"
-        full_path = cfg.hic_path + cell + file_name
-        pairs = pd.read_csv(full_path, sep="\t",
-                            names=['chrA', 'x1', 'x2', 'chrB', 'y1', 'y2', 'a', 'b', 'c', 'd', 'e', 'bar1', 'bar2', 'l',
-                                   'i', 'j', 'k'])
+    for chr in chr_list:
+        pairs = pairs.loc[pairs["chrA"] == "human_chr" + str(chr)]
+        pairs = pairs.loc[pairs["chrB"] == "human_chr" + str(chr)]
+        pairs = pairs[columns]
+        pairs.to_csv(cfg.hic_path + cell + '/' + str(chr) + '/' + "pairs_" + str(chr) + '.txt', sep="\t")
 
-        pairs_19 = pairs.loc[pairs["chrA"] == "human_chr19"]
-        pairs_20 = pairs.loc[pairs["chrA"] == "human_chr20"]
-        pairs_21 = pairs.loc[pairs["chrA"] == "human_chr21"]
-        pairs = pairs.loc[pairs["chrA"] == "human_chr22"]
+    full_read_path = cfg.hic_path + cell + cfg.schic_reads_file
+    reads = pd.read_csv(full_read_path, sep="\t",
+                        names=['a', 'b', 'reads_hg19', 'd', 'e', 'f', 'bar1', 'bar2', 'i', 'j', 'k', 'l', 'm', 'n',
+                               'o', 'p', 'q'])
+    reads = reads[['reads_hg19', 'bar1', 'bar2']]
 
-        pairs_19 = pairs_19.loc[pairs_19["chrB"] == "human_chr19"]
-        pairs_20 = pairs_20.loc[pairs_20["chrB"] == "human_chr20"]
-        pairs_21 = pairs_21.loc[pairs_21["chrB"] == "human_chr21"]
-        pairs = pairs.loc[pairs["chrB"] == "human_chr22"]
-
-        pairs_list = [pairs_19, pairs_20, pairs_21, pairs]
-        for i, pair in enumerate(pairs_list):
-            columns = ['x1', 'y1', 'bar1', 'bar2']
-            pairs_list[i] = pairs_list[i][columns]
-
-        pairs_19 = pairs_list[0]
-        pairs_20 = pairs_list[1]
-        pairs_21 = pairs_list[2]
-        pairs = pairs_list[3]
-        pairs_list = []
-    elif extract == "reads":
-        reads_file = "/GSM2254215_ML1.percentages.txt"
-        full_read_path = cfg.hic_path + cell + reads_file
-        reads = pd.read_csv(full_read_path, sep="\t",
-                            names=['a', 'b', 'reads_hg19', 'd', 'e', 'f', 'bar1', 'bar2', 'i', 'j', 'k', 'l', 'm', 'n',
-                                   'o',
-                                   'p', 'q'])
-        reads = reads[['reads_hg19', 'bar1', 'bar2']]
-
-        for chr in chr_list:
-            pairs = pd.read_csv(cfg.hic_path + cell + '/' + str(chr) + '/' + "pairs_" + str(chr) + '.txt', sep="\t")
-            merged_pairs = pairs.merge(reads, on=["bar1", "bar2"])
-            merged_pairs = merged_pairs[["x1", "y1", "reads_hg19"]]
-            merged_pairs = merged_pairs.rename(columns={"x1": "i", "y1": "j", "reads_hg19": "v"})
-            merged_pairs.to_csv(cfg.hic_path + cell + '/' + str(chr) + '/' + "hic_chr" + str(chr) + '.txt', sep="\t")
-
-    pass
+    for chr in chr_list:
+        pairs = pd.read_csv(cfg.hic_path + cell + '/' + str(chr) + '/' + "pairs_" + str(chr) + '.txt', sep="\t")
+        merged_pairs = pairs.merge(reads, on=["bar1", "bar2"])
+        merged_pairs = merged_pairs[["x1", "y1", "reads_hg19"]]
+        merged_pairs = merged_pairs.rename(columns={"x1": "i", "y1": "j", "reads_hg19": "v"})
+        merged_pairs.to_csv(cfg.hic_path + cell + '/' + str(chr) + '/' + "hic_chr" + str(chr) + '.txt', sep="\t")
 
 
 if __name__ == "__main__":
     cfg = config.Config()
     cell = cfg.cell
     save_processed_data(cfg, cell)
-    #scHiC_pre(cfg, cell, extract="reads")
+    scHiC_preprocess(cfg, cell)

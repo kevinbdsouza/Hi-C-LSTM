@@ -14,7 +14,6 @@ def test_model(model, cfg, cell, chr):
     predictions, test_error, values, pred_df, error_list = model.test(data_loader)
 
     pred_df.to_csv(cfg.output_directory + "shuffle_%s_predictions_chr%s.csv" % (cell, str(chr)), sep="\t")
-    # np.save(cfg.output_directory + "shuffle_renew_zero_chr%s.npy" % str(chr), zero_embed)
 
 
 if __name__ == '__main__':
@@ -33,5 +32,3 @@ if __name__ == '__main__':
 
     for chr in test_chr:
         test_model(model, cfg, cell, chr)
-
-print("done")
