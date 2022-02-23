@@ -23,6 +23,7 @@ class Decoder(nn.Module):
         self.decoder_name = cfg.decoder_name
 
         "intialize LSTM, CNN, and FC decoders"
+        self.sigm = nn.Sigmoid()
         self.decoder_lstm = lstm.LSTM(cfg.input_size_lstm, cfg.hidden_size_lstm, batch_first=True)
         self.decoder_lstm_fc = nn.Linear(cfg.hidden_size_lstm * cfg.sequence_length,
                                          cfg.output_size_lstm * cfg.sequence_length)
