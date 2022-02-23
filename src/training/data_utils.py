@@ -8,7 +8,7 @@ import training.config as config
 
 def get_cumpos(cfg, chr_num):
     """
-    get_bin_idx(cfg, chr_num) -> int
+    get_cumpos(cfg, chr_num) -> int
     Returns cumulative index upto the end of the previous chromosome.
     Args:
         cfg (Config): the configuration to use for the experiment.

@@ -9,6 +9,10 @@ device = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
 
 
 class HiC_R2():
+    """
+    Class to compute R2 along different distances along the genomic axis.
+    Includes methods that help you do this.
+    """
 
     def __init__(self, cfg, chr, mode):
         self.cfg = cfg
@@ -23,6 +27,14 @@ class HiC_R2():
         self.start_ends = np.load(self.start_end_path, allow_pickle=True).item()
 
     def hic_r2(self, hic_predictions):
+        """
+        hic_r2(hic_predictions) -> DataFrame
+        Computes R2 for different distances along the genomic axis.
+        Args:
+            hic_predictions (DataFrame): The dataframe with embeddings and position IDs.
+        """
+
+        "make diff column"
         hic_predictions.columns = ["i", "j", "v", "pred"] + list(np.arange(2 * self.cfg.pos_embed_size))
         hic_predictions["diff"] = np.abs(hic_predictions["i"] - hic_predictions["j"]).astype(int)
         hic_data = hic_predictions.sort_values(by=['i']).reset_index(drop=True)
@@ -41,6 +53,7 @@ class HiC_R2():
                 og_hic = subset_hic["v"]
                 predicted_hic = subset_hic["pred"]
 
+                "compute r2"
                 r2 = self.find_r2(og_hic, predicted_hic)
 
                 if not np.isfinite(r2):
@@ -54,6 +67,13 @@ class HiC_R2():
         return r2_frame
 
     def find_r2(self, og_hic, predicted_hic):
+        """
+        find_r2(og_hic, predicted_hic) -> Series
+        Computes R2 according to observed and predicted arguments
+        Args:
+            og_hic (Series): Series with observed Hi-C at a particular difference distance
+            predicted_hic (Series): Series with predicted Hi-C at a particular difference distance
+        """
 
         mean_og = og_hic.mean()
         ss_tot = ((og_hic.sub(mean_og)) ** 2).sum()
@@ -63,6 +83,13 @@ class HiC_R2():
         return r2
 
     def get_cumpos(self):
+        """
+        get_cumpos() -> int
+        Returns cumulative index upto the end of the previous chromosome.
+        Args:
+            NA
+        """
+
         chr_num = self.chr
         if chr_num == 1:
             cum_pos = 0
@@ -74,10 +101,10 @@ class HiC_R2():
 
 
 if __name__ == '__main__':
-    test_chr = list(range(15, 23))
     cfg = Config()
     cell = cfg.cell
-    model_name = "shuffle_" + cell
+    model_name = cfg.model_name
+    test_chr = cfg.chr_test_lsit
 
     for chr in test_chr:
         r2_ob_hic = HiC_R2(cfg, chr, mode='test')
@@ -86,5 +113,3 @@ if __name__ == '__main__':
         hic_predictions = hic_predictions.drop(['Unnamed: 0'], axis=1)
         r2_frame = r2_ob_hic.hic_r2(hic_predictions)
         r2_frame.to_csv(cfg.output_directory + "r2frame_%s_chr%s.csv" % (cell, str(chr)), sep="\t")
-
-print("done")
