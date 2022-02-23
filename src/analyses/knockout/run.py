@@ -82,7 +82,7 @@ class Knockout():
 
         nrows = int(stop - start)
 
-        embed_rows = np.zeros((nrows + 1, cfg.pos_embed_size))
+        embed_rows = np.zeros((nrows + 1, self.cfg.pos_embed_size))
 
         i_old = 0
         j_old = 0
@@ -93,7 +93,7 @@ class Knockout():
             else:
                 i_old = i_new
                 if np.all((embed_rows[i_new - start, :] == 0)):
-                    col = list(np.arange(cfg.pos_embed_size))
+                    col = list(np.arange(self.cfg.pos_embed_size))
                     col = [str(x) for x in col]
                     embed_rows[i_new - start, :] = np.array(pred_data.loc[r, col])
 
@@ -104,7 +104,7 @@ class Knockout():
             else:
                 j_old = j_new
                 if np.all((embed_rows[j_new - start, :] == 0)):
-                    col = list(np.arange(cfg.pos_embed_size, 2 * cfg.pos_embed_size))
+                    col = list(np.arange(self.cfg.pos_embed_size, 2 * self.cfg.pos_embed_size))
                     col = [str(x) for x in col]
                     embed_rows[j_new - start, :] = np.array(pred_data.loc[r, col])
 
