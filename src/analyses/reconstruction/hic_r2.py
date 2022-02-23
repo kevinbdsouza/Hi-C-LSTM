@@ -3,6 +3,11 @@ from training.config import Config
 import numpy as np
 import traceback
 import torch
+from training.data_utils import get_data_loader_chr
+from analyses.knockout.run import Knockout
+from training.decoder import Decoder
+import time
+from torch.utils.tensorboard import SummaryWriter
 
 pd.options.mode.chained_assignment = None
 device = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
@@ -16,6 +21,7 @@ class HiC_R2():
 
     def __init__(self, cfg, chr, mode):
         self.cfg = cfg
+        self.cell = cfg.cell
         self.mode = mode
         self.hic_path = cfg.hic_path
         self.chr = chr
@@ -99,12 +105,98 @@ class HiC_R2():
 
         return cum_pos
 
+    def get_prediction_df(self, cfg, chr, method="hiclstm", decoder="lstm"):
+        if method == "hiclstm":
+            pred_data = pd.read_csv(cfg.output_directory + "%s_%s_%s_chr%s.csv" % (cfg.cell, method, decoder, str(chr)),
+                                    sep="\t")
+            pred_data = pred_data.drop(['Unnamed: 0'], axis=1)
+        elif method == "sniper":
+            pred_data = None, None
+        elif method == "sca":
+            pred_data = None, None
+
+        return pred_data
+
+    def get_trained_representations(self, method="hiclstm"):
+        ko_ob = Knockout(self.cfg, self.cell, self.chr)
+
+        if method == "hiclstm":
+            pred_data = pd.read_csv(
+                self.cfg.output_directory + "shuffle_%s_predictions_chr%s.csv" % (self.cell, str(self.chr)),
+                sep="\t")
+            pred_data = pred_data.drop(['Unnamed: 0'], axis=1)
+            representations, start, stop = ko_ob.convert_df_to_np(pred_data)
+        elif method == "sniper":
+            representations, start = None, None
+        elif method == "sca":
+            representations, start = None, None
+
+        return representations, start
+
+    def run_decoders(self, representations, cfg, chr, start, decoder="lstm"):
+        """
+        run_decoders(representations, cfg, chr, start, decoder) -> No return object
+        Obtains data for given chr and specified cell in config.
+        Trains the passed representations from method through the decoder of choice.
+        Works on one chromosome at a time.
+        Args:
+            representations (Array): Representation matrix
+            cfg (Config): The configuration to use for the experiment.
+            chr (int): The chromosome to test.
+            start (int): Start indiex in data to offset during training
+            decoder (string): one of lstm, cnn, and fc
+        """
+
+        "Set up Tensorboard logging"
+        timestr = time.strftime("%Y%m%d-%H%M%S")
+        writer = SummaryWriter('./tensorboard_logs/' + model_name + timestr)
+
+        "Initalize decoder and load decoder weights if they exist"
+        decoder_ob = Decoder(cfg, device).to(device)
+        decoder_ob.load_weights()
+
+        "Initalize optimizer"
+        optimizer, criterion = decoder_ob.compile_optimizer()
+
+        "get data"
+        data_loader = get_data_loader_chr(cfg, chr)
+
+        "train decoder"
+        decoder_ob.train_decoders(data_loader, representations, start, optimizer, criterion, writer, decoder=decoder)
+
+    def test_decoders(self, representations, cfg, chr, start, method="hiclstm", decoder="lstm"):
+        """
+        test_decoders(representations, cfg, chr, start, method, decoder) -> No return object
+        Loads loads data, tests the model, and saves the predictions in a csv file.
+        Works on one chromosome at a time.
+        Args:
+            representations (array): The representations from the method
+            cfg (Config): The configuration to use for the experiment.
+            chr (int): The chromosome to test.
+            start (int): Start indiex in data to offset during training
+            method (string): one of hiclstm, sniper, sca
+            decoder (string): one of lstm, cnn, and fc
+        """
+
+        "Initalize decoder and load decoder weights if they exist"
+        decoder_ob = Decoder(cfg, device).to(device)
+        decoder_ob.load_weights()
+
+        "get data"
+        data_loader = get_data_loader_chr(cfg, chr)
+
+        "train decoder"
+        predictions, pred_df = decoder_ob.test_decoder(data_loader, representations, start, decoder=decoder)
+
+        "save predictions"
+        pred_df.to_csv(cfg.output_directory + "%s_%s_%s_chr%s.csv" % (cfg.cell, method, decoder, str(chr)), sep="\t")
+
 
 if __name__ == '__main__':
     cfg = Config()
     cell = cfg.cell
     model_name = cfg.model_name
-    test_chr = cfg.chr_test_lsit
+    test_chr = cfg.chr_test_list
 
     for chr in test_chr:
         r2_ob_hic = HiC_R2(cfg, chr, mode='test')

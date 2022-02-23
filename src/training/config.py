@@ -15,7 +15,7 @@ class Config:
         self.resolution = 10000
         self.cell = "GM12878"
         self.chr_train_list = list(range(1, 23))
-        self.chr_test_lsit = list(range(1, 23))
+        self.chr_test_list = list(range(1, 23))
 
         "Model Paramters"
         self.pos_embed_size = 16
@@ -42,6 +42,11 @@ class Config:
         self.start_end_file = 'starts.npy'
         self.downstream_dir = "/data2/hic_lstm/downstream"
         self.model_name = "shuffle_" + self.cell
+
+        "decoder parameters"
+        self.decoder_name = "hisclstm"
+        self.dec_learning_rate = 0.01
+        self.decoder_epochs = 20
 
         "Output Directories"
         self.proj_dir = "/home/kevindsouza/Documents/projects/PhD/Hi-C-LSTM/"

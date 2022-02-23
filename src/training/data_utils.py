@@ -145,11 +145,6 @@ def get_samples_sparse(data, chr, cfg):
 def window_model(input_idx_list, values_list, input_idx, values):
     """
     This function is not fully tested yet. Use only if exploring.
-    :param input_idx_list:
-    :param values_list:
-    :param input_idx:
-    :param values:
-    :return: List, List
     """
     window = 10
     num_win_list = []

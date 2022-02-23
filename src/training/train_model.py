@@ -8,7 +8,7 @@ from training.data_utils import get_data_loader_batch_chr, save_processed_data
 device = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
 
 
-def train_model(cfg, model_name, writer):
+def train_model(cfg, writer):
     """
     train_model(cfg, model_name, writer) -> No return object
     Loads existing model (or creates new one), loads data, trains the model.
@@ -20,15 +20,15 @@ def train_model(cfg, model_name, writer):
         writer (SummaryWriter): tensorboard summary writer
     """
 
-    "Initalize model and load model wrights if they exist"
-    model = SeqLSTM(cfg, device, model_name).to(device)
+    "Initalize model and load model weights if they exist"
+    model = SeqLSTM(cfg, device).to(device)
     model.load_weights()
 
     "Initalize optimizer"
-    optimizer, criterion = model.compile_optimizer(cfg)
+    optimizer, criterion = model.compile_optimizer()
 
     "Get data"
-    data_loader, samples = get_data_loader_batch_chr(cfg)
+    data_loader = get_data_loader_batch_chr(cfg)
     print("%s batches loaded" % str(len(data_loader)))
 
     "Train model"
@@ -51,4 +51,4 @@ if __name__ == '__main__':
     save_processed_data(cfg, cell)
 
     "Train the model and save the .pth file"
-    train_model(cfg, model_name, writer)
+    train_model(cfg, writer)

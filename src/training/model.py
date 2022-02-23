@@ -7,6 +7,7 @@ from torch.autograd import Variable
 from torch.nn.utils.clip_grad import clip_grad_norm_
 import training.ln_lstm as lstm
 from captum.attr import LayerIntegratedGradients
+from torch.nn import ReLU, Sequential, Conv2d, MaxPool2d, BatchNorm2d
 
 
 class SeqLSTM(nn.Module):
@@ -16,13 +17,13 @@ class SeqLSTM(nn.Module):
     Layer-Norm LSTM for as the decoder.
     """
 
-    def __init__(self, cfg, device, model_name):
+    def __init__(self, cfg, device):
         super(SeqLSTM, self).__init__()
         self.device = device
         self.cfg = cfg
         self.hidden_size_lstm = cfg.hidden_size_lstm
         self.gpu_id = 0
-        self.model_name = model_name
+        self.model_name = cfg.model_name
 
         "Initializes ebedding layer"
         self.pos_embed = nn.Embedding(cfg.genome_len, cfg.pos_embed_size).train()
@@ -39,6 +40,20 @@ class SeqLSTM(nn.Module):
             self.lstm.requires_grad = False
             self.pos_embed.requires_grad = True
             self.out.requires_grad = True
+
+        "intialize LSTM, CNN, and FC decoders"
+        self.decoder_lstm = lstm.LSTM(cfg.input_size_lstm, cfg.hidden_size_lstm, batch_first=True)
+        self.decoder_lstm_fc = nn.Linear(cfg.hidden_size_lstm * cfg.sequence_length,
+                                         cfg.output_size_lstm * cfg.sequence_length)
+        self.decoder_cnn = nn.Sequential(
+            nn.Conv2d(1, 4, kernel_size=(3, 3), stride=1, padding=1),
+            nn.BatchNorm2d(4),
+            nn.Sigmoid(),
+            nn.MaxPool2d(kernel_size=2, stride=2))
+        self.decoder_cnn_fc = nn.Linear(cfg.hidden_size_lstm * cfg.sequence_length,
+                                        cfg.output_size_lstm * cfg.sequence_length)
+        self.decoder_fc = nn.Linear(cfg.input_size_lstm * cfg.sequence_length,
+                                    cfg.output_size_lstm * cfg.sequence_length)
 
     def forward_with_hidden(self, input, iter):
         """
@@ -88,6 +103,42 @@ class SeqLSTM(nn.Module):
         output = self.out(output.reshape(embeddings.shape[0], -1))
         output = self.sigm(output)
         return output, embeddings
+
+    def lstm_decoder(self, embeddings):
+        """
+        lstm_decoder(self, embeddings) -> tensor
+        Forward method to be used when using LSTM as the decoder with representations.
+        Args:
+            embeddings (Tensor): The embeddings for positions.
+        """
+        hidden, state = self._initHidden(embeddings.shape[0])
+        output, _ = self.decoder_lstm(embeddings, (hidden, state))
+        output = self.decoder_lstm_fc(output.reshape(embeddings.shape[0], -1))
+        output = self.sigm(output)
+        return output
+
+    def cnn_decoder(self, embeddings):
+        """
+        cnn_decoder(self, embeddings) -> tensor
+        Forward method to be used when using CNN as the decoder with representations.
+        Args:
+            embeddings (Tensor): The embeddings for positions.
+        """
+        output, _ = self.decoder_cnn(embeddings)
+        output = self.decoder_cnn_fc(output.reshape(embeddings.shape[0], -1))
+        output = self.sigm(output)
+        return output
+
+    def fc_decoder(self, embeddings):
+        """
+        fc_decoder(self, embeddings) -> tensor
+        Forward method to be used when using FC as the decoder with representations.
+        Args:
+            embeddings (Tensor): The embeddings for positions.
+        """
+        output = self.decoder_fc(embeddings)
+        output = self.sigm(output)
+        return output
 
     def _initHidden(self, batch_size):
         """
@@ -422,7 +473,7 @@ class SeqLSTM(nn.Module):
 
     def ko_post(self, ind, val, pred, pred_df, mode):
         """
-        ko_post(preds, ind, val, pred, pred_df, mode) -> DataFrame
+        ko_post(ind, val, pred, pred_df, mode) -> DataFrame
         Removes padded indices and accounts for confusion during duplication.
         Args:
             ind (Array): Concatenated indices
