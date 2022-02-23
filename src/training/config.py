@@ -1,6 +1,5 @@
 import os
 import pathlib
-import random
 
 
 class Config:
@@ -14,6 +13,7 @@ class Config:
         self.num_chr = 23
         self.genome_len = 288091
         self.resolution = 10000
+        self.cell = "GM12878"
         self.chr_train_list = list(range(1, 23))
         self.chr_test_lsit = list(range(1, 23))
 
@@ -24,6 +24,8 @@ class Config:
         self.output_size_lstm = 1
         self.sequence_length = 150
         self.distance_cut_off_mb = int(self.sequence_length / 2)
+        self.lstm_nontrain = False
+        self.window_model = False
 
         "Hyperparameters"
         self.learning_rate = 0.01
@@ -31,11 +33,8 @@ class Config:
         self.batch_size = 210
         self.max_norm = 10
         self.hic_smoothing = 8
-        self.lstm_nontrain = False
-        self.window_model = False
 
-        "Input Directories"
-        self.cell = "GM12878"
+        "Input Directories and file names"
         self.hic_path = '/data2/hic_lstm/data/'
         self.sizes_file = 'chr_cum_sizes2.npy'
         self.schic_reads_file = "/GSM2254215_ML1.percentages.txt"
@@ -59,3 +58,10 @@ class Config:
                 pathlib.Path(file_path).mkdir(parents=True, exist_ok=True)
             else:
                 print("Directory %s exists" % file_path)
+
+        "melo parameters"
+        self.chunk_start = 256803
+        self.chunk_end = 257017
+        self.dupl_start = 257018
+        self.dupl_end = 257232
+        self.shift = 215

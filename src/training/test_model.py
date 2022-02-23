@@ -12,7 +12,7 @@ def test_model(model, cfg, cell, chr):
     Loads loads data, tests the model, and saves the predictions in a csv file.
     Works on one chromosome at a time.
     Args:
-        model (): The model that needs to be tested.
+        model (SeqLSTM): The model that needs to be tested.
         cfg (Config): The configuration to use for the experiment.
         cell (string): The cell type to extract Hi-C from.
         chr (int): The chromosome to test.

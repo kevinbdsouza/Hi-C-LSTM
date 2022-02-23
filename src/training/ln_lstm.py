@@ -9,7 +9,6 @@ from torch.autograd import Variable
 
 use_cuda = torch.cuda.is_available()
 os.environ["CUDA_DEVICE_ORDER"] = "PCI_BUS_ID"
-# The GPU id to use, usually either "0" or "1"
 os.environ["CUDA_VISIBLE_DEVICES"] = "1"
 
 
@@ -59,11 +58,11 @@ class LSTM(nn.Module):
         return hiddens
 
     def layer_forward(self, l, xs, h, image_emb, reverse=False):
-        '''
+        """
         return:
             xs: (seq_len, batch, hidden)
             h: (1, batch, hidden)
-        '''
+        """
         if self.batch_first:
             xs = xs.permute(1, 0, 2).contiguous()
         ys = []
