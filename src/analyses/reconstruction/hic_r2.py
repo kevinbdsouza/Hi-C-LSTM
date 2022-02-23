@@ -148,7 +148,7 @@ class HiC_R2():
 
         "Set up Tensorboard logging"
         timestr = time.strftime("%Y%m%d-%H%M%S")
-        writer = SummaryWriter('./tensorboard_logs/' + model_name + timestr)
+        writer = SummaryWriter('./tensorboard_logs/' + cfg.decoder_name + timestr)
 
         "Initalize decoder and load decoder weights if they exist"
         decoder_ob = Decoder(cfg, device).to(device)
