@@ -41,20 +41,6 @@ class SeqLSTM(nn.Module):
             self.pos_embed.requires_grad = True
             self.out.requires_grad = True
 
-        "intialize LSTM, CNN, and FC decoders"
-        self.decoder_lstm = lstm.LSTM(cfg.input_size_lstm, cfg.hidden_size_lstm, batch_first=True)
-        self.decoder_lstm_fc = nn.Linear(cfg.hidden_size_lstm * cfg.sequence_length,
-                                         cfg.output_size_lstm * cfg.sequence_length)
-        self.decoder_cnn = nn.Sequential(
-            nn.Conv2d(1, 4, kernel_size=(3, 3), stride=1, padding=1),
-            nn.BatchNorm2d(4),
-            nn.Sigmoid(),
-            nn.MaxPool2d(kernel_size=2, stride=2))
-        self.decoder_cnn_fc = nn.Linear(cfg.hidden_size_lstm * cfg.sequence_length,
-                                        cfg.output_size_lstm * cfg.sequence_length)
-        self.decoder_fc = nn.Linear(cfg.input_size_lstm * cfg.sequence_length,
-                                    cfg.output_size_lstm * cfg.sequence_length)
-
     def forward_with_hidden(self, input, iter):
         """
         forward_with_hidden(self, input, iter) -> tensor, tensor
