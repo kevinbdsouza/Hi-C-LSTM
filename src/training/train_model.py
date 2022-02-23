@@ -9,12 +9,16 @@ device = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
 
 
 def train_model(cfg, model_name, writer):
-    '''
-    :param cfg:
-    :param model_name:
-    :param writer:
-    :return:
-    '''
+    """
+    train_model(cfg, model_name, writer) -> No return object
+    Loads existing model (or creates new one), loads data, trains the model.
+    Saves the trained model in a .pth file.
+    Specify training and model parameters in the configuration file.
+    Args:
+        cfg (Config): the configuration to use for the experiment.
+        model_name (string): The model name that needs to be used to load model or create new model
+        writer:
+    """
 
     "Initalize model and load model wrights if they exist"
     model = SeqLSTM(cfg, device, model_name).to(device)

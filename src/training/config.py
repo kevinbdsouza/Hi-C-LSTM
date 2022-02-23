@@ -5,32 +5,27 @@ import random
 
 class Config:
     def __init__(self):
+        """
+        Includes Data Parameters, Model Parameters, Hyperparameters, Input Directories
+        File Names, Model Names, Output Directories
+        """
 
-        ##########################################
-        ############ Data Parameters #############
-        ##########################################
-
+        "Data Parameters"
         self.num_chr = 23
         self.genome_len = 288091
         self.resolution = 10000
+        self.chr_train_list = random.shuffle(list(range(1, 23)))
+        self.chr_test_lsit = list(range(1, 23))
 
-        ##########################################
-        ############ Model Parameters ############
-        ##########################################
-
+        "Model Paramters"
         self.pos_embed_size = 16
         self.input_size_lstm = 2 * self.pos_embed_size
         self.hidden_size_lstm = 8
         self.output_size_lstm = 1
-        self.sequence_length = 150  # length of each input sequence
-
+        self.sequence_length = 150
         self.distance_cut_off_mb = int(self.sequence_length / 2)
-        # for dense input matrix, takes sequence_length around diagonal for each row
 
-        ##########################################
-        ############# Hyperparameters ############
-        ##########################################
-
+        "Hyperparameters"
         self.learning_rate = 0.01
         self.num_epochs = 40
         self.batch_size = 210
@@ -39,10 +34,7 @@ class Config:
         self.lstm_nontrain = False
         self.window_model = False
 
-        ##########################################
-        ############ Input Directories ###########
-        ##########################################
-
+        "Input Directories"
         self.cell = "GM12878"
         self.hic_path = '/data2/hic_lstm/data/'
         self.sizes_file = 'chr_cum_sizes2.npy'
@@ -51,19 +43,15 @@ class Config:
         self.start_end_file = 'starts.npy'
         self.downstream_dir = "/data2/hic_lstm/downstream"
         self.model_name = "shuffle_" + self.cell
-        self.chr_train_list = random.shuffle(list(range(1, 23)))
-        self.chr_test_lsit = list(range(1, 23))
 
-        ##########################################
-        ############ Output Locations ############
-        ##########################################
-
+        "Output Directories"
         self.proj_dir = "/home/kevindsouza/Documents/projects/PhD/Hi-C-LSTM/"
         self.model_dir = self.proj_dir + 'saved_models/'
         self.output_directory = self.downstream_dir + "/predictions/"
         self.plot_dir = self.output_directory + 'data_plots/'
         self.processed_data_dir = self.output_directory + 'processed_data/' + self.cell + "/"
 
+        "create directories if they don't exist"
         for file_path in [self.model_dir, self.output_directory, self.plot_dir, self.processed_data_dir]:
             directory = os.path.dirname(file_path)
             if not os.path.exists(directory):
