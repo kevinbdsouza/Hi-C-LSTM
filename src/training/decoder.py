@@ -32,10 +32,10 @@ class Decoder(nn.Module):
             self.decoder_cnn = nn.Sequential(
                 nn.Conv2d(2, 1, kernel_size=(2, 1), padding=1),
                 nn.Sigmoid(),
-                nn.MaxPool2d(kernel_size=2, stride=2)).to(self.device)
+                nn.MaxPool2d(kernel_size=2, stride=2)).to(device)
 
             self.decoder_cnn_fc = nn.Linear((self.cfg.sequence_length // 2 + 1) * self.cfg.hidden_size_lstm,
-                                            self.cfg.output_size_lstm * self.cfg.sequence_length).to(self.device)
+                                            self.cfg.output_size_lstm * self.cfg.sequence_length).to(device)
         elif decoder == "fc":
             self.decoder_fc = nn.Linear(cfg.input_size_lstm * cfg.sequence_length,
                                         cfg.output_size_lstm * cfg.sequence_length)
