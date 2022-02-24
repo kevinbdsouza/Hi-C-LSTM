@@ -66,11 +66,12 @@ if __name__ == '__main__':
 
             hic_r2_ob = HiC_R2(cfg, chr)
 
-            "load representations"
-            representations, start = hic_r2_ob.get_trained_representations(method="hiclstm")
+            if cfg.get_predictions:
+                "load representations"
+                representations, start = hic_r2_ob.get_trained_representations(method="hiclstm")
 
-            "test decoder"
-            hic_r2_ob.test_decoders(representations, cfg, chr, start, method="hiclstm", decoder="lstm")
+                "test decoder"
+                hic_r2_ob.test_decoders(representations, cfg, chr, start, method="hiclstm", decoder="lstm")
 
             "load saved predictions for method"
             hic_predictions = hic_r2_ob.get_prediction_df(cfg, chr, method="hiclstm", decoder="lstm")

@@ -48,6 +48,7 @@ class Config:
         self.save_representation = True
         self.train_decoders = False
         self.test_decoders = True
+        self.get_predictions = False
         self.dec_learning_rate = 0.01
         self.decoder_epochs = 20
         self.decoder_train_list = [21, 19]
