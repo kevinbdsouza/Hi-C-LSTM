@@ -14,7 +14,7 @@ class Decoder(nn.Module):
     Includes LSTM, CNN, and FC decoders.
     """
 
-    def __init__(self, cfg, device):
+    def __init__(self, cfg, device, decoder="lstm"):
         super(Decoder, self).__init__()
         self.device = device
         self.cfg = cfg
@@ -24,18 +24,23 @@ class Decoder(nn.Module):
 
         "intialize LSTM, CNN, and FC decoders"
         self.sigm = nn.Sigmoid()
-        self.decoder_lstm = lstm.LSTM(cfg.input_size_lstm, cfg.hidden_size_lstm, batch_first=True)
-        self.decoder_lstm_fc = nn.Linear(cfg.hidden_size_lstm * cfg.sequence_length,
-                                         cfg.output_size_lstm * cfg.sequence_length)
-        self.decoder_cnn = nn.Sequential(
-            nn.Conv2d(1, 4, kernel_size=(3, 3), stride=1, padding=1),
-            nn.BatchNorm2d(4),
-            nn.Sigmoid(),
-            nn.MaxPool2d(kernel_size=2, stride=2))
-        self.decoder_cnn_fc = nn.Linear(cfg.hidden_size_lstm * cfg.sequence_length,
+        if decoder == "lstm":
+            self.decoder_lstm = lstm.LSTM(cfg.input_size_lstm, cfg.hidden_size_lstm, batch_first=True)
+            self.decoder_lstm_fc = nn.Linear(cfg.hidden_size_lstm * cfg.sequence_length,
+                                             cfg.output_size_lstm * cfg.sequence_length)
+        elif decoder == "cnn":
+            self.decoder_cnn = nn.Sequential(
+                nn.Conv2d(1, 4, kernel_size=(3, 3), stride=1, padding=1),
+                nn.BatchNorm2d(4),
+                nn.Sigmoid(),
+                nn.MaxPool2d(kernel_size=2, stride=2))
+            self.decoder_cnn_fc = nn.Linear(cfg.hidden_size_lstm * cfg.sequence_length,
+                                            cfg.output_size_lstm * cfg.sequence_length)
+        elif decoder == "fc":
+            self.decoder_fc = nn.Linear(cfg.input_size_lstm * cfg.sequence_length,
                                         cfg.output_size_lstm * cfg.sequence_length)
-        self.decoder_fc = nn.Linear(cfg.input_size_lstm * cfg.sequence_length,
-                                    cfg.output_size_lstm * cfg.sequence_length)
+        else:
+            print("Decoder should be one of lstm, cnn, and fc.")
 
     def lstm_decoder(self, embeddings):
         """

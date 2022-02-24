@@ -45,16 +45,16 @@ class Config:
         self.model_name = "shuffle_" + self.cell
 
         "decoder parameters"
-        self.decoder_name = "hiclstm"
-        self.decoder = "lstm"
+        self.decoder_name = "hiclstm_cnn"
+        self.decoder = "cnn"
         self.save_representation = False
-        self.train_decoders = False
+        self.train_decoders = True
         self.test_decoders = True
         self.get_predictions = False
         self.dec_learning_rate = 0.01
         self.decoder_epochs = 20
         self.decoder_train_list = [21, 19]
-        self.decoder_test_list = [19, 20, 21, 22]
+        self.decoder_test_list = [22, 20]
 
         "Output Directories"
         self.proj_dir = "/home/kevindsouza/Documents/projects/PhD/Hi-C-LSTM/"
@@ -78,3 +78,6 @@ class Config:
         self.dupl_start = 257018
         self.dupl_end = 257232
         self.shift = 215
+
+
+

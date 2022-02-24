@@ -162,7 +162,7 @@ class HiC_R2():
         writer = SummaryWriter('./tensorboard_logs/' + self.cfg.decoder_name + timestr)
 
         "Initalize decoder and load decoder weights if they exist"
-        decoder_ob = Decoder(self.cfg, device).to(device)
+        decoder_ob = Decoder(self.cfg, device, decoder=decoder).to(device)
         decoder_ob.load_weights()
 
         "Initalize optimizer"
@@ -187,7 +187,7 @@ class HiC_R2():
         """
 
         "Initalize decoder and load decoder weights if they exist"
-        decoder_ob = Decoder(self.cfg, device).to(device)
+        decoder_ob = Decoder(self.cfg, device, decoder=decoder).to(device)
         decoder_ob.load_weights()
 
         "get data"
