@@ -10,7 +10,7 @@ from torch.nn.utils.clip_grad import clip_grad_norm_
 
 class Decoder(nn.Module):
     """
-    Decoders to be used with representations.
+    Class includes Decoders to be used with representations.
     Includes LSTM, CNN, and FC decoders.
     """
 
@@ -90,7 +90,7 @@ class Decoder(nn.Module):
         compile_optimizer(self) -> optimizer, criterion
         Method to initialize optimizer and criterion
         Args:
-            No Args, specify learning rate in config. Uses Adam as default.
+            No Args, specify decoder learning rate in config. Uses Adam as default.
         """
         optimizer = torch.optim.Adam(self.parameters(), lr=self.cfg.dec_learning_rate)
         criterion = nn.MSELoss()
@@ -132,9 +132,9 @@ class Decoder(nn.Module):
         pred_df["pred"] = pred
         return pred_df
 
-    def train_decoders(self, data_loader, embed_rows, start, criterion, optimizer, writer, decoder="lstm"):
+    def train_decoder(self, data_loader, embed_rows, start, criterion, optimizer, writer, decoder="lstm"):
         """
-        train_decoders(data_loader, embed_rows, start, criterion, optimizer, writer, decoder="lstm") -> No return object
+        train_decoder(data_loader, embed_rows, start, criterion, optimizer, writer, decoder="lstm") -> No return object
         Method to train the decoders.
         Runs the representations from specific method through the chosen decoder. Saves the resulting decoder model.
         Args:
@@ -200,7 +200,7 @@ class Decoder(nn.Module):
 
     def test_decoder(self, data_loader, embed_rows, start, decoder="lstm"):
         """
-        test_decoders(data_loader, embed_rows, start, mode) -> tensor, DataFrame
+        test_decoder(data_loader, embed_rows, start, decoder) -> tensor, DataFrame
         Method to test the decoder.
         Runs the representations from specific method through chosen decoder. Gets output Hi-C.
         Save resulting representations and predictions in csv file.

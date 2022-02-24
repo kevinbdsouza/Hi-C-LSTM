@@ -105,41 +105,47 @@ class HiC_R2():
 
         return cum_pos
 
-    def get_prediction_df(self, cfg, chr, method="hiclstm", decoder="lstm"):
-        if method == "hiclstm_full":
-            pred_data = pd.read_csv(cfg.output_directory + "hiclstm_%s_predictions_chr%s.csv" % (cfg.cell, str(chr)),
-                                    sep="\t")
+    def get_prediction_df(self, method="hiclstm", decoder="lstm"):
+        """
+        get_prediction_df(cfg, chr, method, decoder) -> DataFrame
+        Returns dataframe containing positions, observed Hi-C and predicted Hi-C.
+        Args:
+            method (string): one of hiclstm, sniper, sca
+            decoder (string): one of lstm, cnn, and fc
+        """
+
+        if decoder == "full":
+            pred_data = pd.read_csv(
+                cfg.output_directory + "hiclstm_%s_predictions_chr%s.csv" % (self.cfg.cell, str(self.chr)),
+                sep="\t")
             pred_data = pred_data.drop(['Unnamed: 0'], axis=1)
-        elif method == "hiclstm":
-            pred_data = pd.read_csv(cfg.output_directory + "%s_%s_%s_chr%s.csv" % (cfg.cell, method, decoder, str(chr)),
-                                    sep="\t")
+        else:
+            pred_data = pd.read_csv(
+                cfg.output_directory + "%s_%s_%s_chr%s.csv" % (self.cfg.cell, method, decoder, str(self.chr)),
+                sep="\t")
             pred_data = pred_data.drop(['Unnamed: 0'], axis=1)
-        elif method == "sniper":
-            pred_data = None, None
-        elif method == "sca":
-            pred_data = None, None
 
         return pred_data
 
     def get_trained_representations(self, method="hiclstm"):
+        """
+        get_trained_representations(method) -> Array, int
+        Gets fully trained representations for given method, cell type and chromosome.
+        obtain sniper and sca representations from respective methods.
+        Should contain SNIPER and SCA positions end internal representations.
+        Args:
+            method (string): one of hiclstm, sniper, sca
+        """
+
         ko_ob = Knockout(self.cfg, self.cell, self.chr)
-
-        if method == "hiclstm":
-            pred_data = pd.read_csv(
-                self.cfg.output_directory + "hiclstm_%s_predictions_chr%s.csv" % (self.cell, str(self.chr)),
-                sep="\t")
-            pred_data = pred_data.drop(['Unnamed: 0'], axis=1)
-            representations, start, stop = ko_ob.convert_df_to_np(pred_data, method="hiclstm")
-        elif method == "sniper":
-            "obtain from sniper"
-            representations, start = None, None
-        elif method == "sca":
-            "obtain from sca"
-            representations, start = None, None
-
+        pred_data = pd.read_csv(
+            self.cfg.output_directory + "%s_%s_predictions_chr%s.csv" % (method, self.cell, str(self.chr)),
+            sep="\t")
+        pred_data = pred_data.drop(['Unnamed: 0'], axis=1)
+        representations, start, stop = ko_ob.convert_df_to_np(pred_data, method=method)
         return representations, start
 
-    def run_decoders(self, representations, cfg, chr, start, decoder="lstm"):
+    def run_decoders(self, representations, start, decoder="lstm"):
         """
         run_decoders(representations, cfg, chr, start, decoder) -> No return object
         Obtains data for given chr and specified cell in config.
@@ -147,55 +153,51 @@ class HiC_R2():
         Works on one chromosome at a time.
         Args:
             representations (Array): Representation matrix
-            cfg (Config): The configuration to use for the experiment.
-            chr (int): The chromosome to test.
             start (int): Start indiex in data to offset during training
             decoder (string): one of lstm, cnn, and fc
         """
 
         "Set up Tensorboard logging"
         timestr = time.strftime("%Y%m%d-%H%M%S")
-        writer = SummaryWriter('./tensorboard_logs/' + cfg.decoder_name + timestr)
+        writer = SummaryWriter('./tensorboard_logs/' + self.cfg.decoder_name + timestr)
 
         "Initalize decoder and load decoder weights if they exist"
-        decoder_ob = Decoder(cfg, device).to(device)
+        decoder_ob = Decoder(self.cfg, device).to(device)
         decoder_ob.load_weights()
 
         "Initalize optimizer"
         optimizer, criterion = decoder_ob.compile_optimizer()
 
         "get data"
-        data_loader = get_data_loader_chr(cfg, chr)
+        data_loader = get_data_loader_chr(self.cfg, self.chr)
 
         "train decoder"
-        decoder_ob.train_decoders(data_loader, representations, start, criterion, optimizer, writer, decoder=decoder)
+        decoder_ob.train_decoder(data_loader, representations, start, criterion, optimizer, writer, decoder=decoder)
 
-    def test_decoders(self, representations, cfg, chr, start, method="hiclstm", decoder="lstm"):
+    def test_decoders(self, representations, start, method="hiclstm", decoder="lstm"):
         """
         test_decoders(representations, cfg, chr, start, method, decoder) -> No return object
         Loads loads data, tests the model, and saves the predictions in a csv file.
         Works on one chromosome at a time.
         Args:
             representations (array): The representations from the method
-            cfg (Config): The configuration to use for the experiment.
-            chr (int): The chromosome to test.
             start (int): Start indiex in data to offset during training
             method (string): one of hiclstm, sniper, sca
             decoder (string): one of lstm, cnn, and fc
         """
 
         "Initalize decoder and load decoder weights if they exist"
-        decoder_ob = Decoder(cfg, device).to(device)
+        decoder_ob = Decoder(self.cfg, device).to(device)
         decoder_ob.load_weights()
 
         "get data"
-        data_loader = get_data_loader_chr(cfg, chr)
+        data_loader = get_data_loader_chr(self.cfg, self.chr)
 
         "train decoder"
         predictions, pred_df = decoder_ob.test_decoder(data_loader, representations, start, decoder=decoder)
 
         "save predictions"
-        pred_df.to_csv(cfg.output_directory + "%s_%s_%s_chr%s.csv" % (cfg.cell, method, decoder, str(chr)), sep="\t")
+        pred_df.to_csv(cfg.output_directory + "%s_%s_%s_chr%s.csv" % (self.cfg.cell, method, decoder, str(self.chr)), sep="\t")
 
 
 if __name__ == '__main__':
@@ -205,7 +207,7 @@ if __name__ == '__main__':
     test_chr = cfg.chr_test_list
 
     for chr in test_chr:
-        r2_ob_hic = HiC_R2(cfg, chr, mode='test')
+        r2_ob_hic = HiC_R2(cfg, chr)
         hic_predictions = pd.read_csv(cfg.output_directory + "shuffle_%s_predictions_chr%s.csv" % (cell, str(chr)),
                                       sep="\t")
         hic_predictions = hic_predictions.drop(['Unnamed: 0'], axis=1)

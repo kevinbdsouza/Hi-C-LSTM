@@ -26,6 +26,7 @@ class Config:
         self.distance_cut_off_mb = int(self.sequence_length / 2)
         self.lstm_nontrain = False
         self.window_model = False
+        self.method = "hiclstm"
 
         "Hyperparameters"
         self.learning_rate = 0.01
@@ -45,6 +46,7 @@ class Config:
 
         "decoder parameters"
         self.decoder_name = "hiclstm"
+        self.decoder = "lstm"
         self.save_representation = False
         self.train_decoders = False
         self.test_decoders = True
