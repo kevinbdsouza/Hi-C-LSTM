@@ -82,7 +82,7 @@ class Knockout():
 
         try:
             embed_rows = np.load(
-                self.cfg.output_directory + "%s_rep_%s_chr%s.npy" % (method, self.cfg.cell, str(self.cfg.chr)))
+                self.cfg.output_directory + "%s_rep_%s_chr%s.npy" % (method, self.cfg.cell, str(self.chr)))
         except:
             nrows = int(stop - start)
             embed_rows = np.zeros((nrows + 1, self.cfg.pos_embed_size))
