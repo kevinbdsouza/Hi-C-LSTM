@@ -254,5 +254,4 @@ class Decoder(nn.Module):
                 main_pred_df = pd.concat([main_pred_df, pred_df], axis=0)
 
         predictions = torch.reshape(predictions, (-1, 1)).cpu().detach().numpy()
-
         return predictions, main_pred_df
