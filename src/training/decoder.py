@@ -34,11 +34,11 @@ class Decoder(nn.Module):
                 nn.Sigmoid(),
                 nn.MaxPool2d(kernel_size=2, stride=2)).to(device)
 
-            self.decoder_cnn_fc = nn.Linear((self.cfg.sequence_length // 2 + 1) * self.cfg.hidden_size_lstm,
-                                            self.cfg.output_size_lstm * self.cfg.sequence_length).to(device)
+            self.decoder_cnn_fc = nn.Linear((cfg.sequence_length // 2 + 1) * cfg.hidden_size_lstm,
+                                            cfg.output_size_lstm * cfg.sequence_length).to(device)
         elif decoder == "fc":
-            self.decoder_fc = nn.Linear(cfg.input_size_lstm * cfg.sequence_length,
-                                        cfg.output_size_lstm * cfg.sequence_length)
+            self.decoder_fc = nn.Linear(2 * cfg.pos_embed_size * cfg.sequence_length,
+                                        cfg.output_size_lstm * cfg.sequence_length).to(device)
         else:
             print("Decoder should be one of lstm, cnn, and fc.")
 
@@ -75,7 +75,7 @@ class Decoder(nn.Module):
         Args:
             embeddings (Tensor): The embeddings for positions.
         """
-        output = self.decoder_fc(embeddings)
+        output = self.decoder_fc(embeddings.reshape(embeddings.shape[0], -1))
         output = self.sigm(output)
         return output
 
@@ -179,14 +179,16 @@ class Decoder(nn.Module):
 
                     "run decoder with representations"
                     if decoder == "lstm":
-                        embeddings = embeddings.view((-1, self.cfg.sequence_length, 2 * cfg.pos_embed_size)).float().to(device)
+                        embeddings = embeddings.view((-1, cfg.sequence_length, 2 * cfg.pos_embed_size)).float().to(device)
                         output = self.lstm_decoder(embeddings)
                     elif decoder == "cnn":
                         embeddings = embeddings.view(
-                            (-1, self.cfg.sequence_length, self.cfg.pos_embed_size, 2)).float().to(device)
+                            (-1, cfg.sequence_length, cfg.pos_embed_size, 2)).float().to(device)
                         embeddings = torch.permute(embeddings, (0, 3, 2, 1))
                         output = self.cnn_decoder(embeddings)
                     elif decoder == "fc":
+                        embeddings = embeddings.view((-1, cfg.sequence_length, 2 * cfg.pos_embed_size)).float().to(
+                            device)
                         output = self.fc_decoder(embeddings)
 
                     loss = criterion(output, values)
