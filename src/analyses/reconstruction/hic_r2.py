@@ -161,7 +161,7 @@ class HiC_R2():
         data_loader = get_data_loader_chr(cfg, chr)
 
         "train decoder"
-        decoder_ob.train_decoders(data_loader, representations, start, optimizer, criterion, writer, decoder=decoder)
+        decoder_ob.train_decoders(data_loader, representations, start, criterion, optimizer, writer, decoder=decoder)
 
     def test_decoders(self, representations, cfg, chr, start, method="hiclstm", decoder="lstm"):
         """
