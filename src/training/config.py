@@ -52,7 +52,7 @@ class Config:
         self.dec_learning_rate = 0.01
         self.decoder_epochs = 20
         self.decoder_train_list = [21, 19]
-        self.decoder_test_list = [22, 20]
+        self.decoder_test_list = [19, 20, 21, 22]
 
         "Output Directories"
         self.proj_dir = "/home/kevindsouza/Documents/projects/PhD/Hi-C-LSTM/"
