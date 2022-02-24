@@ -5,7 +5,7 @@ import traceback
 import torch
 from training.data_utils import get_data_loader_chr
 from analyses.knockout.run import Knockout
-from training.decoder import Decoder
+from analyses.reconstruction.decoder import Decoder
 import time
 from torch.utils.tensorboard import SummaryWriter
 

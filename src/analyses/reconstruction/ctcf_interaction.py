@@ -32,17 +32,20 @@ class CTCF_Interactions():
 
     def plot_domain_edges(self, pred_data):
         """
-        plot_loops(pred_data, loop_data) -> DataFrame
+        plot_domain_edges(pred_data) -> No return object
         Gets Loop data from Loops file.
         Args:
             NA
         """
 
+        "converts prediction to heatmaps"
         hic_mat, st = get_heatmaps(pred_data)
 
+        "gets domain data"
         dom_ob = Domains(self.cfg, self.cfg.cell, self.chr)
         dom_data = dom_ob.get_domain_data()
 
+        "computes windows at domain edges"
         th = self.cfg.ctcf_dots_threshold
         mean_map_og = np.zeros((2 * th, 2 * th))
         mean_map_pred = np.zeros((2 * th, 2 * th))
@@ -62,6 +65,7 @@ class CTCF_Interactions():
                 mean_map_og = mean_map_og + hic_win_og
                 mean_map_pred = mean_map_pred + hic_win_pred
 
+        "plot domain edges"
         mean_map_og = mean_map_og / num
         mean_map_pred = mean_map_pred / num
         simple_plot(mean_map_og)
@@ -77,6 +81,4 @@ if __name__ == '__main__':
     for chr in test_chr:
         pred_data = pd.read_csv(cfg.output_directory + "hiclstm_%s_predictions_chr%s.csv" % (cfg.cell, str(chr)), sep="\t")
         ctcf_ob_hic = CTCF_Interactions(cfg, chr)
-        loop_data = ctcf_ob_hic.get_loop_data()
-
-        ctcf_ob_hic.plot_loops(pred_data, loop_data)
+        ctcf_ob_hic.plot_domain_edges(pred_data)

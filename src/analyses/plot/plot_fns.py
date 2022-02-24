@@ -108,68 +108,6 @@ class PlotFns:
 
         return value_list_other
 
-    def plot_heatmaps(self, data):
-        st = int(data["i"].min())
-        data["i"] = data["i"] - st
-        data["j"] = data["j"] - st
-        nr = int(data["j"].max()) + 1
-        rows = np.array(data["i"]).astype(int)
-        cols = np.array(data["j"]).astype(int)
-
-        hic_mat = np.zeros((nr, nr))
-        hic_mat[rows, cols] = np.array(data["v"])
-        hic_upper = np.triu(hic_mat)
-        hic_mat[cols, rows] = np.array(data["pred"])
-        hic_lower = np.tril(hic_mat)
-        hic_mat = hic_upper + hic_lower
-        hic_mat[np.diag_indices_from(hic_mat)] /= 2
-        # self.simple_plot(hic_mat)
-        return hic_mat, st
-
-    def simple_plot(self, hic_win):
-        '''
-        plt.imshow(hic_win, cmap='hot', interpolation='nearest')
-        plt.yticks([])
-        plt.xticks([])
-        plt.show()
-        '''
-        sns.set_theme()
-        ax = sns.heatmap(hic_win, cmap="Reds")
-        ax.set_yticks([])
-        ax.set_xticks([])
-        plt.show()
-        pass
-
-    def ctcf_dots(self, hic_mat, st, chr):
-        dom_ob = Domains(cfg, self.cfg.cell, chr)
-        dom_data = dom_ob.get_domain_data()
-
-        th = 41
-        mean_map_og = np.zeros((2 * th, 2 * th))
-        mean_map_pred = np.zeros((2 * th, 2 * th))
-        num = 0
-        for n in range(len(dom_data)):
-            x1 = dom_data.loc[n]["x1"] - st + get_cumpos(self.cfg, chr)
-            x2 = dom_data.loc[n]["x2"] - st + get_cumpos(self.cfg, chr)
-            y1 = dom_data.loc[n]["y1"] - st + get_cumpos(self.cfg, chr)
-            y2 = dom_data.loc[n]["y2"] - st + get_cumpos(self.cfg, chr)
-
-            if (x2 - x1) <= th - 1:
-                continue
-            else:
-                num += 1
-                hic_win_og = hic_mat[x1 - th:x1 + th, y2 - th:y2 + th]
-                hic_win_pred = hic_mat[x2 - th:x2 + th, y1 - th:y1 + th]
-                mean_map_og = mean_map_og + hic_win_og
-                mean_map_pred = mean_map_pred + hic_win_pred
-
-        mean_map_og = mean_map_og / num
-        mean_map_pred = mean_map_pred / num
-        self.simple_plot(mean_map_og)
-        self.simple_plot(mean_map_pred.T)
-
-        pass
-
     def plot_combined_all(self, cell):
         methods = ["Hi-C-LSTM", "SNIPER-INTRA", "SNIPER-INTER", "SCI", "PCA", "SBCID"]
 
@@ -269,7 +207,6 @@ class PlotFns:
             graph_fscore_all_tasks = np.load(self.path + "graph_fscore_hff_all_tasks.npy")
             pca_fscore_all_tasks = np.load(self.path + "pca_fscore_hff_all_tasks.npy")
             sbcid_fscore_all_tasks = np.load(self.path + "sbcid_fscore_hff_all_tasks.npy")
-
 
         df_main = pd.DataFrame(
             columns=["Tasks", "Hi-C-LSTM", "SNIPER-INTRA", "SNIPER-INTER", "SCI", "PCA",
@@ -404,7 +341,7 @@ class PlotFns:
         plt.legend(fontsize=18)
         plt.subplots_adjust(bottom=0.35)
         plt.savefig("/home/kevindsouza/Downloads/map.png")
-        #plt.show()
+        # plt.show()
 
         pass
 
@@ -430,16 +367,16 @@ class PlotFns:
         gmlow_values_all_tasks = np.load(self.path + "gmlow_metrics_all_tasks.npy")
         gmlow2_values_all_tasks = np.load(self.path + "gmlow2_metrics_all_tasks.npy")
 
-
-
         df_main = pd.DataFrame(columns=["Tasks", "GM12878_Rao", "H1hESC_Dekker",
                                         "GM12878_low", "HFFhTERT_Dekker", "GM12878_low2"])
         df_main["Tasks"] = tasks
         df_main["GM12878_Rao"] = gm_values_all_tasks + gm_auroc_reduced + gm_accuracy_reduced + gm_fscore_all_tasks
-        df_main["H1hESC_Dekker"] = h1_values_all_tasks + h1_auroc_all_tasks + h1_accuracy_all_tasks + h1_fscore_all_tasks
+        df_main[
+            "H1hESC_Dekker"] = h1_values_all_tasks + h1_auroc_all_tasks + h1_accuracy_all_tasks + h1_fscore_all_tasks
         df_main["GM12878_low"] = gmlow_values_all_tasks
         df_main["GM12878_low2"] = gmlow2_values_all_tasks
-        df_main["HFFhTERT_Dekker"] = hff_values_all_tasks + hff_auroc_all_tasks + hff_accuracy_all_tasks + hff_fscore_all_tasks
+        df_main[
+            "HFFhTERT_Dekker"] = hff_values_all_tasks + hff_auroc_all_tasks + hff_accuracy_all_tasks + hff_fscore_all_tasks
 
         plt.figure(figsize=(12, 10))
         plt.xticks(rotation=90, fontsize=20)
@@ -459,7 +396,7 @@ class PlotFns:
         plt.legend(fontsize=18)
         plt.subplots_adjust(bottom=0.35)
         plt.savefig("/home/kevindsouza/Downloads/map_cells.png")
-        #plt.show()
+        # plt.show()
 
         pass
 
@@ -703,7 +640,7 @@ class PlotFns:
         pass
 
     def plot_gbr(self):
-        #ig_log_df = pd.DataFrame(np.load(self.path + "ig_log_df_all.npy", allow_pickle=True))
+        # ig_log_df = pd.DataFrame(np.load(self.path + "ig_log_df_all.npy", allow_pickle=True))
         ig_log_df = pd.DataFrame(np.load(self.path + "ig_tf_df_plus_ctcf.npy", allow_pickle=True))
         ig_log_df = ig_log_df.rename(columns={0: "ig_val", 1: "label"})
         ig_log_df["ig_val"] = ig_log_df["ig_val"].astype(float)
@@ -786,7 +723,7 @@ class PlotFns:
         fig.legend(handles, labels, loc='upper right', fontsize=18)
 
         plt.savefig("/home/kevindsouza/Downloads/r2_cells_hiclstm.png")
-        #plt.show()
+        # plt.show()
 
         '''
         plt.figure(figsize=(10, 8))
@@ -1089,7 +1026,6 @@ class PlotFns:
         plt.plot('pos', 'SOX2_KO', data=df_main, marker='x', markersize=16, color="C6", linewidth=3, label="SOX2 KO")
         plt.plot('pos', 'XBP1_KO', data=df_main, marker='+', markersize=16, color="C7", linewidth=3, label="XBP1 KO")
 
-
         plt.legend(fontsize=18)
         plt.subplots_adjust(left=0.2)
         plt.savefig("/home/kevindsouza/Downloads/ko_average.png")
@@ -1234,12 +1170,5 @@ if __name__ == "__main__":
 
     # plot_ob.plot_feature_signal()
     # plot_ob.plot_pred_range()
-
-    '''
-    chr = 21
-    pred_data = pd.read_csv(cfg.output_directory + "shuffle_%s_predictions_chr%s.csv" % (cfg.cell, str(chr)), sep="\t")
-    hic_mat, st = plot_ob.plot_heatmaps(pred_data)
-    plot_ob.ctcf_dots(hic_mat, st, chr)
-    '''
 
     print("done")
