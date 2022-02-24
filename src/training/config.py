@@ -47,7 +47,7 @@ class Config:
         self.decoder_name = "hisclstm"
         self.dec_learning_rate = 0.01
         self.decoder_epochs = 20
-        self.decoder_train_list = [19, 21]
+        self.decoder_train_list = [21, 19]
         self.decoder_test_list = [20, 22]
 
         "Output Directories"

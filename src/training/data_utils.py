@@ -235,7 +235,7 @@ def get_data_loader_chr(cfg, chr):
 
         "create dataloader"
         dataset = torch.utils.data.TensorDataset(input_idx.float(), values.float())
-        data_loader = torch.utils.data.DataLoader(dataset=dataset, batch_size=cfg.batch_size, shuffle=False)
+        data_loader = torch.utils.data.DataLoader(dataset=dataset, batch_size=cfg.batch_size, shuffle=True)
         return data_loader
     except Exception as e:
         print("Processed data does not exist for chromosome")
