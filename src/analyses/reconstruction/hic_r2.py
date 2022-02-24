@@ -105,7 +105,11 @@ class HiC_R2():
         return cum_pos
 
     def get_prediction_df(self, cfg, chr, method="hiclstm", decoder="lstm"):
-        if method == "hiclstm":
+        if method == "hiclstm_full":
+            pred_data = pd.read_csv(cfg.output_directory + "hiclstm_%s_predictions_chr%s.csv" % (cfg.cell, str(chr)),
+                                    sep="\t")
+            pred_data = pred_data.drop(['Unnamed: 0'], axis=1)
+        elif method == "hiclstm":
             pred_data = pd.read_csv(cfg.output_directory + "%s_%s_%s_chr%s.csv" % (cfg.cell, method, decoder, str(chr)),
                                     sep="\t")
             pred_data = pred_data.drop(['Unnamed: 0'], axis=1)

@@ -74,7 +74,7 @@ if __name__ == '__main__':
                 hic_r2_ob.test_decoders(representations, cfg, chr, start, method="hiclstm", decoder="lstm")
 
             "load saved predictions for method"
-            hic_predictions = hic_r2_ob.get_prediction_df(cfg, chr, method="hiclstm", decoder="lstm")
+            hic_predictions = hic_r2_ob.get_prediction_df(cfg, chr, method="hiclstm_full", decoder="lstm")
 
             "compute R2 and save R2"
             r2_frame = hic_r2_ob.hic_r2(hic_predictions)
