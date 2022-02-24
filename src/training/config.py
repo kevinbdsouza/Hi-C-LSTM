@@ -79,5 +79,7 @@ class Config:
         self.dupl_end = 257232
         self.shift = 215
 
+        "ctcf dots"
+        self.ctcf_dots_threshold = 41
 
 

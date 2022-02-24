@@ -11,7 +11,7 @@ from mpl_toolkits import mplot3d
 from analyses.classification.domains import Domains
 
 
-def plot_heatmaps(data):
+def get_heatmaps(data):
     st = int(data["i"].min())
     data["i"] = data["i"] - st
     data["j"] = data["j"] - st
@@ -26,10 +26,7 @@ def plot_heatmaps(data):
     hic_lower = np.tril(hic_mat)
     hic_mat = hic_upper + hic_lower
     hic_mat[np.diag_indices_from(hic_mat)] /= 2
-    # hic_win = hic_mat[6701:7440, 6701:7440]
-    # hic_win = hic_mat[900:1450, 900:1450]
 
-    simple_plot(hic_mat)
     return hic_mat, st
 
 
@@ -75,7 +72,6 @@ def simple_plot(hic_win):
     plt.xticks([])
     plt.show()
     '''
-
 
     sns.set_theme()
     ax = sns.heatmap(hic_win, cmap="Reds", vmin=0, vmax=1)
@@ -275,9 +271,8 @@ if __name__ == '__main__':
         plot_r2(comb_r2_df)
         '''
 
-
-        #pred_data = pd.read_csv(cfg.output_directory + "shuffle_%s_predictions_chr%s.csv" % (cell, str(chr)), sep="\t")
-        #plot_foxg1(pred_data)
+        # pred_data = pd.read_csv(cfg.output_directory + "shuffle_%s_predictions_chr%s.csv" % (cell, str(chr)), sep="\t")
+        # plot_foxg1(pred_data)
         '''
         foxg1_data = pd.read_csv(cfg.output_directory + "shuffle_%s_afko_chr%s.csv" % (cell, str(chr)), sep="\t")
         plot_foxg1(foxg1_data)
@@ -301,6 +296,9 @@ if __name__ == '__main__':
         # plot_heatmaps(pred_data)
 
     print("done")
+
+
+
 
     # foxg1_data = pd.read_csv(cfg.output_directory + "shuffle_%s_afko_chr%s.csv" % (self.cfg.cell, str(self.chr)), sep="\t")
     # pred_data = pd.read_csv(cfg.output_directory + "shuffle_%s_predictions_chr%s.csv" % (cell, str(chr)), sep="\t")
