@@ -183,7 +183,7 @@ class Decoder(nn.Module):
                         output = self.lstm_decoder(embeddings)
                     elif decoder == "cnn":
                         embeddings = embeddings.view(
-                            (self.cfg.batch_size, self.cfg.sequence_length, self.cfg.pos_embed_size, -1)).float().to(device)
+                            (-1, self.cfg.sequence_length, self.cfg.pos_embed_size, 2)).float().to(device)
                         embeddings = torch.permute(embeddings, (0, 3, 2, 1))
                         output = self.cnn_decoder(embeddings)
                     elif decoder == "fc":
