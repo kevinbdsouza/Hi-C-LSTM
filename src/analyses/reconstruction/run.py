@@ -43,35 +43,42 @@ if __name__ == '__main__':
     cfg = Config()
     cell = cfg.cell
 
-    for chr in cfg.decoder_train_list:
-        "run fully trained hiclstm model to save representations"
-        full_hiclstm_representations(cfg, chr)
+    if cfg.train_decoders:
+        for chr in cfg.decoder_train_list:
+            if cfg.save_representation:
+                "run fully trained hiclstm model to save representations"
+                full_hiclstm_representations(cfg, chr)
 
-        hic_r2_ob = HiC_R2(cfg, chr)
+            hic_r2_ob = HiC_R2(cfg, chr)
 
-        "load representations"
-        representations, start = hic_r2_ob.get_trained_representations(method="hiclstm")
+            "load representations"
+            representations, start = hic_r2_ob.get_trained_representations(method="hiclstm")
 
-        "train decoder"
-        hic_r2_ob.run_decoders(representations, cfg, chr, start, decoder="lstm")
+            "train decoder"
+            hic_r2_ob.run_decoders(representations, cfg, chr, start, decoder="lstm")
 
-    comb_r2_df = pd.DataFrame(columns=["diff", "r2"])
-    for chr in cfg.decoder_test_list:
-        hic_r2_ob = HiC_R2(cfg, chr)
+    if cfg.test_decoders:
+        comb_r2_df = pd.DataFrame(columns=["diff", "r2"])
+        for chr in cfg.decoder_test_list:
+            if cfg.save_representation:
+                "run fully trained hiclstm model to save representations"
+                full_hiclstm_representations(cfg, chr)
 
-        "load representations"
-        representations, start = hic_r2_ob.get_trained_representations(method="hiclstm")
+            hic_r2_ob = HiC_R2(cfg, chr)
 
-        "test decoder"
-        hic_r2_ob.test_decoders(representations, cfg, chr, start, method="hiclstm", decoder="lstm")
+            "load representations"
+            representations, start = hic_r2_ob.get_trained_representations(method="hiclstm")
 
-        "load saved predictions for method"
-        hic_predictions = hic_r2_ob.get_prediction_df(cfg, chr, method="hiclstm", decoder="lstm")
+            "test decoder"
+            hic_r2_ob.test_decoders(representations, cfg, chr, start, method="hiclstm", decoder="lstm")
 
-        "compute R2 and save R2"
-        r2_frame = hic_r2_ob.hic_r2(hic_predictions)
-        r2_frame.to_csv(cfg.output_directory + "r2frame_%s_chr%s.csv" % (cell, str(chr)), sep="\t")
-        comb_r2_df = comb_r2_df.append(r2_frame, ignore_index=True)
+            "load saved predictions for method"
+            hic_predictions = hic_r2_ob.get_prediction_df(cfg, chr, method="hiclstm", decoder="lstm")
 
-    "plot r2"
-    plot_utils.plot_r2(comb_r2_df)
+            "compute R2 and save R2"
+            r2_frame = hic_r2_ob.hic_r2(hic_predictions)
+            r2_frame.to_csv(cfg.output_directory + "r2frame_%s_chr%s.csv" % (cell, str(chr)), sep="\t")
+            comb_r2_df = comb_r2_df.append(r2_frame, ignore_index=True)
+
+        "plot r2"
+        plot_utils.plot_r2(comb_r2_df)

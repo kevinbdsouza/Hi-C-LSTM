@@ -64,7 +64,7 @@ class Knockout():
 
         return data
 
-    def convert_df_to_np(self, pred_data):
+    def convert_df_to_np(self, pred_data, method="hiclstm"):
         i_start = int(pred_data['i'].min())
         i_stop = int(pred_data['i'].max())
         j_start = int(pred_data['j'].min())
@@ -80,33 +80,36 @@ class Knockout():
         else:
             stop = j_stop
 
-        nrows = int(stop - start)
+        try:
+            embed_rows = np.load(
+                self.cfg.output_directory + "%s_rep_%s_chr%s.npy" % (method, self.cfg.cell, str(self.cfg.chr)))
+        except:
+            nrows = int(stop - start)
+            embed_rows = np.zeros((nrows + 1, self.cfg.pos_embed_size))
 
-        embed_rows = np.zeros((nrows + 1, self.cfg.pos_embed_size))
+            i_old = 0
+            j_old = 0
+            for r in range(len(pred_data)):
+                i_new = int(pred_data.loc[r, "i"])
+                if i_new == i_old:
+                    continue
+                else:
+                    i_old = i_new
+                    if np.all((embed_rows[i_new - start, :] == 0)):
+                        col = list(np.arange(self.cfg.pos_embed_size))
+                        col = [str(x) for x in col]
+                        embed_rows[i_new - start, :] = np.array(pred_data.loc[r, col])
 
-        i_old = 0
-        j_old = 0
-        for r in range(len(pred_data)):
-            i_new = int(pred_data.loc[r, "i"])
-            if i_new == i_old:
-                continue
-            else:
-                i_old = i_new
-                if np.all((embed_rows[i_new - start, :] == 0)):
-                    col = list(np.arange(self.cfg.pos_embed_size))
-                    col = [str(x) for x in col]
-                    embed_rows[i_new - start, :] = np.array(pred_data.loc[r, col])
+                j_new = int(pred_data.loc[r, "j"])
 
-            j_new = int(pred_data.loc[r, "j"])
-
-            if j_new == j_old:
-                continue
-            else:
-                j_old = j_new
-                if np.all((embed_rows[j_new - start, :] == 0)):
-                    col = list(np.arange(self.cfg.pos_embed_size, 2 * self.cfg.pos_embed_size))
-                    col = [str(x) for x in col]
-                    embed_rows[j_new - start, :] = np.array(pred_data.loc[r, col])
+                if j_new == j_old:
+                    continue
+                else:
+                    j_old = j_new
+                    if np.all((embed_rows[j_new - start, :] == 0)):
+                        col = list(np.arange(self.cfg.pos_embed_size, 2 * self.cfg.pos_embed_size))
+                        col = [str(x) for x in col]
+                        embed_rows[j_new - start, :] = np.array(pred_data.loc[r, col])
 
         return embed_rows, start, stop
 
@@ -153,7 +156,7 @@ class Knockout():
 
     def perform_ko(self, model, pred_data, indices):
         data_loader, samples = get_data_loader_chr(self.cfg, self.chr)
-        embed_rows, start, stop = self.convert_df_to_np(pred_data)
+        embed_rows, start, stop = self.convert_df_to_np(pred_data, method="hiclstm")
         embed_rows = self.ko_indices(embed_rows, start, indices)
 
         _, ko_pred_df = model.perform_ko(data_loader, embed_rows, start, mode="ko")
@@ -174,7 +177,7 @@ class Knockout():
 
     def normalize_embed_predict(self, model, pred_data):
         data_loader, samples = get_data_loader_chr(self.cfg, self.chr)
-        embed_rows, start, stop = self.convert_df_to_np(pred_data)
+        embed_rows, start, stop = self.convert_df_to_np(pred_data, method="hiclstm")
         embed_rows = self.normalize_embed(embed_rows)
 
         _, ko_pred_df = model.perform_ko(data_loader, embed_rows, start, mode="ko")
@@ -199,7 +202,7 @@ class Knockout():
         return loc_list, chr_list
 
     def tal_lmo2_preprocess(self):
-        #hek_mat = pd.read_csv(self.hek_file, sep="\t")
+        # hek_mat = pd.read_csv(self.hek_file, sep="\t")
         hek_mat = pd.read_csv(self.lmo2ko_file, sep="\t")
 
         index, chr_list = self.change_index(list(hek_mat.index))
@@ -332,8 +335,6 @@ if __name__ == '__main__':
         # ko_ob.train_tal1_lmo2(model, cfg, model_name)
         # ko_ob.test_tal1_lmo2(model, cfg)
 
-        #ko_ob.tf_ko(model, pred_data)
-
-
+        # ko_ob.tf_ko(model, pred_data)
 
     print("done")
