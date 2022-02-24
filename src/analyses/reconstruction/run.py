@@ -45,7 +45,7 @@ if __name__ == '__main__':
 
     for chr in cfg.decoder_train_list:
         "run fully trained hiclstm model to save representations"
-        #full_hiclstm_representations(cfg, chr)
+        full_hiclstm_representations(cfg, chr)
 
         hic_r2_ob = HiC_R2(cfg, chr)
 

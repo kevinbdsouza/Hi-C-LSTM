@@ -121,7 +121,7 @@ class HiC_R2():
 
         if method == "hiclstm":
             pred_data = pd.read_csv(
-                self.cfg.output_directory + "shuffle_%s_predictions_chr%s.csv" % (self.cell, str(self.chr)),
+                self.cfg.output_directory + "hiclstm_%s_predictions_chr%s.csv" % (self.cell, str(self.chr)),
                 sep="\t")
             pred_data = pred_data.drop(['Unnamed: 0'], axis=1)
             representations, start, stop = ko_ob.convert_df_to_np(pred_data)
