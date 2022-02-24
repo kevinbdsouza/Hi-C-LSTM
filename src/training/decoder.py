@@ -244,15 +244,19 @@ class Decoder(nn.Module):
                         embed_ij[n, cfg.pos_embed_size:2 * cfg.pos_embed_size] = embed_rows[int(ind[n, 1]) - start]
 
                 embeddings = torch.from_numpy(embed_ij)
-                embeddings = embeddings.view((-1, self.cfg.sequence_length, 2 * cfg.pos_embed_size)).float().to(
-                    device)
 
                 "run decoder with representations"
                 if decoder == "lstm":
+                    embeddings = embeddings.view((-1, cfg.sequence_length, 2 * cfg.pos_embed_size)).float().to(device)
                     output = self.lstm_decoder(embeddings)
                 elif decoder == "cnn":
+                    embeddings = embeddings.view(
+                        (-1, cfg.sequence_length, cfg.pos_embed_size, 2)).float().to(device)
+                    embeddings = torch.permute(embeddings, (0, 3, 2, 1))
                     output = self.cnn_decoder(embeddings)
                 elif decoder == "fc":
+                    embeddings = embeddings.view((-1, cfg.sequence_length, 2 * cfg.pos_embed_size)).float().to(
+                        device)
                     output = self.fc_decoder(embeddings)
 
                 predictions = torch.cat((ko_predictions, output), 0)
