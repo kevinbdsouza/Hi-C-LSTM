@@ -2,7 +2,6 @@ import pandas as pd
 from training.config import Config
 import numpy as np
 import torch
-from analyses.classification.loops import Loops
 from analyses.classification.downstream_helper import DownstreamHelper
 from training.data_utils import get_cumpos
 from analyses.plot.plot_utils import simple_plot, get_heatmaps
