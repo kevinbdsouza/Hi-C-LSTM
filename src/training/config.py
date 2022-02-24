@@ -45,8 +45,8 @@ class Config:
         self.model_name = "shuffle_" + self.cell
 
         "decoder parameters"
-        self.decoder_name = "hiclstm_cnn"
-        self.decoder = "cnn"
+        self.decoder_name = "hiclstm_fc"
+        self.decoder = "fc"
         self.save_representation = False
         self.train_decoders = True
         self.test_decoders = True
