@@ -45,7 +45,7 @@ class Config:
 
         "decoder parameters"
         self.decoder_name = "hiclstm"
-        self.save_representation = True
+        self.save_representation = False
         self.train_decoders = False
         self.test_decoders = True
         self.get_predictions = False
