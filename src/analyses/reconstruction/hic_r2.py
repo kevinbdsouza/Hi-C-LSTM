@@ -40,6 +40,7 @@ class HiC_R2():
         """
 
         "make diff column"
+        hic_predictions = hic_predictions.iloc[:, :4]
         hic_predictions.columns = ["i", "j", "v", "pred"]
         hic_predictions["diff"] = np.abs(hic_predictions["i"] - hic_predictions["j"]).astype(int)
         hic_data = hic_predictions.sort_values(by=['i']).reset_index(drop=True)
