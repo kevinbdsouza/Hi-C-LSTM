@@ -36,6 +36,8 @@ class Loops:
 
                 temp_data = temp_data.filter(['start', 'end', 'target'], axis=1)
                 pos_matrix = pos_matrix.append(temp_data)
+
+            pos_matrix["target"] = "Loops"
             return pos_matrix
         else:
             return data
