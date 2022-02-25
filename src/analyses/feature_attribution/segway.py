@@ -4,8 +4,7 @@ import numpy as np
 import os
 import pickle
 from scipy.spatial import distance
-
-logger = logging.getLogger(__name__)
+from training.config import Config
 
 
 class SegWay:
@@ -100,17 +99,10 @@ class SegWay:
 
         """
         column_list = ["chr", "start", "end", "target", "num", "dot", "start_2", "end_2", "color"]
-        col_numbers = list(range(0, len(column_list)))
-        new_df = pd.DataFrame()
-
         segway_small_annotations = pd.read_csv(self.segway_small_annotations_path + self.seg_chr_bed,
                                                sep="\t", engine='python', header=None)
-        col_series = pd.Series(segway_small_annotations.columns)
-        new_df = new_df.append(col_series, ignore_index=True)
-        segway_small_annotations.columns = col_numbers
-        segway_small_new_annotations = pd.concat([new_df, segway_small_annotations])
-        segway_small_new_annotations.columns = column_list
-        segway_small_new_annotations = segway_small_new_annotations[['start', 'end', 'target']]
+        segway_small_annotations.columns = column_list
+        segway_small_new_annotations = segway_small_annotations[['start', 'end', 'target']]
         segway_small_new_annotations["start"] = segway_small_new_annotations["start"].astype(int) // self.cfg.resolution
         segway_small_new_annotations["end"] = segway_small_new_annotations["end"].astype(int) // self.cfg.resolution
 
@@ -119,18 +111,11 @@ class SegWay:
     def segway_gbr(self):
 
         column_list = ["chr", "start", "end", "target", "num", "dot", "start_2", "end_2", "color"]
-        col_numbers = list(range(0, len(column_list)))
-        new_df = pd.DataFrame()
         segway_gbr_annotations = pd.read_csv(
             self.segway_gbr_annotations_path + self.cell + "/" + self.segway_gbr_chr_bed,
-            sep="\t", engine='python')
-
-        col_series = pd.Series(segway_gbr_annotations.columns)
-        new_df = new_df.append(col_series, ignore_index=True)
-        segway_gbr_annotations.columns = col_numbers
-        segway_gbr_new_annotations = pd.concat([new_df, segway_gbr_annotations])
-        segway_gbr_new_annotations.columns = column_list
-        segway_gbr_new_annotations = segway_gbr_new_annotations[['start', 'end', 'target']]
+            sep="\t", engine='python', header=None)
+        segway_gbr_annotations.columns = column_list
+        segway_gbr_new_annotations = segway_gbr_annotations[['start', 'end', 'target']]
         segway_gbr_new_annotations["start"] = segway_gbr_new_annotations["start"].astype(int) // self.cfg.resolution
         segway_gbr_new_annotations["end"] = segway_gbr_new_annotations["end"].astype(int) // self.cfg.resolution
 
@@ -138,18 +123,14 @@ class SegWay:
 
 
 if __name__ == '__main__':
-    cfg = None
-    chr = 'chr21'
-    cell = "GM12878"
+    cfg = Config()
+    chr = 21
+    cell = cfg.cell
 
-    seg_ob = SegWay(cfg, chr, cell)
-    fasta_seq = seg_ob.read_fasta(seg_ob.fasta_path)
-
-    chr_len = len(fasta_seq)
+    seg_ob = SegWay(cfg, chr)
 
     # signal = seg_ob.create_signal_from_pickle(seg_ob.features_path)
     # seg_ob.load_features(chr_len)
 
     # seg_ob.run_segway()
     all_means = seg_ob.run_genome_euclid()
-    print("done")
