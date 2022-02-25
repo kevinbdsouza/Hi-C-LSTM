@@ -88,8 +88,8 @@ class Domains:
 
     def get_tad_boundaries(self):
         tads = self.get_tad_data()
-        df_start = tads.loc[tads["start", "target"]].rename(columns={"start": "pos"})
-        df_end = tads.loc[tads["end", "target"]].rename(columns={"end": "pos"})
+        df_start = tads[["start", "target"]].rename(columns={"start": "pos"})
+        df_end = tads[["end", "target"]].rename(columns={"end": "pos"})
         tadbs = pd.concat([df_start, df_end])
         tadbs["target"] = "TADBs"
         return tadbs
