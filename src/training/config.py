@@ -84,7 +84,7 @@ class Config:
         self.ctcf_dots_threshold = 41
 
         "captum"
-        self.run_captum = True
+        self.run_captum = False
         self.tf_file_path = self.output_directory + "tf_db.csv"
         self.tf_columns = ["HGNC symbol", "chromosome", "start"]
         self.run_tfs = False
