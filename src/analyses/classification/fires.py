@@ -9,7 +9,7 @@ class Fires:
         self.cfg = cfg
         self.chr = chr
         self.chr_tad = 'chr' + str(chr)
-        self.path = cfg.downstream_dir + "FIREs/"
+        self.path = cfg.downstream_dir + "/FIREs/"
         self.fire_file = self.path + "fires.pkl"
         self.tad_file = self.path + 'TAD_boundaries.xlsx'
         self.cell = "GM12878"
