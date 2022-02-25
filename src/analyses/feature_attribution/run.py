@@ -11,8 +11,7 @@ from analyses.classification.run import DownstreamTasks
 from analyses.classification.fires import Fires
 from analyses.classification.loops import Loops
 from analyses.classification.domains import Domains
-import seaborn as sns
-import matplotlib.pyplot as plt
+from analyses.plot.plot_utils import plot_gbr
 from training.data_utils import get_cumpos
 
 device = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')

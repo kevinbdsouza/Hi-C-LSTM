@@ -14,8 +14,8 @@ from sklearn.linear_model import LinearRegression
 from sklearn import preprocessing
 from sklearn.metrics import *
 import seaborn as sn
-#import matplotlib as mpl
-#mpl.use('module://backend_interagg')
+# import matplotlib as mpl
+# mpl.use('module://backend_interagg')
 import matplotlib.pyplot as plt
 
 logger = logging.getLogger(__name__)
@@ -34,27 +34,6 @@ class DownstreamHelper:
         self.num_subc = 5
         self.embed_rows = None
         self.pred_rows = None
-
-        if mode == 'sniper':
-            self.embed_path = self.cfg.sniper_annotation_path + "encoding_" + str(self.chr) + ".npy"
-            self.embed_rows = pd.DataFrame(np.load(self.embed_path))
-            self.embed_rows["pos"] = self.embed_rows.index + self.start
-        elif mode == 'lstm':
-            self.embed_rows = pd.DataFrame(columns=list(np.arange(cfg.pos_embed_size)) + ["pos"])
-            self.pred_rows = pd.read_csv(
-                cfg.output_directory + "shuffle_%s_predictions_chr%s.csv" % (self.cell, str(chr)), sep="\t")
-            self.pred_rows = self.pred_rows.drop(['Unnamed: 0'], axis=1)
-            for k in range(cfg.pos_embed_size):
-                self.embed_rows[k] = self.pred_rows[str(k)]
-            self.embed_rows["pos"] = self.pred_rows["i"]
-        elif mode == "graph":
-            self.embed_path = self.cfg.graph_annotation_path + "embedding_" + str(self.chr) + ".npy"
-            self.embed_rows = pd.DataFrame(np.load(self.embed_path))
-            self.embed_rows["pos"] = self.embed_rows.index + self.start
-        elif mode == "pca":
-            self.embed_path = self.cfg.pca_annotation_path + "encoding_" + str(self.chr) + ".npy"
-            self.embed_rows = pd.DataFrame(np.load(self.embed_path))
-            self.embed_rows["pos"] = self.embed_rows.index + self.start
 
     def cat_convert(self, y_test, y_valid, feature_matrix):
 
