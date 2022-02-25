@@ -82,7 +82,7 @@ class Domains:
         domain_data = self.get_domain_data()
         tad_data = self.get_tad_data()
         merged_data = pd.concat([domain_data, tad_data])
-        merged_data = merged_data.drop_duplicates(subset=['A', 'B'], keep='last').reset_index(drop=True)
+        merged_data = merged_data.drop_duplicates(subset=['start', 'end'], keep='last').reset_index(drop=True)
         merged_data["target"] = "Merged_Domains"
         return merged_data
 
