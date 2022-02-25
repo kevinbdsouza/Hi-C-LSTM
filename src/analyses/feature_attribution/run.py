@@ -15,8 +15,8 @@ import seaborn as sns
 import matplotlib.pyplot as plt
 from training.data_utils import get_cumpos
 
-#device = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
-device = "cpu"
+device = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
+#device = "cpu"
 
 
 def run_captum(cfg, model, chr):
