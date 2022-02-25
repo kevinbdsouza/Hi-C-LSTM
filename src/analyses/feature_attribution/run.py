@@ -147,14 +147,16 @@ def attribute_elements(cfg, chr, ig_df, element="ctcf"):
 
     elif element == "TADBs":
         domain_ob = Domains(cfg, chr, mode="ig")
-        element_data = domain_ob.get_tad_boundaries()
+        element_data = domain_ob.get_tad_boundaries(ctcf="all")
         pass
 
     elif element == "TADBsCTCF+":
-        pass
+        domain_ob = Domains(cfg, chr, mode="ig")
+        element_data = domain_ob.get_tad_boundaries(ctcf="positive")
 
     elif element == "TADBsCTCF-":
-        pass
+        domain_ob = Domains(cfg, chr, mode="ig")
+        element_data = domain_ob.get_tad_boundaries(ctcf="negative")
 
     elif element == "Loop_CTCFCohesin":
         pass
@@ -163,7 +165,7 @@ def attribute_elements(cfg, chr, ig_df, element="ctcf"):
         pass
 
     element_data = element_data.drop_duplicates(keep='first').reset_index(drop=True)
-    if element != "TADBs":
+    if element != "TADBs" and element != "TADBsCTCF+" and element != "TADBsCTCF-":
         element_data = downstream_ob.downstream_helper_ob.get_window_data(element_data)
     element_data["pos"] = element_data["pos"] + cumpos
     ig_df = pd.merge(ig_df, element_data, on="pos")

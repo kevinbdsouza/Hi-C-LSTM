@@ -3,6 +3,7 @@ import os
 import numpy as np
 from training.config import Config
 from analyses.classification.downstream_helper import DownstreamHelper
+from analyses.feature_attribution.tf import TFChip
 
 
 class Domains:
@@ -86,12 +87,22 @@ class Domains:
         merged_data["target"] = "Merged_Domains"
         return merged_data
 
-    def get_tad_boundaries(self):
+    def get_tad_boundaries(self, ctcf):
         tads = self.get_tad_data()
         df_start = tads[["start", "target"]].rename(columns={"start": "pos"})
         df_end = tads[["end", "target"]].rename(columns={"end": "pos"})
         tadbs = pd.concat([df_start, df_end])
         tadbs["target"] = "TADBs"
+
+        ctcf_ob = TFChip(self.cfg, self.chr)
+        ctcf_data = ctcf_ob.get_ctcf_data()
+        if ctcf == "positive":
+            tadbs = tadbs[tadbs["start"].any() == ctcf_data["starts"].any()]
+            tadbs = tadbs[tadbs["end"].any() == ctcf_data["end"].any()]
+        elif ctcf == "negative":
+            tadbs = tadbs[tadbs["start"].any() != ctcf_data["starts"].any()]
+            tadbs = tadbs[tadbs["end"].any() != ctcf_data["end"].any()]
+
         return tadbs
 
 
