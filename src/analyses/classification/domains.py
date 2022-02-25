@@ -82,9 +82,17 @@ class Domains:
         domain_data = self.get_domain_data()
         tad_data = self.get_tad_data()
         merged_data = pd.concat([domain_data, tad_data])
-        merged_data = merged_data.drop_duplicates(subset=['start', 'end'], keep='last').reset_index(drop=True)
+        merged_data = merged_data.drop_duplicates(subset=['start', 'end'], keep='last')
         merged_data["target"] = "Merged_Domains"
         return merged_data
+
+    def get_tad_boundaries(self):
+        tads = self.get_tad_data()
+        df_start = tads["start", "target"].rename(columns={"start": "pos"})
+        df_end = tads["end", "target"].rename(columns={"end": "pos"})
+        tadbs = pd.concat([df_start, df_end])
+        tadbs["target"] = "TADBs"
+        return tadbs
 
 
 if __name__ == '__main__':

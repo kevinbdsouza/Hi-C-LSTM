@@ -1,5 +1,5 @@
 import pandas as pd
-import re
+from training.config import Config
 
 
 class Fires:
@@ -37,17 +37,6 @@ class Fires:
 
 
 if __name__ == '__main__':
-    fire_path = "/opt/data/latent/data/downstream/FIREs"
-
-    chrom_fire = 21
-    chrom_tad = 'chr21'
-    cell_names = ['GM12878', 'H1', 'IMR90', 'MES', 'MSC', 'NPC', 'TRO']
-
-    fire_ob = Fires()
-    fire_ob.get_fire_data(fire_path)
-    fire_labeled = fire_ob.filter_fire_data(chrom_fire)
-
-    fire_ob.get_tad_data(fire_path, cell_names)
-    tad_filtered = fire_ob.filter_tad_data(chrom_tad)
-
-    print("done")
+    chr = 21
+    cfg = Config
+    fire_ob = Fires(cfg, chr, mode="ig")

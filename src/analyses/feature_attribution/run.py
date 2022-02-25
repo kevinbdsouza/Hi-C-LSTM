@@ -146,6 +146,8 @@ def attribute_elements(cfg, chr, ig_df, element="ctcf"):
         element_data = domain_ob.merge_domains()
 
     elif element == "TADBs":
+        domain_ob = Domains(cfg, chr, mode="ig")
+        element_data = domain_ob.get_tad_boundaries()
         pass
 
     elif element == "TADBsCTCF+":
