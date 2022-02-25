@@ -9,28 +9,17 @@ logger = logging.getLogger(__name__)
 
 
 class SegWay:
-    def __init__(self, cfg, chr, cells):
-        self.fasta_path = "/data2/latent/data/dna/chr21.fa"
-        self.dir = "/home/kevindsouza/Documents/projects/latentGenome/results/04-27-2019_n/h_110/5e-14/21/lstm_features/"
-        self.features_path = self.dir + "feat_chr_21.pkl"
+    def __init__(self, cfg, chr):
         self.segway_small_annotations_path = "/data2/hic_lstm/downstream/segway_small/"
         self.segway_small_file_name = "segway.hg19.bed"
         self.segway_small_label_file = "mnemonics.txt"
         self.segway_gbr_annotations_path = "/data2/hic_lstm/downstream/segway_gbr_domain/gbr_hg19_ann/"
         self.cfg = cfg
-        self.chr = chr
-        self.seg_chr_bed = chr + '.bed'
-        self.cell = cells[0]
+        self.chr = 'chr' + str(chr)
+        self.seg_chr_bed = self.chr + '.bed'
+        self.cell = cfg.cell
         self.segway_gbr_file_name = self.cell + ".bed"
-        self.segway_gbr_chr_bed = chr + '.bed'
-        self.segway_small_labels = pd.read_csv(self.segway_small_annotations_path + self.segway_small_label_file,
-                                          sep="\t")
-
-    def read_fasta(self, fasta_path):
-        records = list(SeqIO.parse(fasta_path, "fasta"))
-        new_seq = records[0].seq
-
-        return new_seq
+        self.segway_gbr_chr_bed = self.chr + '.bed'
 
     def convert_to_bp_resolution(self, track):
         bp_track = np.zeros((25 * len(track, )))
@@ -107,7 +96,9 @@ class SegWay:
         return
 
     def segway_small_annotations(self):
+        """
 
+        """
         column_list = ["chr", "start", "end", "target", "num", "dot", "start_2", "end_2", "color"]
         col_numbers = list(range(0, len(column_list)))
         new_df = pd.DataFrame()

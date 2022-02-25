@@ -6,13 +6,14 @@ from analyses.classification.downstream_helper import DownstreamHelper
 
 
 class Loops:
-    def __init__(self, cfg, cell, chr):
+    def __init__(self, cfg, chr, mode="ig"):
         self.rep_data = []
         self.base_name = "_loops_motifs.txt"
         self.exp_name = cell + self.base_name
         self.cell_path = os.path.join(cfg.downstream_dir, "loops", self.exp_name)
         self.cfg = cfg
         self.chr = chr
+        self.mode = mode
         self.down_helper_ob = DownstreamHelper(cfg, chr, mode="test")
 
     def get_loop_data(self):
@@ -23,7 +24,21 @@ class Loops:
         data = data.loc[data['chr1'] == str(self.chr)].reset_index(drop=True)
 
         data = self.alter_data(data)
-        return data
+        if self.mode == "ig":
+            pos_matrix = pd.DataFrame()
+            for i in range(2):
+                if i == 0:
+                    temp_data = data.rename(columns={'x1': 'start', 'x2': 'end'},
+                                            inplace=False)
+                else:
+                    temp_data = data.rename(columns={'y1': 'start', 'y2': 'end'},
+                                            inplace=False)
+
+                temp_data = temp_data.filter(['start', 'end', 'target'], axis=1)
+                pos_matrix = pos_matrix.append(temp_data)
+            return pos_matrix
+        else:
+            return data
 
     def alter_data(self, data):
         data["x1"] = (data["x1"]).astype(int) // self.cfg.resolution

@@ -2,8 +2,9 @@ import pandas as pd
 import os
 from training import config
 
+
 class TFChip:
-    def __init__(self, cfg, cell, chr):
+    def __init__(self, cfg, chr, mode="ig"):
         self.file_path = os.path.join(cfg.downstream_dir, "ctcf")
         self.cohesin_path = os.path.join(cfg.downstream_dir, "cohesin")
         self.file_name = "ENCFF706QLS.bed"
@@ -11,7 +12,8 @@ class TFChip:
         self.smc3_file_name = "smc3.bed"
         self.pol2_file_name = "pol2.bam"
         self.cfg = cfg
-        self.chr = chr
+        self.mode = mode
+        self.chr = 'chr' + str(chr)
 
     def get_ctcf_data(self):
         data = pd.read_csv(os.path.join(self.file_path, self.chr + ".bed"), sep="\t", header=None)
@@ -40,9 +42,9 @@ class TFChip:
         smc_data = smc_data.loc[smc_data[:][0] == self.chr]
         smc_data = self.alter_data(smc_data)
 
-        # pol_data = pd.read_csv(os.path.join(self.cohesin_path, self.pol2_file_name), sep="\t", header=None)
-        # pol_data = pol_data.loc[pol_data[:][0] == chr]
-        # pol_data = self.alter_data(pol_data)
+        if self.mode == "ig":
+            rad_data["target"] = "RAD21"
+            smc_data["target"] = "SMC3"
 
         return rad_data, smc_data
 

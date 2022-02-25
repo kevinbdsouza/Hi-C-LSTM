@@ -6,13 +6,14 @@ from analyses.classification.downstream_helper import DownstreamHelper
 
 
 class Domains:
-    def __init__(self, cfg, cell, chr):
+    def __init__(self, cfg, chr, mode="ig"):
         self.rep_data = []
         self.base_name = "_domains.txt"
         self.exp_name = cell + self.base_name
         self.cell_path = os.path.join(cfg.downstream_dir, "domains", self.exp_name)
         self.cfg = cfg
         self.chr = chr
+        self.mode = mode
         self.down_helper_ob = DownstreamHelper(cfg, chr, mode="test")
 
     def get_domain_data(self):
@@ -23,6 +24,10 @@ class Domains:
         data = data.loc[data['chr1'] == str(self.chr)].reset_index(drop=True)
 
         data = self.alter_data(data)
+        if self.mode == "ig":
+            data.rename(columns={'x1': 'start', 'x2': 'end'},
+                        inplace=True)
+            data = data.filter(['start', 'end', 'target'], axis=1)
         return data
 
     def alter_data(self, data):

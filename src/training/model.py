@@ -7,7 +7,6 @@ from torch.autograd import Variable
 from torch.nn.utils.clip_grad import clip_grad_norm_
 import training.ln_lstm as lstm
 from captum.attr import LayerIntegratedGradients
-from torch.nn import ReLU, Sequential, Conv2d, MaxPool2d, BatchNorm2d
 
 
 class SeqLSTM(nn.Module):
