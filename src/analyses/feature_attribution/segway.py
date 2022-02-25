@@ -102,11 +102,11 @@ class SegWay:
         segway_small_annotations = pd.read_csv(self.segway_small_annotations_path + self.seg_chr_bed,
                                                sep="\t", engine='python', header=None)
         segway_small_annotations.columns = column_list
-        segway_small_new_annotations = segway_small_annotations[['start', 'end', 'target']]
-        segway_small_new_annotations["start"] = segway_small_new_annotations["start"].astype(int) // self.cfg.resolution
-        segway_small_new_annotations["end"] = segway_small_new_annotations["end"].astype(int) // self.cfg.resolution
+        segway_small_annotations = segway_small_annotations[['start', 'end', 'target']]
+        segway_small_annotations["start"] = segway_small_annotations["start"].astype(int) // self.cfg.resolution
+        segway_small_annotations["end"] = segway_small_annotations["end"].astype(int) // self.cfg.resolution
 
-        return segway_small_new_annotations.reset_index(drop=True)
+        return segway_small_annotations.reset_index(drop=True)
 
     def segway_gbr(self):
 
@@ -115,11 +115,11 @@ class SegWay:
             self.segway_gbr_annotations_path + self.cell + "/" + self.segway_gbr_chr_bed,
             sep="\t", engine='python', header=None)
         segway_gbr_annotations.columns = column_list
-        segway_gbr_new_annotations = segway_gbr_annotations[['start', 'end', 'target']]
-        segway_gbr_new_annotations["start"] = segway_gbr_new_annotations["start"].astype(int) // self.cfg.resolution
-        segway_gbr_new_annotations["end"] = segway_gbr_new_annotations["end"].astype(int) // self.cfg.resolution
+        segway_gbr_annotations = segway_gbr_annotations[['start', 'end', 'target']]
+        segway_gbr_annotations["start"] = segway_gbr_annotations["start"].astype(int) // self.cfg.resolution
+        segway_gbr_annotations["end"] = segway_gbr_annotations["end"].astype(int) // self.cfg.resolution
 
-        return segway_gbr_new_annotations
+        return segway_gbr_annotations.reset_index(drop=True)
 
 
 if __name__ == '__main__':
