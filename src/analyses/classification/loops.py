@@ -9,7 +9,7 @@ class Loops:
     def __init__(self, cfg, chr, mode="ig"):
         self.rep_data = []
         self.base_name = "_loops_motifs.txt"
-        self.exp_name = cell + self.base_name
+        self.exp_name = cfg.cell + self.base_name
         self.cell_path = os.path.join(cfg.downstream_dir, "loops", self.exp_name)
         self.cfg = cfg
         self.chr = chr
