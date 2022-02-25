@@ -89,4 +89,4 @@ class Config:
         self.tf_columns = ["HGNC symbol", "chromosome", "start"]
         self.run_tfs = False
         self.run_elements = True
-        self.element = "Loop_Domains"
+        self.element = "Domains"

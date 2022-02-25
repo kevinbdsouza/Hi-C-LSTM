@@ -9,7 +9,7 @@ class Domains:
     def __init__(self, cfg, chr, mode="ig"):
         self.rep_data = []
         self.base_name = "_domains.txt"
-        self.exp_name = cell + self.base_name
+        self.exp_name = cfg.cell + self.base_name
         self.cell_path = os.path.join(cfg.downstream_dir, "domains", self.exp_name)
         self.cfg = cfg
         self.chr = chr
@@ -28,6 +28,7 @@ class Domains:
             data.rename(columns={'x1': 'start', 'x2': 'end'},
                         inplace=True)
             data = data.filter(['start', 'end', 'target'], axis=1)
+            data["target"] = "Domains"
         return data
 
     def alter_data(self, data):
