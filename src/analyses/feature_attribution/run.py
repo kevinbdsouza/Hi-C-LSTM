@@ -194,6 +194,7 @@ if __name__ == '__main__':
 
         main_df = pd.concat([main_df, ig_elements], axis=0)
 
+    main_df = main_df.groupby('target').agg({'ig': 'mean'})
     main_df = main_df.sort_values("ig")
     main_df = main_df.iloc[-5:][ :]
     plot_gbr(main_df)
