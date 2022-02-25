@@ -377,10 +377,10 @@ class SeqLSTM(nn.Module):
 
             prev_row = row
             subset_df = main_pred_df.loc[main_pred_df["i"] == row]
-            sign = subset_df["ig"] > 0
-            new_col = sign * ((subset_df["ig"] - subset_df[sign]["ig"].min()) / subset_df["ig"].max()) + ~sign * -(
-                    (subset_df["ig"] - subset_df[~sign]["ig"].max()) / subset_df["ig"].min())
-            mean_ig = new_col.sum()
+            #sign = subset_df["ig"] > 0
+            #new_col = sign * ((subset_df["ig"] - subset_df[sign]["ig"].min()) / subset_df["ig"].max()) + ~sign * -(
+            #        (subset_df["ig"] - subset_df[~sign]["ig"].max()) / subset_df["ig"].min())
+            mean_ig = subset_df["ig"].sum()
             final_pred_df = final_pred_df.append({'i': row, 'ig': mean_ig}, ignore_index=True)
 
         sign = final_pred_df["ig"] > 0
