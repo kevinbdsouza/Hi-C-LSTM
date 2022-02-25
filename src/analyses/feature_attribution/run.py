@@ -44,7 +44,7 @@ def run_captum(cfg, model, chr):
 def get_top_tfs_chip(cfg, ig_df, chr):
     """
     get_top_tfs_chip(cfg, ig_df, chr) -> DataFrame
-    Attributed importance to each of the TFs.
+    Attributed importance to each of the TFs according to CHipSeq Peaks.
     Args:
         cfg (Config): The configuration to use for the experiment.
         ig_df (DataFrame): Dataframe containing positions and IG values.
@@ -56,7 +56,7 @@ def get_top_tfs_chip(cfg, ig_df, chr):
 def get_top_tfs_db(cfg, ig_df, chr):
     """
     get_top_tfs_db(cfg, ig_df, chr) -> DataFrame
-    Attributed importance to each of the TFs.
+    Attributed importance to each of the TFs according TF database from TFBS website.
     Args:
         cfg (Config): The configuration to use for the experiment.
         ig_df (DataFrame): Dataframe containing positions and IG values.
@@ -94,7 +94,7 @@ def attribute_elements(cfg, chr, ig_df, element="ctcf"):
         cfg (Config): The configuration to use for the experiment.
         chr (int): The chromosome to run captum on.
         ig_df (Dataframe): Dataframe containing positions and IG values
-        element (string): one of Small_Scale, GBR, CTCF, FIREs, TADs, Loop_Domains,
+        element (string): one of Segway, GBR, CTCF, FIREs, TADs, Loop_Domains,
                         Domains, RAD21, SMC3
     """
 
@@ -104,7 +104,7 @@ def attribute_elements(cfg, chr, ig_df, element="ctcf"):
 
     ig_df = ig_df.astype({"pos": int})
 
-    if element == "Small_Scale":
+    if element == "Segway":
         seg_ob = SegWay(cfg, chr)
         element_data = seg_ob.segway_small_annotations()
 
@@ -122,8 +122,8 @@ def attribute_elements(cfg, chr, ig_df, element="ctcf"):
         element_data = fire_ob.filter_fire_data()
 
     elif element == "TADs":
-        fire_ob = Fires(cfg, chr, mode="ig")
-        element_data = fire_ob.get_tad_data()
+        domain_ob = Domains(cfg, chr, mode="ig")
+        element_data = domain_ob.get_tad_data()
 
     elif element == "Loop_Domains":
         loop_ob = Loops(cfg, chr, mode="ig")
@@ -141,8 +141,28 @@ def attribute_elements(cfg, chr, ig_df, element="ctcf"):
         tf_ob = TFChip(cfg, chr)
         _, element_data = tf_ob.get_cohesin_data()
 
+    elif element == "Merge_Domains":
+        domain_ob = Domains(cfg, chr, mode="ig")
+        element_data = domain_ob.merge_domains()
+
+    elif element == "TADBs":
+        pass
+
+    elif element == "TADBsCTCF+":
+        pass
+
+    elif element == "TADBsCTCF-":
+        pass
+
+    elif element == "Loop_CTCFCohesin":
+        pass
+
+    elif element == "NonLoop_CTCFCohesin":
+        pass
+
     element_data = element_data.drop_duplicates(keep='first').reset_index(drop=True)
-    element_data = downstream_ob.downstream_helper_ob.get_window_data(element_data)
+    if element != "TADBs":
+        element_data = downstream_ob.downstream_helper_ob.get_window_data(element_data)
     element_data["pos"] = element_data["pos"] + cumpos
     ig_df = pd.merge(ig_df, element_data, on="pos")
     ig_df.reset_index(drop=True, inplace=True)
@@ -150,16 +170,7 @@ def attribute_elements(cfg, chr, ig_df, element="ctcf"):
     return ig_df
 
 
-if __name__ == '__main__':
-
-    cfg = Config()
-    cell = cfg.cell
-    model_name = cfg.model_name
-
-    "load model"
-    model = SeqLSTM(cfg, device).to(device)
-    model.load_weights()
-
+def run_experiment(cfg, model):
     main_df = pd.DataFrame(columns=["pos", "target"])
     for chr in cfg.decoder_test_list:
         print('IG Start Chromosome: {}'.format(chr))
@@ -193,3 +204,27 @@ if __name__ == '__main__':
     elif cfg.run_elements:
         "save element IG"
         main_df.to_csv(cfg.output_directory + "ig_%s.csv" % cfg.element, sep="\t")
+
+
+def run_all_elements(cfg, model):
+    element_list = ["CTCF", "RAD21", "SMC3", "GBR", "TADs", "FIREs", "Domains", "Loop_Domains",
+                    "Merge_Domains", "TADBs", "TADBsCTCF+", "TADBsCTCF-", "Loop_CTCFCohesin",
+                    "NonLoop_CTCFCohesin"]
+    for element in element_list:
+        cfg.element = element
+        run_experiment(cfg, model)
+
+
+if __name__ == '__main__':
+    cfg = Config()
+    cell = cfg.cell
+    model_name = cfg.model_name
+
+    "load model"
+    model = SeqLSTM(cfg, device).to(device)
+    model.load_weights()
+
+    if cfg.run_all_elements:
+        run_all_elements(cfg, model)
+    else:
+        run_experiment(cfg, model)

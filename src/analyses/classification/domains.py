@@ -1,7 +1,7 @@
 import pandas as pd
 import os
 import numpy as np
-from training import config
+from training.config import Config
 from analyses.classification.downstream_helper import DownstreamHelper
 
 
@@ -12,9 +12,12 @@ class Domains:
         self.exp_name = cfg.cell + self.base_name
         self.cell_path = os.path.join(cfg.downstream_dir, "domains", self.exp_name)
         self.cfg = cfg
+        self.cell = cfg.cell
         self.chr = chr
+        self.chr_tad = 'chr' + str(chr)
         self.mode = mode
         self.down_helper_ob = DownstreamHelper(cfg, chr, mode="test")
+        self.tad_file = cfg.downstream_dir + "/FIREs/" + 'TAD_boundaries.xlsx'
 
     def get_domain_data(self):
         data = pd.read_csv(self.cell_path, sep="\s+", header=None)
@@ -42,15 +45,52 @@ class Domains:
 
         return data
 
+    def get_tad_data(self):
+        tads = pd.read_excel(self.tad_file, sheet_name=self.cell, names=["chr", "start", "end"])
+        tads = tads.sort_values(by=['start']).reset_index(drop=True)
+
+        "convert to resolution"
+        tads["start"] = tads["start"] // self.cfg.resolution
+        tads["end"] = tads["end"] // self.cfg.resolution
+
+        tad_data_chr = tads.loc[tads['chr'] == self.chr_tad].reset_index(drop=True)
+        tad_data_chr['target'] = 1
+        tad_data_chr = tad_data_chr.filter(['start', 'end', 'target'], axis=1)
+        if self.mode == "ig":
+            tad_data_chr['target'] = "TADs"
+        return tad_data_chr
+
+    def augment_tad_negatives(self, tad_df):
+
+        neg_df = pd.DataFrame(columns=['start', 'end', 'target'])
+
+        for i in range(tad_df.shape[0]):
+            diff = tad_df.iloc[i]['end'] - tad_df.iloc[i]['start']
+
+            start_neg = tad_df.iloc[i]['start'] - diff
+            end_neg = tad_df.iloc[i]['start'] - 1
+
+            if i == 0 or start_neg > tad_df.iloc[i - 1]['end']:
+                neg_df = neg_df.append({'start': start_neg, 'end': end_neg, 'target': 0},
+                                       ignore_index=True)
+
+        tad_updated = pd.concat([tad_df, neg_df]).reset_index(drop=True)
+
+        return tad_updated
+
+    def merge_domains(self):
+        domain_data = self.get_domain_data()
+        tad_data = self.get_tad_data()
+        merged_data = pd.concat([domain_data, tad_data])
+        merged_data = merged_data.drop_duplicates(subset=['A', 'B'], keep='last').reset_index(drop=True)
+        merged_data["target"] = "Merged_Domains"
+        return merged_data
+
 
 if __name__ == '__main__':
-    data_dir = "/data2/hic_lstm/downstream"
-
     chr = 21
-    cfg = config.Config()
-    cell = "GM12878"
+    cfg = Config()
+    cell = cfg.cell
 
-    rep_ob = Domains(cfg, cell, chr)
+    rep_ob = Domains(cfg, chr, mode="ig")
     data = rep_ob.get_domain_data()
-
-    print("done")

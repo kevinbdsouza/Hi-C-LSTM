@@ -21,6 +21,9 @@ class SegWay:
         self.segway_gbr_chr_bed = self.chr + '.bed'
 
     def convert_segway_labels(self, segway_annotations):
+        """
+
+        """
         return segway_annotations.reset_index(drop=True)
 
     def segway_small_annotations(self):
@@ -39,9 +42,15 @@ class SegWay:
         return segway_annotations
 
     def convert_gbr_labels(self, gbr_annotations):
+        """
+        No need of conversion at this point.
+        """
         return gbr_annotations.reset_index(drop=True)
 
     def segway_gbr(self):
+        """
+
+        """
         column_list = ["chr", "start", "end", "target", "num", "dot", "start_2", "end_2", "color"]
         gbr_annotations = pd.read_csv(
             self.segway_gbr_annotations_path + self.cell + "/" + self.segway_gbr_chr_bed,
@@ -59,11 +68,4 @@ if __name__ == '__main__':
     cfg = Config()
     chr = 21
     cell = cfg.cell
-
     seg_ob = SegWay(cfg, chr)
-
-    # signal = seg_ob.create_signal_from_pickle(seg_ob.features_path)
-    # seg_ob.load_features(chr_len)
-
-    # seg_ob.run_segway()
-    all_means = seg_ob.run_genome_euclid()

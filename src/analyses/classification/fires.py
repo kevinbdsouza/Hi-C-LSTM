@@ -9,10 +9,8 @@ class Fires:
         self.cfg = cfg
         self.chr = chr
         self.mode = mode
-        self.chr_tad = 'chr' + str(chr)
         self.path = cfg.downstream_dir + "/FIREs/"
         self.fire_file = self.path + "fires.pkl"
-        self.tad_file = self.path + 'TAD_boundaries.xlsx'
         self.cell = "GM12878"
 
     def get_fire_data(self):
@@ -36,39 +34,6 @@ class Fires:
             fire_labeled = fire_labeled.loc[fire_labeled["target"] == 1]
             fire_labeled["target"] = "FIREs"
         return fire_labeled
-
-    def get_tad_data(self):
-        tads = pd.read_excel(self.tad_file, sheet_name=self.cell, names=["chr", "start", "end"])
-        tads = tads.sort_values(by=['start']).reset_index(drop=True)
-
-        "convert to resolution"
-        tads["start"] = tads["start"] // self.cfg.resolution
-        tads["end"] = tads["end"] // self.cfg.resolution
-
-        tad_data_chr = tads.loc[tads['chr'] == self.chr_tad].reset_index(drop=True)
-        tad_data_chr['target'] = 1
-        tad_data_chr = tad_data_chr.filter(['start', 'end', 'target'], axis=1)
-        if self.mode == "ig":
-            tad_data_chr['target'] = "TADs"
-        return tad_data_chr
-
-    def augment_tad_negatives(self, tad_df):
-
-        neg_df = pd.DataFrame(columns=['start', 'end', 'target'])
-
-        for i in range(tad_df.shape[0]):
-            diff = tad_df.iloc[i]['end'] - tad_df.iloc[i]['start']
-
-            start_neg = tad_df.iloc[i]['start'] - diff
-            end_neg = tad_df.iloc[i]['start'] - 1
-
-            if i == 0 or start_neg > tad_df.iloc[i - 1]['end']:
-                neg_df = neg_df.append({'start': start_neg, 'end': end_neg, 'target': 0},
-                                       ignore_index=True)
-
-        tad_updated = pd.concat([tad_df, neg_df]).reset_index(drop=True)
-
-        return tad_updated
 
 
 if __name__ == '__main__':
