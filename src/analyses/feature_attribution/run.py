@@ -166,7 +166,6 @@ if __name__ == '__main__':
         "attribute TFs"
         if cfg.run_tfs:
             ig_elements = attribute_tfs(cfg, ig_df, chr)
-            ig_elements.to_csv(cfg.output_directory + "ig_tf%s.csv" % (str(chr)), sep="\t")
 
         "attribute elements"
         if cfg.run_elements:
@@ -177,5 +176,6 @@ if __name__ == '__main__':
 
     if cfg.run_tfs:
         main_df = main_df.groupby('target').agg({'ig': 'mean'})
-        main_df = main_df.sort_values("ig")
-        main_df = main_df.iloc[-5:][:]
+        main_df = main_df.sort_values("ig", ascending=False)
+        main_df.to_csv(cfg.output_directory + "ig_tf.csv", sep="\t")
+
