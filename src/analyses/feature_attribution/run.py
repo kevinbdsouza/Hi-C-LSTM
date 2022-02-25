@@ -138,28 +138,6 @@ def attribute_elements(cfg, chr, ig_df, element="ctcf"):
     return ig_df
 
 
-def plot_gbr(main_df):
-    """
-    captum_test(cfg, model, chr) -> DataFrame
-    Gets data for chromosome and cell type. Runs IG using captum.
-    Args:
-        cfg (Config): The configuration to use for the experiment.
-        model (SeqLSTM): The model to run captum on.
-        chr (int): The chromosome to run captum on.
-    """
-    main_df["ig"] = main_df["ig"].astype(float)
-
-    plt.figure(figsize=(16, 7))
-    sns.set(font_scale=1.8)
-    sns.set_style(style='white')
-    plt.xticks(rotation=90, fontsize=20)
-    plt.ylim(-1, 1)
-    ax = sns.violinplot(x="target", y="ig", data=main_df)
-    ax.set(xlabel='', ylabel='IG Importance')
-    plt.show()
-    pass
-
-
 if __name__ == '__main__':
 
     cfg = Config()
@@ -184,7 +162,7 @@ if __name__ == '__main__':
                                      columns=["pos", "ig"])
             except Exception as e:
                 print("Make sure IG values are computed and saved")
-                break
+                quit()
 
         "attribute TFs"
         if cfg.run_tfs:
@@ -200,5 +178,4 @@ if __name__ == '__main__':
 
     main_df = main_df.groupby('target').agg({'ig': 'mean'})
     main_df = main_df.sort_values("ig")
-    main_df = main_df.iloc[-5:][ :]
-    plot_gbr(main_df)
+    main_df = main_df.iloc[-5:][:]
