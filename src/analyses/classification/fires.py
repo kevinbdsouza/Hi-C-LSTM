@@ -3,11 +3,12 @@ import re
 
 
 class Fires:
-    def __init__(self, cfg, chr):
+    def __init__(self, cfg, chr, mode="ig"):
         self.fire_data = None
         self.tad_data = None
         self.cfg = cfg
         self.chr = chr
+        self.mode = mode
         self.chr_tad = 'chr' + str(chr)
         self.path = cfg.downstream_dir + "/FIREs/"
         self.fire_file = self.path + "fires.pkl"
@@ -28,28 +29,12 @@ class Fires:
     def filter_fire_data(self):
         fire_data_chr = self.fire_data.loc[self.fire_data['chr'] == self.chr].reset_index(drop=True)
 
-        fire_data_chr['GM12878_l'] = 0
-        fire_data_chr['H1_l'] = 0
-        fire_data_chr['IMR90_l'] = 0
-        fire_data_chr['MES_l'] = 0
-        fire_data_chr['MSC_l'] = 0
-        fire_data_chr['NPC_l'] = 0
-        fire_data_chr['TRO_l'] = 0
-
-        fire_data_chr.loc[fire_data_chr['GM12878'] >= 0.5, 'GM12878_l'] = 1
-        fire_data_chr.loc[fire_data_chr['H1'] >= 0.5, 'H1_l'] = 1
-        fire_data_chr.loc[fire_data_chr['IMR90'] >= 0.5, 'IMR90_l'] = 1
-        fire_data_chr.loc[fire_data_chr['MES'] >= 0.5, 'MES_l'] = 1
-        fire_data_chr.loc[fire_data_chr['MSC'] >= 0.5, 'MSC_l'] = 1
-        fire_data_chr.loc[fire_data_chr['NPC'] >= 0.5, 'NPC_l'] = 1
-        fire_data_chr.loc[fire_data_chr['TRO'] >= 0.5, 'TRO_l'] = 1
-
-        fire_labeled = fire_data_chr[
-            ['chr', 'start', 'end', 'GM12878_l', 'H1_l', 'IMR90_l', 'MES_l', 'MSC_l', 'NPC_l', 'TRO_l']]
-
-        fire_labeled = fire_labeled.filter(['start', 'end', "GM12878" + '_l'], axis=1)
-        fire_labeled.rename(columns={"GM12878" + '_l': 'target'}, inplace=True)
-
+        fire_data_chr['target'] = 0
+        fire_data_chr.loc[fire_data_chr['GM12878'] >= 0.5, 'target'] = 1
+        fire_labeled = fire_data_chr.filter(['start', 'end', 'target'], axis=1)
+        if self.mode == "ig":
+            fire_labeled = fire_labeled.loc[fire_labeled["target"] == 1]
+            fire_labeled["target"] = "FIREs"
         return fire_labeled
 
     def get_tad_data(self):
@@ -61,9 +46,10 @@ class Fires:
         tads["end"] = tads["end"] // self.cfg.resolution
 
         tad_data_chr = tads.loc[tads['chr'] == self.chr_tad].reset_index(drop=True)
-        tad_data_chr['target'] = "TADs"
+        tad_data_chr['target'] = 1
         tad_data_chr = tad_data_chr.filter(['start', 'end', 'target'], axis=1)
-
+        if self.mode == "ig":
+            tad_data_chr['target'] = "TADs"
         return tad_data_chr
 
     def augment_tad_negatives(self, tad_df):

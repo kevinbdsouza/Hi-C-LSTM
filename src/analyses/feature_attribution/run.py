@@ -117,12 +117,12 @@ def attribute_elements(cfg, chr, ig_df, element="ctcf"):
         element_data = ctcf_ob.get_ctcf_data()
 
     elif element == "FIREs":
-        fire_ob = Fires(cfg, chr)
+        fire_ob = Fires(cfg, chr, mode="ig")
         fire_ob.get_fire_data()
         element_data = fire_ob.filter_fire_data()
 
     elif element == "TADs":
-        fire_ob = Fires(cfg, chr)
+        fire_ob = Fires(cfg, chr, mode="ig")
         element_data = fire_ob.get_tad_data()
 
     elif element == "Loop_Domains":
