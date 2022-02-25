@@ -47,14 +47,15 @@ class Config:
         "decoder parameters"
         self.decoder_name = "hiclstm_fc"
         self.decoder = "fc"
-        self.save_representation = False
+        self.compute_representation = False
+        self.save_representation = True
         self.train_decoders = True
         self.test_decoders = True
         self.get_predictions = False
         self.dec_learning_rate = 0.01
         self.decoder_epochs = 20
         self.decoder_train_list = [21, 19]
-        self.decoder_test_list = [22]
+        self.decoder_test_list = [19, 20, 21, 22]
 
         "Output Directories"
         self.proj_dir = "/home/kevindsouza/Documents/projects/PhD/Hi-C-LSTM/"
@@ -83,8 +84,9 @@ class Config:
         self.ctcf_dots_threshold = 41
 
         "captum"
-        self.run_captum = True
+        self.run_captum = False
         self.tf_file_path = self.output_directory + "tf_db.csv"
         self.tf_columns = ["HGNC symbol", "chromosome", "start"]
-        self.run_tfs = False
-        self.run_elements = True
+        self.run_tfs = True
+        self.run_elements = False
+        self.element = "ctcf"

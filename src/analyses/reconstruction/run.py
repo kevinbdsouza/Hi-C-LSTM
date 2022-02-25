@@ -66,7 +66,7 @@ if __name__ == '__main__':
     if cfg.test_decoders:
         comb_r2_df = pd.DataFrame(columns=["diff", "r2"])
         for chr in cfg.decoder_test_list:
-            if cfg.save_representation:
+            if cfg.compute_representation:
                 "run fully trained hiclstm model to save representations"
                 full_hiclstm_representations(cfg, chr)
 
@@ -75,8 +75,9 @@ if __name__ == '__main__':
             if cfg.get_predictions:
                 "load and save representations"
                 representations, start = hic_r2_ob.get_trained_representations(method=cfg.method)
-                np.save(cfg.output_directory + "%s_rep_%s_chr%s.npy" % (cfg.method, cfg.cell, str(chr)),
-                        representations)
+                if cfg.save_representation:
+                    np.save(cfg.output_directory + "%s_rep_%s_chr%s.npy" % (cfg.method, cfg.cell, str(chr)),
+                            representations)
 
                 "test decoder"
                 hic_r2_ob.test_decoders(representations, start, method=cfg.method, decoder=cfg.decoder)

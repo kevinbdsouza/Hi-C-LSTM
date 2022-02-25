@@ -16,7 +16,6 @@ import matplotlib.pyplot as plt
 from training.data_utils import get_cumpos
 
 device = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
-#device = "cpu"
 
 
 def run_captum(cfg, model, chr):
@@ -139,7 +138,7 @@ def attribute_elements(cfg, chr, ig_df, element="ctcf"):
     return ig_df
 
 
-def plot_gbr(ig_df):
+def plot_gbr(main_df):
     """
     captum_test(cfg, model, chr) -> DataFrame
     Gets data for chromosome and cell type. Runs IG using captum.
@@ -148,14 +147,14 @@ def plot_gbr(ig_df):
         model (SeqLSTM): The model to run captum on.
         chr (int): The chromosome to run captum on.
     """
-    ig_df["ig"] = ig_df["ig"].astype(float)
+    main_df["ig"] = main_df["ig"].astype(float)
 
     plt.figure(figsize=(16, 7))
     sns.set(font_scale=1.8)
     sns.set_style(style='white')
     plt.xticks(rotation=90, fontsize=20)
     plt.ylim(-1, 1)
-    ax = sns.violinplot(x="target", y="ig", data=ig_df)
+    ax = sns.violinplot(x="target", y="ig", data=main_df)
     ax.set(xlabel='', ylabel='IG Importance')
     plt.show()
     pass
@@ -171,23 +170,28 @@ if __name__ == '__main__':
     model = SeqLSTM(cfg, device).to(device)
     model.load_weights()
 
-    main_tf_df = pd.DataFrame(columns=["pos", "target"])
+    main_df = pd.DataFrame(columns=["pos", "target"])
     for chr in cfg.decoder_test_list:
         print('IG Start Chromosome: {}'.format(chr))
 
         if cfg.run_captum:
+            "run captum and save IG Dataframe"
             ig_df = run_captum(cfg, model, chr)
-
-        "load saved IG dataframe"
-        ig_df = pd.DataFrame(np.load(cfg.output_directory + "ig_df_chr%s.npy" % (str(chr))),
-                             columns=["pos", "ig"])
+        else:
+            "load saved IG dataframe"
+            ig_df = pd.DataFrame(np.load(cfg.output_directory + "ig_df_chr%s.npy" % (str(chr))),
+                                 columns=["pos", "ig"])
 
         "attribute TFs"
         if cfg.run_tfs:
-            ig_tf = attribute_tfs(cfg, ig_df, chr)
-            ig_tf.to_csv(cfg.output_directory + "ig_tf%s.csv" % (str(chr)), sep="\t")
-            main_tf_df = pd.concat([main_tf_df, ig_tf], axis=0)
+            ig_elements = attribute_tfs(cfg, ig_df, chr)
+            ig_elements.to_csv(cfg.output_directory + "ig_tf%s.csv" % (str(chr)), sep="\t")
 
+        "attribute elements"
         if cfg.run_elements:
-            ig_elements = attribute_elements(cfg, chr, ig_df, element="ctcf")
-            plot_gbr(ig_elements)
+            ig_elements = attribute_elements(cfg, chr, ig_df, element=cfg.element)
+            ig_elements.to_csv(cfg.output_directory + "ig_%s_chr%s.csv" % (cfg.element, str(chr)), sep="\t")
+
+        main_df = pd.concat([main_df, ig_elements], axis=0)
+
+    plot_gbr(main_df)
