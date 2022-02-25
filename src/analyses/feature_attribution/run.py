@@ -179,8 +179,11 @@ if __name__ == '__main__':
             ig_df = run_captum(cfg, model, chr)
         else:
             "load saved IG dataframe"
-            ig_df = pd.DataFrame(np.load(cfg.output_directory + "ig_df_chr%s.npy" % (str(chr))),
-                                 columns=["pos", "ig"])
+            try:
+                ig_df = pd.DataFrame(np.load(cfg.output_directory + "ig_df_chr%s.npy" % (str(chr))),
+                                     columns=["pos", "ig"])
+            except Exception as e:
+                print("Make sure IG values are computed and saved")
 
         "attribute TFs"
         if cfg.run_tfs:
