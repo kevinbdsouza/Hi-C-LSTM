@@ -41,9 +41,21 @@ def run_captum(cfg, model, chr):
     return ig_df
 
 
-def attribute_tfs(cfg, ig_df, chr):
+def get_top_tfs_chip(cfg, ig_df, chr):
     """
-    attribute_tfs(cfg, ig_df, chr) -> DataFrame
+    get_top_tfs_chip(cfg, ig_df, chr) -> DataFrame
+    Attributed importance to each of the TFs.
+    Args:
+        cfg (Config): The configuration to use for the experiment.
+        ig_df (DataFrame): Dataframe containing positions and IG values.
+        chr (int): The chromosome to run captum on.
+    """
+    pass
+
+
+def get_top_tfs_db(cfg, ig_df, chr):
+    """
+    get_top_tfs_db(cfg, ig_df, chr) -> DataFrame
     Attributed importance to each of the TFs.
     Args:
         cfg (Config): The configuration to use for the experiment.
@@ -82,7 +94,8 @@ def attribute_elements(cfg, chr, ig_df, element="ctcf"):
         cfg (Config): The configuration to use for the experiment.
         chr (int): The chromosome to run captum on.
         ig_df (Dataframe): Dataframe containing positions and IG values
-        element (string): one of small, gbr, ctcf, fire, tad, loops, domains, cohesin
+        element (string): one of small, gbr, ctcf, fires, tads, loop_domains,
+                        domains, rad21, smc3
     """
 
     "use downstream obejct to access helper"
@@ -103,16 +116,16 @@ def attribute_elements(cfg, chr, ig_df, element="ctcf"):
         ctcf_ob = TFChip(cfg, chr)
         element_data = ctcf_ob.get_ctcf_data()
 
-    elif element == "fire":
+    elif element == "fires":
         fire_ob = Fires(cfg, chr)
         fire_ob.get_fire_data()
         element_data = fire_ob.filter_fire_data()
 
-    elif element == "tad":
+    elif element == "tads":
         fire_ob = Fires(cfg, chr)
         element_data = fire_ob.get_tad_data()
 
-    elif element == "loops":
+    elif element == "loop_domains":
         loop_ob = Loops(cfg, chr, mode="ig")
         element_data = loop_ob.get_loop_data()
 
@@ -165,18 +178,18 @@ if __name__ == '__main__':
 
         "attribute TFs"
         if cfg.run_tfs:
-            ig_elements = attribute_tfs(cfg, ig_df, chr)
-
-        "attribute elements"
-        if cfg.run_elements:
+            ig_elements = get_top_tfs_db(cfg, ig_df, chr)
+            main_df = pd.concat([main_df, ig_elements], axis=0)
+        elif cfg.run_elements:
+            "attribute elements"
             ig_elements = attribute_elements(cfg, chr, ig_df, element=cfg.element)
-            ig_elements.to_csv(cfg.output_directory + "ig_%s_chr%s.csv" % (cfg.element, str(chr)), sep="\t")
-
-        if cfg.run_tfs or cfg.run_elements:
             main_df = pd.concat([main_df, ig_elements], axis=0)
 
+    "sort TFs by IG values"
     if cfg.run_tfs:
         main_df = main_df.groupby('target').agg({'ig': 'mean'})
         main_df = main_df.sort_values("ig", ascending=False)
         main_df.to_csv(cfg.output_directory + "ig_tf.csv", sep="\t")
-
+    elif cfg.run_elements:
+        "save element IG"
+        main_df.to_csv(cfg.output_directory + "ig_%s.csv" % cfg.element, sep="\t")
