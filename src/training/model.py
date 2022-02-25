@@ -61,7 +61,7 @@ class SeqLSTM(nn.Module):
         output = self.sigm(output)
         return output, embeddings
 
-    def forward_reinit(self, input):
+    def forward(self, input):
         """
         forward_reinit(self, input) -> tensor, tensor
         Default forward method that reinitializes hidden sates in every frame.
@@ -202,7 +202,7 @@ class SeqLSTM(nn.Module):
                     values = values.to(device)
 
                     "Forward Pass"
-                    output, _ = self.forward_reinit(indices)
+                    output, _ = self.forward(indices)
                     loss = criterion(output, values)
 
                     "Backward and optimize"
@@ -308,7 +308,7 @@ class SeqLSTM(nn.Module):
                 target_values = torch.cat((target_values, values), 0)
 
                 "forward pass"
-                lstm_output, embeddings = self.forward_reinit(indices)
+                lstm_output, embeddings = self.forward(indices)
                 predictions = torch.cat((predictions, lstm_output), 0)
 
                 "compute error"
