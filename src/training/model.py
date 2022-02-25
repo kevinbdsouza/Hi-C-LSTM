@@ -346,7 +346,7 @@ class SeqLSTM(nn.Module):
 
         "remove padded indices"
         ind = indices.cpu().detach().numpy().reshape(-1, 2)
-        ig = ig.cpu().detach().numpy().reshape(-1, 1)
+        ig = ig.cpu().detach().numpy().reshape(-1, 2)
         idx = np.array(np.where(np.sum(ind, axis=1) == 0))[0]
         ind = np.delete(ind, idx, axis=0)
         ig = np.delete(ig, idx, axis=0)
@@ -354,7 +354,7 @@ class SeqLSTM(nn.Module):
         "add to dataframe"
         pred_df["i"] = ind[:, 0]
         pred_df["j"] = ind[:, 1]
-        pred_df["ig"] = ig
+        pred_df["ig"] = ig[:, 0]
 
         return pred_df
 
@@ -423,7 +423,7 @@ class SeqLSTM(nn.Module):
                                                return_convergence_delta=True, attribute_to_layer_input=False)
 
             "sum attributions for all dimensions"
-            attributions = torch.sum(attributions[:, :, 0, :], 2)
+            attributions = torch.sum(attributions, 3)
             pred_df = self.simple_post(indices, attributions, pred_df)
             main_pred_df = pd.concat([main_pred_df, pred_df], axis=0)
 
