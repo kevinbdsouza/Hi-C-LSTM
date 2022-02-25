@@ -366,10 +366,13 @@ class SeqLSTM(nn.Module):
         Args:
             main_pred_df (DataFrame): DataFrame containing indices and ig values
         """
+        
+        main_pred_df = main_pred_df.groupby('i').agg({'ig': 'sum'})
+
+        '''
         df_columns = ["i", "ig"]
         final_pred_df = pd.DataFrame(columns=df_columns)
         prev_row = None
-
         for i in range(len(main_pred_df)):
             row = main_pred_df.iloc[i]["i"]
             if row == prev_row:
@@ -382,13 +385,14 @@ class SeqLSTM(nn.Module):
                     (subset_df["ig"] - subset_df[~sign]["ig"].max()) / subset_df["ig"].min())
             mean_ig = new_col.sum()
             final_pred_df = final_pred_df.append({'i': row, 'ig': mean_ig}, ignore_index=True)
+        '''
 
-        sign = final_pred_df["ig"] > 0
-        final_pred_df["ig"] = sign * (
-                (final_pred_df["ig"] - final_pred_df[sign]["ig"].min()) / final_pred_df["ig"].max()) \
-                              + ~sign * -((final_pred_df["ig"] - final_pred_df[~sign]["ig"].max()) / final_pred_df[
+        sign = main_pred_df["ig"] > 0
+        main_pred_df["ig"] = sign * (
+                (main_pred_df["ig"] - main_pred_df[sign]["ig"].min()) / main_pred_df["ig"].max()) \
+                              + ~sign * -((main_pred_df["ig"] - main_pred_df[~sign]["ig"].max()) / main_pred_df[
             "ig"].min())
-        return final_pred_df
+        return main_pred_df
 
     def get_captum_ig(self, data_loader):
         """
