@@ -184,6 +184,7 @@ if __name__ == '__main__':
                                      columns=["pos", "ig"])
             except Exception as e:
                 print("Make sure IG values are computed and saved")
+                break
 
         "attribute TFs"
         if cfg.run_tfs:
