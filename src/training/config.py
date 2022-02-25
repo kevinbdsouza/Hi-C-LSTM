@@ -87,6 +87,6 @@ class Config:
         self.run_captum = False
         self.tf_file_path = self.output_directory + "tf_db.csv"
         self.tf_columns = ["HGNC symbol", "chromosome", "start"]
-        self.run_tfs = False
+        self.run_tfs = True
         self.run_elements = False
         self.element = "ctcf"
