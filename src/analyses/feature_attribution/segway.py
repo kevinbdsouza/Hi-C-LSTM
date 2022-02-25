@@ -20,106 +20,39 @@ class SegWay:
         self.segway_gbr_file_name = self.cell + ".bed"
         self.segway_gbr_chr_bed = self.chr + '.bed'
 
-    def convert_to_bp_resolution(self, track):
-        bp_track = np.zeros((25 * len(track, )))
-
-        for i in range(len(track)):
-            bp_track[25 * i:(i + 1) * 25 - 1] = track[i]
-
-        return bp_track
-
-    def create_signal_from_pickle(self, feature_path):
-        signal = None
-
-        for i in range(0, 24):
-            features = pd.read_pickle(self.features_path)
-            feature = features.loc[:, i]
-
-            # bp_track = self.convert_to_bp_resolution(np.array(feature))
-
-            for j in range(len(np.array(feature))):
-                with open(self.dir + 'feature_' + str(i) + '.txt', "a") as myfile:
-                    line = 'chr21   ' + str(25 * j + 1) + "   " + str(25 * (j + 1)) + "    " + str(feature[j]) + '\n'
-
-                    myfile.write(line)
-
-        return signal
-
-    def load_features(self, chr_len):
-
-        for i in range(11, 24):
-            feature_path = self.dir + 'feature_' + str(i) + '.npy'
-            feature = np.load(feature_path)
-            feature = feature[:chr_len]
-
-            with open(self.dir + 'feature_' + str(i) + '.wigFix', "ab") as myfile:
-                np.savetxt(myfile, feature, delimiter=',', newline='\n')
-
-        return
-
-    def rename_files(self):
-        for filename in os.listdir(self.dir):
-            os.rename(filename, filename)
-
-        pass
-
-    def run_genome_euclid(self):
-        target = open(
-            '/home/kevindsouza/Documents/projects/latentGenome/results/04-27-2019_n/h_110/5e-14/21/lstm_features/feat_chr_21.pkl',
-            'rb')
-        chr_df = pickle.load(target)
-        target.close()
-
-        chr_df = chr_df.drop(['target', 'gene_id'], axis=1)
-
-        all_means = []
-        for i in range(1, len(chr_df) - 1):
-            all_dst = []
-            diff = i
-            for k in range(0, len(chr_df) - 1):
-                if k + diff >= len(chr_df):
-                    break
-                a = chr_df.iloc[k, :]
-                b = chr_df.iloc[k + diff, :]
-                all_dst.append(distance.euclidean(a, b))
-            all_means.append(np.mean(all_dst))
-
-        return all_means
-
-    def run_segway(self):
-
-        GENOMEDATA_DIRNAME = "/home/kevindsouza/Documents/projects/latentGenome/results/04-27-2019_n/h_110/5e-14/21/lstm_features/genomedata/genomedata.test"
-
-        # run.main(["--random-starts=3", "train", GENOMEDATA_DIRNAME])
-
-        return
+    def convert_segway_labels(self, segway_annotations):
+        return segway_annotations.reset_index(drop=True)
 
     def segway_small_annotations(self):
         """
 
         """
         column_list = ["chr", "start", "end", "target", "num", "dot", "start_2", "end_2", "color"]
-        segway_small_annotations = pd.read_csv(self.segway_small_annotations_path + self.seg_chr_bed,
-                                               sep="\t", engine='python', header=None)
-        segway_small_annotations.columns = column_list
-        segway_small_annotations = segway_small_annotations[['start', 'end', 'target']]
-        segway_small_annotations["start"] = segway_small_annotations["start"].astype(int) // self.cfg.resolution
-        segway_small_annotations["end"] = segway_small_annotations["end"].astype(int) // self.cfg.resolution
+        segway_annotations = pd.read_csv(self.segway_small_annotations_path + self.seg_chr_bed,
+                                         sep="\t", engine='python', header=None)
+        segway_annotations.columns = column_list
+        segway_annotations = segway_annotations[['start', 'end', 'target']]
+        segway_annotations["start"] = segway_annotations["start"].astype(int) // self.cfg.resolution
+        segway_annotations["end"] = segway_annotations["end"].astype(int) // self.cfg.resolution
 
-        return segway_small_annotations.reset_index(drop=True)
+        segway_annotations = self.convert_segway_labels(segway_annotations)
+        return segway_annotations
+
+    def convert_gbr_labels(self, gbr_annotations):
+        return gbr_annotations.reset_index(drop=True)
 
     def segway_gbr(self):
-
         column_list = ["chr", "start", "end", "target", "num", "dot", "start_2", "end_2", "color"]
-        segway_gbr_annotations = pd.read_csv(
+        gbr_annotations = pd.read_csv(
             self.segway_gbr_annotations_path + self.cell + "/" + self.segway_gbr_chr_bed,
             sep="\t", engine='python', header=None)
-        segway_gbr_annotations.columns = column_list
-        segway_gbr_annotations = segway_gbr_annotations[['start', 'end', 'target']]
-        segway_gbr_annotations["start"] = segway_gbr_annotations["start"].astype(int) // self.cfg.resolution
-        segway_gbr_annotations["end"] = segway_gbr_annotations["end"].astype(int) // self.cfg.resolution
+        gbr_annotations.columns = column_list
+        gbr_annotations = gbr_annotations[['start', 'end', 'target']]
+        gbr_annotations["start"] = gbr_annotations["start"].astype(int) // self.cfg.resolution
+        gbr_annotations["end"] = gbr_annotations["end"].astype(int) // self.cfg.resolution
 
-        return segway_gbr_annotations.reset_index(drop=True)
+        gbr_annotations = self.convert_gbr_labels(gbr_annotations)
+        return gbr_annotations
 
 
 if __name__ == '__main__':
