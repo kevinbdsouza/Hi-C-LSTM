@@ -158,7 +158,7 @@ if __name__ == '__main__':
             "load saved IG dataframe"
             try:
                 ig_df = pd.DataFrame(np.load(cfg.output_directory + "ig_df_chr%s.npy" % (str(chr))),
-                                     columns=["pos", "ig"])
+                                     columns=["ig", "pos"])
             except Exception as e:
                 print("Make sure IG values are computed and saved")
                 quit()
