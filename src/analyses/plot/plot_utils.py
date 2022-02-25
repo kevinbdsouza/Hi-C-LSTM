@@ -146,6 +146,27 @@ def plot_euclid_heatmap(embeddings):
     pass
 
 
+def plot_gbr(main_df):
+    """
+    captum_test(cfg, model, chr) -> DataFrame
+    Gets data for chromosome and cell type. Runs IG using captum.
+    Args:
+        cfg (Config): The configuration to use for the experiment.
+        model (SeqLSTM): The model to run captum on.
+        chr (int): The chromosome to run captum on.
+    """
+    main_df["ig"] = main_df["ig"].astype(float)
+
+    plt.figure(figsize=(16, 7))
+    sns.set(font_scale=1.8)
+    sns.set_style(style='white')
+    plt.xticks(rotation=90, fontsize=20)
+    plt.ylim(-1, 1)
+    ax = sns.violinplot(x="target", y="ig", data=main_df)
+    ax.set(xlabel='', ylabel='IG Importance')
+    plt.show()
+
+
 def plot_r2(comb_r2_df):
     max_diff = int(comb_r2_df['diff'].max())
     max_mb = 50
@@ -296,9 +317,6 @@ if __name__ == '__main__':
         # plot_heatmaps(pred_data)
 
     print("done")
-
-
-
 
     # foxg1_data = pd.read_csv(cfg.output_directory + "shuffle_%s_afko_chr%s.csv" % (self.cfg.cell, str(self.chr)), sep="\t")
     # pred_data = pd.read_csv(cfg.output_directory + "shuffle_%s_predictions_chr%s.csv" % (cell, str(chr)), sep="\t")
