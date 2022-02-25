@@ -104,7 +104,7 @@ class SegWay:
         new_df = pd.DataFrame()
 
         segway_small_annotations = pd.read_csv(self.segway_small_annotations_path + self.seg_chr_bed,
-                                               sep="\t", engine='python')
+                                               sep="\t", engine='python', columns=column_list)
         col_series = pd.Series(segway_small_annotations.columns)
         new_df = new_df.append(col_series, ignore_index=True)
         segway_small_annotations.columns = col_numbers
