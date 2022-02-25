@@ -94,8 +94,8 @@ def attribute_elements(cfg, chr, ig_df, element="ctcf"):
         cfg (Config): The configuration to use for the experiment.
         chr (int): The chromosome to run captum on.
         ig_df (Dataframe): Dataframe containing positions and IG values
-        element (string): one of small, gbr, ctcf, fires, tads, loop_domains,
-                        domains, rad21, smc3
+        element (string): one of Small_Scale, GBR, CTCF, FIREs, TADs, Loop_Domains,
+                        Domains, RAD21, SMC3
     """
 
     "use downstream obejct to access helper"
@@ -104,40 +104,40 @@ def attribute_elements(cfg, chr, ig_df, element="ctcf"):
 
     ig_df = ig_df.astype({"pos": int})
 
-    if element == "small":
+    if element == "Small_Scale":
         seg_ob = SegWay(cfg, chr)
         element_data = seg_ob.segway_small_annotations()
 
-    elif element == "gbr":
+    elif element == "GBR":
         seg_ob = SegWay(cfg, chr)
         element_data = seg_ob.segway_gbr().reset_index(drop=True)
 
-    elif element == "ctcf":
+    elif element == "CTCF":
         ctcf_ob = TFChip(cfg, chr)
         element_data = ctcf_ob.get_ctcf_data()
 
-    elif element == "fires":
+    elif element == "FIREs":
         fire_ob = Fires(cfg, chr)
         fire_ob.get_fire_data()
         element_data = fire_ob.filter_fire_data()
 
-    elif element == "tads":
+    elif element == "TADs":
         fire_ob = Fires(cfg, chr)
         element_data = fire_ob.get_tad_data()
 
-    elif element == "loop_domains":
+    elif element == "Loop_Domains":
         loop_ob = Loops(cfg, chr, mode="ig")
         element_data = loop_ob.get_loop_data()
 
-    elif element == "domains":
+    elif element == "Domains":
         domain_ob = Domains(cfg, chr, mode="ig")
         element_data = domain_ob.get_domain_data()
 
-    elif element == "rad21":
+    elif element == "RAD21":
         tf_ob = TFChip(cfg, chr)
         element_data, _ = tf_ob.get_cohesin_data()
 
-    elif element == "smc3":
+    elif element == "SMC3":
         tf_ob = TFChip(cfg, chr)
         _, element_data = tf_ob.get_cohesin_data()
 

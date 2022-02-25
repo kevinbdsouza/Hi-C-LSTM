@@ -61,7 +61,7 @@ class Fires:
         tads["end"] = tads["end"] // self.cfg.resolution
 
         tad_data_chr = tads.loc[tads['chr'] == self.chr_tad].reset_index(drop=True)
-        tad_data_chr['target'] = 1
+        tad_data_chr['target'] = "TADs"
         tad_data_chr = tad_data_chr.filter(['start', 'end', 'target'], axis=1)
 
         return tad_data_chr
