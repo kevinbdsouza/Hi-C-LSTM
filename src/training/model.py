@@ -397,6 +397,20 @@ class SeqLSTM(nn.Module):
         Return
         Args:
             data_loader (DataLoader): DataLoader containing dataset to iterate over
+        Raises:
+            if there is an error in selection targets concerning tuples. Change some internal code in:
+                def _select_targets(output: Tensor, target: TargetType) -> Tensor:
+                    num_examples = output[0].shape[0]
+                    dims = len(output[0].shape)
+                    device = output[0].device
+
+                    elif isinstance(target, list):
+                        assert len(target) == num_examples, "Target list length does not match output!"
+                        if isinstance(target[0], int):
+                            assert dims == 2, "Output must be 2D to select tensor of targets."
+                            return torch.gather(
+                                output[0], 1, torch.tensor(target, device=device).reshape(len(output[0]), 1)
+                            )
         """
         device = self.device
         cfg = self.cfg
