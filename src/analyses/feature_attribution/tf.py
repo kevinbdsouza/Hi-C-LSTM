@@ -23,8 +23,7 @@ class TFChip:
     def alter_data(self, data):
         column_list = ["chr", "start", "end", "dot", "score", "dot_2", "enrich", "pval", "qval", "peak"]
         data.columns = column_list
-        data['target'] = 1
-        ctcf_data = data.filter(['start', 'end', "target"], axis=1)
+        data['target'] = "CTCF"
 
         data["start"] = (data["start"]).astype(int) // self.cfg.resolution
         data["end"] = (data["end"]).astype(int) // self.cfg.resolution
