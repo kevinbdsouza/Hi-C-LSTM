@@ -172,7 +172,8 @@ if __name__ == '__main__':
             ig_elements = attribute_elements(cfg, chr, ig_df, element=cfg.element)
             ig_elements.to_csv(cfg.output_directory + "ig_%s_chr%s.csv" % (cfg.element, str(chr)), sep="\t")
 
-        main_df = pd.concat([main_df, ig_elements], axis=0)
+        if cfg.run_tfs or cfg.run_elements:
+            main_df = pd.concat([main_df, ig_elements], axis=0)
 
     if cfg.run_tfs:
         main_df = main_df.groupby('target').agg({'ig': 'mean'})
