@@ -61,6 +61,7 @@ def get_top_tfs_chip(cfg, ig_df, chr):
     chip_data = downstream_ob.downstream_helper_ob.get_window_data(chip_data)
     chip_data["pos"] = chip_data["pos"] + cumpos
     ig_df = pd.merge(ig_df, chip_data, on="pos")
+    ig_df = ig_df[["pos", "ig"]]
     ig_df.reset_index(drop=True, inplace=True)
     return ig_df
 
