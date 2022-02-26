@@ -91,4 +91,4 @@ class Config:
         self.run_chip = False
         self.run_elements = True
         self.element = "Segway"
-        self.run_all_elements = True
+        self.run_all_elements = False
