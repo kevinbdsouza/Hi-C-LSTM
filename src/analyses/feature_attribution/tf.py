@@ -34,7 +34,7 @@ class TFChip:
 
         chip_data["start"] = (chip_data["start_full"]).astype(int) // self.cfg.resolution
         chip_data["end"] = (chip_data["end_full"]).astype(int) // self.cfg.resolution
-        chip_data = chip_data.filter(['start', 'end', 'start_full', 'end_full', 'target'], axis=1)
+        chip_data = chip_data.filter(['start', 'end', 'start_full', 'end_full', 'target', 'chr'], axis=1)
 
         chip_data = chip_data.sort_values('start')
         return chip_data
