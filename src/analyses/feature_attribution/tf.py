@@ -14,6 +14,7 @@ class TFChip:
         self.pol2_file_name = "pol2.bam"
         self.cfg = cfg
         self.mode = mode
+        self.loop_chr = chr
         self.chr = 'chr' + str(chr)
 
     def get_ctcf_data(self):
@@ -55,7 +56,7 @@ class TFChip:
         merged_data = merged_data.drop_duplicates(subset=['start', 'end'], keep='last')
         merged_data["target"] = "CTCF+Cohesin"
 
-        loop_ob = Loops(cfg, chr, mode="ig")
+        loop_ob = Loops(self.cfg, self.loop_chr, mode="ig")
         loop_data = loop_ob.get_loop_data()
         loop_data = loop_data.drop_duplicates(keep='first').reset_index(drop=True)
         loop_data = loop_ob.down_helper_ob.get_window_data(loop_data)
