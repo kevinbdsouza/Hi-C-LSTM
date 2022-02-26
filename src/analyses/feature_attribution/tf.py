@@ -26,9 +26,10 @@ class TFChip:
             NA
         """
 
-        tf_data = pd.read_csv(os.path.join(self.tf_path, self.tf_bed_name), sep="\t", header=None)
-
-        pass
+        chip_data = pd.read_csv(os.path.join(self.tf_path, self.tf_bed_name), sep="\t", header=None)
+        chip_data = chip_data.loc[chip_data[:][0] == self.chr]
+        chip_data = self.alter_data(chip_data)
+        return chip_data
 
     def get_ctcf_data(self):
         """
@@ -71,14 +72,12 @@ class TFChip:
         rad_data = pd.read_csv(os.path.join(self.cohesin_path, self.rad21_file_name), sep="\t", header=None)
         rad_data = rad_data.loc[rad_data[:][0] == self.chr]
         rad_data = self.alter_data(rad_data)
+        rad_data["target"] = "RAD21"
 
         smc_data = pd.read_csv(os.path.join(self.cohesin_path, self.smc3_file_name), sep="\t", header=None)
         smc_data = smc_data.loc[smc_data[:][0] == self.chr]
         smc_data = self.alter_data(smc_data)
-
-        if self.mode == "ig":
-            rad_data["target"] = "RAD21"
-            smc_data["target"] = "SMC3"
+        smc_data["target"] = "SMC3"
 
         return rad_data, smc_data
 

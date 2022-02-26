@@ -51,9 +51,18 @@ def get_top_tfs_chip(cfg, ig_df, chr):
         chr (int): The chromosome to which IG values belong.
     """
 
+    downstream_ob = DownstreamTasks(cfg, chr, mode='lstm')
+    cumpos = get_cumpos(cfg, chr)
+
     tf_ob = TFChip(cfg, chr)
     chip_data = tf_ob.get_chip_data()
-    pass
+
+    chip_data = chip_data.drop_duplicates(keep='first').reset_index(drop=True)
+    chip_data = downstream_ob.downstream_helper_ob.get_window_data(chip_data)
+    chip_data["pos"] = chip_data["pos"] + cumpos
+    ig_df = pd.merge(ig_df, chip_data, on="pos")
+    ig_df.reset_index(drop=True, inplace=True)
+    return ig_df
 
 
 def get_top_tfs_db(cfg, ig_df, chr):
@@ -81,7 +90,7 @@ def get_top_tfs_db(cfg, ig_df, chr):
 
     "convert TF positions to cumulative indices"
     cumpos = get_cumpos(cfg, chr)
-    chr_start = [cumpos for i in range(len(tf_db_chr))]
+    chr_start = [cumpos for _ in range(len(tf_db_chr))]
     tf_db_chr["start"] = tf_db_chr["start"] + chr_start
     tf_db_chr = tf_db_chr.rename(columns={'start': 'pos', 'HGNC symbol': 'target'})
 
