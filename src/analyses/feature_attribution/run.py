@@ -206,7 +206,7 @@ def run_experiment(cfg, model):
         cfg (Config): The configuration to use for the experiment.
         model (SeqLSTM): Model to be used to run integrated gradients.
     """
-    main_df = pd.DataFrame(columns=["pos", "target"])
+    main_df = pd.DataFrame()
     for chr in cfg.decoder_test_list:
         print('IG Start Chromosome: {}'.format(chr))
 
