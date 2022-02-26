@@ -77,7 +77,8 @@ def get_top_tfs_db(cfg, ig_df, chr):
     tf_db_chr = tf_db.loc[tf_db["chromosome"] == chr]
 
     "convert TF positions to cumulative indices"
-    chr_start = get_cumpos(cfg, chr)
+    cumpos = get_cumpos(cfg, chr)
+    chr_start = [cumpos for i in range(len(tf_db_chr))]
     tf_db_chr["start"] = tf_db_chr["start"] + chr_start
     tf_db_chr = tf_db_chr.rename(columns={'start': 'pos', 'HGNC symbol': 'target'})
 

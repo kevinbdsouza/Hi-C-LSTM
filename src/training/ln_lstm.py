@@ -13,6 +13,10 @@ os.environ["CUDA_VISIBLE_DEVICES"] = "1"
 
 
 class LSTM(nn.Module):
+    """
+    Implementation of LayerNormLSTM.
+    """
+
     def __init__(self,
                  input_size,
                  hidden_size,
@@ -45,7 +49,7 @@ class LSTM(nn.Module):
             l.reset_parameters()
 
     def init_hidden(self, batch_size):
-        # Uses Xavier init here.
+        "Uses Xavier init here"
         hiddens = []
         for l in self.layers:
             std = math.sqrt(2.0 / (l.input_size + l.hidden_size))
@@ -80,7 +84,7 @@ class LSTM(nn.Module):
         if self.direction > 1:
             x = torch.cat((x, x), 2)
         if type(hiddens) != list:
-            # when the hidden feed is (direction * num_layer, batch, hidden)
+            "when the hidden feed is (direction * num_layer, batch, hidden)"
             tmp = []
             for idx in range(hiddens[0].size(0)):
                 tmp.append((hiddens[0].narrow(0, idx, 1),
@@ -128,7 +132,7 @@ class CLN(nn.Module):
         self.alpha = Parameter(self.alpha)
         self.beta = Parameter(self.beta)
 
-        # MLP used to predict delta of alpha, beta
+        "MLP used to predict delta of alpha, beta"
         self.fc_alpha = nn.Linear(self.image_size, self.input_size)
         self.fc_beta = nn.Linear(self.image_size, self.input_size)
 
@@ -147,7 +151,7 @@ class CLN(nn.Module):
     def forward(self, x, image_emb):
         if image_emb is None:
             return x
-        # x: (batch, input_size)
+        "x: (batch, input_size)"
         size = x.size()
         x = x.view(x.size(0), -1)
         x = (x - torch.mean(x, 1).unsqueeze(1).expand_as(x)) / torch.sqrt(
@@ -174,7 +178,7 @@ class LayerNorm(nn.Module):
         self.alpha = Tensor(1, input_size).fill_(1)
         self.beta = Tensor(1, input_size).fill_(0)
         self.epsilon = epsilon
-        # Wrap as parameters if necessary
+        "Wrap as parameters if necessary"
         if learnable:
             W = Parameter
         else:
@@ -240,19 +244,19 @@ class LSTMcell(nn.Module):
         c = c.view(c.size(1), -1)
         x = x.view(x.size(1), -1)
 
-        # Linear mappings
+        "Linear mappings"
         preact = self.i2h(x) + self.h2h(h)
 
         soft_sign = nn.Softsign()
 
-        # activations
+        "activations"
         gates = preact[:, :3 * self.hidden_size].sigmoid()
         g_t = soft_sign(preact[:, 3 * self.hidden_size:])
         i_t = gates[:, :self.hidden_size]
         f_t = gates[:, self.hidden_size:2 * self.hidden_size]
         o_t = gates[:, -self.hidden_size:]
 
-        # cell computations
+        "cell computations"
         if do_dropout and self.dropout_method == 'semeniuta':
             g_t = F.dropout(g_t, p=self.dropout, training=self.training)
 
@@ -264,7 +268,7 @@ class LSTMcell(nn.Module):
 
         h_t = torch.mul(o_t, soft_sign(c_t))
 
-        # Reshape for compatibility
+        "Reshape for compatibility"
         if do_dropout:
             if self.dropout_method == 'pytorch':
                 F.dropout(h_t, p=self.dropout, training=self.training, inplace=True)
@@ -319,7 +323,7 @@ class LayerNormLSTM(LSTMcell):
         c = c.view(c.size(1), -1)
         x = x.view(x.size(1), -1)
 
-        # Linear mappings
+        "Linear mappings"
         i2h = self.i2h(x)
         h2h = self.h2h(h)
         if self.ln_preact:
@@ -333,14 +337,14 @@ class LayerNormLSTM(LSTMcell):
 
         soft_sign = nn.Softsign()
 
-        # activations
+        "activations"
         gates = preact[:, :3 * self.hidden_size].sigmoid()
         g_t = soft_sign(preact[:, 3 * self.hidden_size:])
         i_t = gates[:, :self.hidden_size]
         f_t = gates[:, self.hidden_size:2 * self.hidden_size]
         o_t = gates[:, -self.hidden_size:]
 
-        # cell computations
+        "cell computations"
         if do_dropout and self.dropout_method == 'semeniuta':
             g_t = F.dropout(g_t, p=self.dropout, training=self.training)
 
@@ -357,7 +361,7 @@ class LayerNormLSTM(LSTMcell):
 
         h_t = torch.mul(o_t, soft_sign(c_t))
 
-        # Reshape for compatibility
+        "Reshape for compatibility"
         if do_dropout:
             if self.dropout_method == 'pytorch':
                 F.dropout(h_t, p=self.dropout, training=self.training, inplace=True)
@@ -373,7 +377,6 @@ class LayerNormLSTM(LSTMcell):
 if __name__ == '__main__':
     model = LSTM(50, 100, 2)
     x = Variable(Tensor(50, 32, 50))
-    # h = model.init_hidden(32)
     h = (Variable(Tensor(2 * 2, 32, 100)),
          Variable(Tensor(2 * 2, 32, 100)))
     print(model(x, h))
