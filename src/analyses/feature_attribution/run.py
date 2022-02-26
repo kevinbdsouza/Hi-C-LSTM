@@ -235,7 +235,8 @@ def run_experiment(cfg, model):
 
     "sort TFs by IG values"
     if cfg.run_tfs:
-        main_df = main_df.groupby('target').agg({'ig': 'mean'})
+        if not cfg.run_chip:
+            main_df = main_df.groupby('target').agg({'ig': 'mean'})
         main_df = main_df.sort_values("ig", ascending=False)
         main_df.to_csv(cfg.output_directory + "ig_tf.csv", sep="\t")
     elif cfg.run_elements:
