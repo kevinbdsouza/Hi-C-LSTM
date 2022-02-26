@@ -25,10 +25,17 @@ class TFChip:
         Args:
             NA
         """
+        column_list = ["chr", "start_full", "end_full", "dot", "score", "dot_2", "enrich", "pval", "qval", "peak"]
 
         chip_data = pd.read_csv(os.path.join(self.tf_path, self.tf_bed_name), sep="\t", header=None)
         chip_data = chip_data.loc[chip_data[:][0] == self.chr]
-        chip_data = self.alter_data(chip_data)
+        chip_data.columns = column_list
+
+        chip_data["start"] = (chip_data["start_full"]).astype(int) // self.cfg.resolution
+        chip_data["end"] = (chip_data["end_full"]).astype(int) // self.cfg.resolution
+        chip_data = chip_data.filter(['start', 'end', 'start_full', 'end_full', 'target'], axis=1)
+
+        chip_data = chip_data.sort_values('start')
         return chip_data
 
     def get_ctcf_data(self):
