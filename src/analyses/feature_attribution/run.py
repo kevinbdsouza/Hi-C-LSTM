@@ -147,7 +147,8 @@ def attribute_elements(cfg, chr, ig_df, element="ctcf"):
 
     elif element == "TADBs":
         domain_ob = Domains(cfg, chr, mode="ig")
-        element_data = domain_ob.get_tad_boundaries(ctcf="all")
+        tf_ob = TFChip(cfg, chr)
+        element_data = domain_ob.get_tad_boundaries(tf_ob, ctcf="all")
         pass
 
     elif element == "TADBsCTCF+":
