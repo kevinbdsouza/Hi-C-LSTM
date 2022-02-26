@@ -16,7 +16,6 @@ class TFChip:
         self.cfg = cfg
         self.mode = mode
         self.chr = 'chr' + str(chr)
-        self.downstream_ob = DownstreamTasks(cfg, chr, mode='lstm')
 
     def get_ctcf_data(self):
         data = pd.read_csv(os.path.join(self.file_path, self.chr + ".bed"), sep="\t", header=None)
@@ -60,7 +59,7 @@ class TFChip:
         loop_ob = Loops(cfg, chr, mode="ig")
         loop_data = loop_ob.get_loop_data()
         loop_data = loop_data.drop_duplicates(keep='first').reset_index(drop=True)
-        loop_data = self.downstream_ob.downstream_helper_ob.get_window_data(loop_data)
+        loop_data = loop_ob.down_helper_ob.get_window_data(loop_data)
         if loops == "inside":
             within_loops = merged_data[merged_data["start"].isin(loop_data["pos"])]
             merged_data = pd.concat([within_loops, merged_data[merged_data["end"].isin(loop_data["pos"])]])
