@@ -97,11 +97,11 @@ class Domains:
         ctcf_ob = TFChip(self.cfg, self.chr)
         ctcf_data = ctcf_ob.get_ctcf_data()
         if ctcf == "positive":
-            tadbs = tadbs[tadbs["pos"].isin(ctcf_data["start"])]
-            tadbs = tadbs[tadbs["pos"].isin(ctcf_data["end"])]
+            tadbctcf = tadbs[tadbs["pos"].isin(ctcf_data["start"])]
+            tadbs = pd.concat([tadbctcf, tadbs[tadbs["pos"].isin(ctcf_data["end"])]])
         elif ctcf == "negative":
-            tadbs = tadbs[~tadbs["pos"].isin(ctcf_data["start"])]
-            tadbs = tadbs[~tadbs["pos"].isin(ctcf_data["end"])]
+            tadbctcf = tadbs[~tadbs["pos"].isin(ctcf_data["start"])]
+            tadbs = pd.concat([tadbctcf, ~tadbs[tadbs["pos"].isin(ctcf_data["end"])]])
 
         return tadbs
 
