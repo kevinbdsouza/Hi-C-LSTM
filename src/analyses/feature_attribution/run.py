@@ -152,11 +152,13 @@ def attribute_elements(cfg, chr, ig_df, element="ctcf"):
 
     elif element == "TADBsCTCF+":
         domain_ob = Domains(cfg, chr, mode="ig")
-        element_data = domain_ob.get_tad_boundaries(ctcf="positive")
+        tf_ob = TFChip(cfg, chr)
+        element_data = domain_ob.get_tad_boundaries(tf_ob, ctcf="positive")
 
     elif element == "TADBsCTCF-":
         domain_ob = Domains(cfg, chr, mode="ig")
-        element_data = domain_ob.get_tad_boundaries(ctcf="negative")
+        tf_ob = TFChip(cfg, chr)
+        element_data = domain_ob.get_tad_boundaries(tf_ob, ctcf="negative")
 
     elif element == "Loop_CTCFCohesin":
         tf_ob = TFChip(cfg, chr)

@@ -2,7 +2,6 @@ import pandas as pd
 import os
 from training.config import Config
 from analyses.classification.loops import Loops
-from analyses.classification.run import DownstreamTasks
 
 
 class TFChip:
