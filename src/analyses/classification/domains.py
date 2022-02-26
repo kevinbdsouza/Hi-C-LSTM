@@ -97,11 +97,11 @@ class Domains:
         ctcf_ob = TFChip(self.cfg, self.chr)
         ctcf_data = ctcf_ob.get_ctcf_data()
         if ctcf == "positive":
-            tadbs = tadbs[tadbs["start"].any() == ctcf_data["starts"].any()]
-            tadbs = tadbs[tadbs["end"].any() == ctcf_data["end"].any()]
+            tadbs = tadbs[tadbs["pos"].isin(ctcf_data["start"])]
+            tadbs = tadbs[tadbs["pos"].isin(ctcf_data["end"])]
         elif ctcf == "negative":
-            tadbs = tadbs[tadbs["start"].any() != ctcf_data["starts"].any()]
-            tadbs = tadbs[tadbs["end"].any() != ctcf_data["end"].any()]
+            tadbs = tadbs[~tadbs["pos"].isin(ctcf_data["start"])]
+            tadbs = tadbs[~tadbs["pos"].isin(ctcf_data["end"])]
 
         return tadbs
 
