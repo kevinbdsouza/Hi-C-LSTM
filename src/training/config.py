@@ -92,6 +92,6 @@ class Config:
         self.run_elements = True
         self.element = "Segway"
         self.run_all_elements = False
-        self.elements_list = "CTCF", "RAD21", "SMC3", "GBR", "TADs", "FIREs", "Domains", "Loop_Domains",
+        self.elements_list = ["CTCF", "RAD21", "SMC3", "GBR", "TADs", "FIREs", "Domains", "Loop_Domains",
                                 "Merge_Domains", "TADBs", "TADBsCTCF+", "TADBsCTCF-", "Loop_CTCFCohesin",
                                 "NonLoop_CTCFCohesin"]

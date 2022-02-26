@@ -266,12 +266,9 @@ def run_all_elements(cfg, model):
         model (SeqLSTM): Model to be used to run integrated gradients.
     """
 
-    element_list = ["CTCF", "RAD21", "SMC3", "GBR", "TADs", "FIREs", "Domains", "Loop_Domains",
-                    "Merge_Domains", "TADBs", "TADBsCTCF+", "TADBsCTCF-", "Loop_CTCFCohesin",
-                    "NonLoop_CTCFCohesin"]
     cfg.run_elements = True
     cfg.run_tfs = False
-    for element in element_list:
+    for element in cfg.elements_list:
         cfg.element = element
         run_experiment(cfg, model)
 
