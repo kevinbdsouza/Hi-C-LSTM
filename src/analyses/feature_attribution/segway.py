@@ -22,13 +22,20 @@ class SegWay:
 
     def convert_segway_labels(self, segway_annotations):
         """
-
+        convert_segway_labels(segway_annotations) -> DataFrame
+        Converts numerical segway labels to string segway labels.
+        Args:
+            segway_annotations (DataFrame): Segway data to be converted
         """
+
         return segway_annotations.reset_index(drop=True)
 
     def segway_small_annotations(self):
         """
-
+        segway_small_annotations() -> DataFrame
+        Obtains segway small scale positions and labels.
+        Args:
+            NA
         """
         column_list = ["chr", "start", "end", "target", "num", "dot", "start_2", "end_2", "color"]
         segway_annotations = pd.read_csv(self.segway_small_annotations_path + self.seg_chr_bed,
@@ -43,13 +50,20 @@ class SegWay:
 
     def convert_gbr_labels(self, gbr_annotations):
         """
-        No need of conversion at this point.
+        convert_gbr_labels(gbr_annotations) -> DataFrame
+        Converts segway GBR labels to better string segway labels.
+        Currently not implemented.
+        Args:
+            gbr_annotations (DataFrame): GBR data to be converted
         """
         return gbr_annotations.reset_index(drop=True)
 
     def segway_gbr(self):
         """
-
+        segway_gbr() -> DataFrame
+        Obtains segway GBR domain scale positions and labels.
+        Args:
+            NA
         """
         column_list = ["chr", "start", "end", "target", "num", "dot", "start_2", "end_2", "color"]
         gbr_annotations = pd.read_csv(

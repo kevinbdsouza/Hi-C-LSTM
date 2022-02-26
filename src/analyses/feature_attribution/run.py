@@ -11,7 +11,6 @@ from analyses.classification.run import DownstreamTasks
 from analyses.classification.fires import Fires
 from analyses.classification.loops import Loops
 from analyses.classification.domains import Domains
-from analyses.plot.plot_utils import plot_gbr
 from training.data_utils import get_cumpos
 
 device = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
@@ -19,8 +18,9 @@ device = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
 
 def run_captum(cfg, model, chr):
     """
-    captum_test(cfg, model, chr) -> DataFrame
+    run_captum(cfg, model, chr) -> DataFrame
     Gets data for chromosome and cell type. Runs IG using captum.
+    Saves resulting IG DataFrame.
     Args:
         cfg (Config): The configuration to use for the experiment.
         model (SeqLSTM): The model to run captum on.
@@ -48,7 +48,7 @@ def get_top_tfs_chip(cfg, ig_df, chr):
     Args:
         cfg (Config): The configuration to use for the experiment.
         ig_df (DataFrame): Dataframe containing positions and IG values.
-        chr (int): The chromosome to run captum on.
+        chr (int): The chromosome to which IG values belong.
     """
     pass
 
@@ -56,11 +56,11 @@ def get_top_tfs_chip(cfg, ig_df, chr):
 def get_top_tfs_db(cfg, ig_df, chr):
     """
     get_top_tfs_db(cfg, ig_df, chr) -> DataFrame
-    Attributed importance to each of the TFs according TF database from TFBS website.
+    Attributed importance to each of the TFs according TF database from TFBS web portal.
     Args:
         cfg (Config): The configuration to use for the experiment.
         ig_df (DataFrame): Dataframe containing positions and IG values.
-        chr (int): The chromosome to run captum on.
+        chr (int): The chromosome to which IG values belong.
     """
 
     ig_df = ig_df.astype({"pos": int})
@@ -92,10 +92,11 @@ def attribute_elements(cfg, chr, ig_df, element="ctcf"):
     Merges data for specified element with IG values based on position.
     Args:
         cfg (Config): The configuration to use for the experiment.
-        chr (int): The chromosome to run captum on.
+        chr (int): The chromosome to which IG values belong.
         ig_df (Dataframe): Dataframe containing positions and IG values
         element (string): one of Segway, GBR, CTCF, FIREs, TADs, Loop_Domains,
-                        Domains, RAD21, SMC3
+                        Domains, RAD21, SMC3, Merge_Domains, TADBs, TADBsCTCF+,
+                        TADBsCTCF-, Loop_CTCFCohesin, NonLoop_CTCFCohesin.
     """
 
     "use downstream obejct to access helper"
@@ -180,6 +181,17 @@ def attribute_elements(cfg, chr, ig_df, element="ctcf"):
 
 
 def run_experiment(cfg, model):
+    """
+    run_experiment(cfg, model) -> No return object
+    Runs experiment with specified config for all specified test chromosomes.
+    If run_captum is True, runs captum on specifief chromosome. If False loads from saved IG DataFrame.
+    If run_tfs is True, compares with TFBS positions.
+    if run_elements is True, compares with psoitions of specified element.
+    Use run_all_elements to run for all elements in elements list.
+    Args:
+        cfg (Config): The configuration to use for the experiment.
+        model (SeqLSTM): Model to be used to run integrated gradients.
+    """
     main_df = pd.DataFrame(columns=["pos", "target"])
     for chr in cfg.decoder_test_list:
         print('IG Start Chromosome: {}'.format(chr))
@@ -216,6 +228,14 @@ def run_experiment(cfg, model):
 
 
 def run_all_elements(cfg, model):
+    """
+    run_all_elements(cfg, model) -> No return object
+    Runs experiment with specified config and chosen element. Run experiment runs for all specified test chromosomes.
+    Args:
+        cfg (Config): The configuration to use for the experiment.
+        model (SeqLSTM): Model to be used to run integrated gradients.
+    """
+
     element_list = ["CTCF", "RAD21", "SMC3", "GBR", "TADs", "FIREs", "Domains", "Loop_Domains",
                     "Merge_Domains", "TADBs", "TADBsCTCF+", "TADBsCTCF-", "Loop_CTCFCohesin",
                     "NonLoop_CTCFCohesin"]
@@ -236,6 +256,8 @@ if __name__ == '__main__':
     model.load_weights()
 
     if cfg.run_all_elements:
+        "run all elements"
         run_all_elements(cfg, model)
     else:
+        "run according to config"
         run_experiment(cfg, model)

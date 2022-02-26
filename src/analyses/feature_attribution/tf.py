@@ -18,11 +18,25 @@ class TFChip:
         self.chr = 'chr' + str(chr)
 
     def get_ctcf_data(self):
+        """
+        get_ctcf_data() -> DataFrame
+        Gets CTCF CHipSeq positions. Filters columns. Converts them to desired resolution.
+        Args:
+            NA
+        """
+
         data = pd.read_csv(os.path.join(self.file_path, self.chr + ".bed"), sep="\t", header=None)
         ctcf_data = self.alter_data(data)
         return ctcf_data
 
     def alter_data(self, data):
+        """
+        alter_data(data) -> DataFrame
+        Filters columns. Converts them to desired resolution.
+        Args:
+            data (DataFrame): The loaded CTCF positions.
+        """
+
         column_list = ["chr", "start", "end", "dot", "score", "dot_2", "enrich", "pval", "qval", "peak"]
         data.columns = column_list
         data['target'] = "CTCF"
@@ -35,6 +49,12 @@ class TFChip:
         return data
 
     def get_cohesin_data(self):
+        """
+        get_ctcf_data() -> DataFrame, DataFrame
+        Gets RAD21 and SMC3 CHipSeq positions. Filters columns. Converts them to desired resolution.
+        Args:
+            NA
+        """
         rad_data = pd.read_csv(os.path.join(self.cohesin_path, self.rad21_file_name), sep="\t", header=None)
         rad_data = rad_data.loc[rad_data[:][0] == self.chr]
         rad_data = self.alter_data(rad_data)
@@ -50,6 +70,15 @@ class TFChip:
         return rad_data, smc_data
 
     def ctcf_in_loops(self, loops="inside"):
+        """
+        ctcf_in_loops(loops) -> DataFrame
+        Gets common CTCF and Cohesin positions. Obtains Loop data.
+        If inside is specified, gets common positions inside loops.
+        If outside is specified, gets common positions outside loops.
+        Args:
+            loops (string): one of all, inside, and outside
+        """
+
         ctcf_data = self.get_ctcf_data()
         rad_data, smc_data = self.get_cohesin_data()
         merged_data = pd.concat([ctcf_data, rad_data, smc_data])
