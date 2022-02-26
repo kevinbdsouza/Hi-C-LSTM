@@ -159,10 +159,12 @@ def attribute_elements(cfg, chr, ig_df, element="ctcf"):
         element_data = domain_ob.get_tad_boundaries(ctcf="negative")
 
     elif element == "Loop_CTCFCohesin":
-        pass
+        tf_ob = TFChip(cfg, chr)
+        element_data = tf_ob.ctcf_in_loops(loops="inside")
 
     elif element == "NonLoop_CTCFCohesin":
-        pass
+        tf_ob = TFChip(cfg, chr)
+        element_data = tf_ob.ctcf_in_loops(loops="outside")
 
     element_data = element_data.drop_duplicates(keep='first').reset_index(drop=True)
     if element != "TADBs" and element != "TADBsCTCF+" and element != "TADBsCTCF-":
@@ -214,6 +216,8 @@ def run_all_elements(cfg, model):
     element_list = ["CTCF", "RAD21", "SMC3", "GBR", "TADs", "FIREs", "Domains", "Loop_Domains",
                     "Merge_Domains", "TADBs", "TADBsCTCF+", "TADBsCTCF-", "Loop_CTCFCohesin",
                     "NonLoop_CTCFCohesin"]
+    cfg.run_elements = True
+    cfg.run_tfs = False
     for element in element_list:
         cfg.element = element
         run_experiment(cfg, model)
@@ -231,4 +235,5 @@ if __name__ == '__main__':
     if cfg.run_all_elements:
         run_all_elements(cfg, model)
     else:
+        cfg.run_tfs = True
         run_experiment(cfg, model)

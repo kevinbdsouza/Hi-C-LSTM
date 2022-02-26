@@ -1,6 +1,8 @@
 import pandas as pd
 import os
-from training import config
+from training.config import Config
+from analyses.classification.loops import Loops
+from analyses.classification.run import DownstreamTasks
 
 
 class TFChip:
@@ -14,6 +16,7 @@ class TFChip:
         self.cfg = cfg
         self.mode = mode
         self.chr = 'chr' + str(chr)
+        self.downstream_ob = DownstreamTasks(cfg, chr, mode='lstm')
 
     def get_ctcf_data(self):
         data = pd.read_csv(os.path.join(self.file_path, self.chr + ".bed"), sep="\t", header=None)
@@ -47,16 +50,31 @@ class TFChip:
 
         return rad_data, smc_data
 
+    def ctcf_in_loops(self, loops="inside"):
+        ctcf_data = self.get_ctcf_data()
+        rad_data, smc_data = self.get_cohesin_data()
+        merged_data = pd.concat([ctcf_data, rad_data, smc_data])
+        merged_data = merged_data.drop_duplicates(subset=['start', 'end'], keep='last')
+        merged_data["target"] = "CTCF+Cohesin"
+
+        loop_ob = Loops(cfg, chr, mode="ig")
+        loop_data = loop_ob.get_loop_data()
+        loop_data = loop_data.drop_duplicates(keep='first').reset_index(drop=True)
+        loop_data = self.downstream_ob.downstream_helper_ob.get_window_data(loop_data)
+        if loops == "inside":
+            within_loops = merged_data[merged_data["start"].isin(loop_data["pos"])]
+            merged_data = pd.concat([within_loops, merged_data[merged_data["end"].isin(loop_data["pos"])]])
+        elif loops == "outside":
+            outside_loops = merged_data[~merged_data["start"].isin(loop_data["pos"])]
+            merged_data = pd.concat([outside_loops, merged_data[~merged_data["end"].isin(loop_data["pos"])]])
+
+        return merged_data
+
 
 if __name__ == '__main__':
-    data_dir = "/data2/hic_lstm/downstream"
-
     chr = 21
-    cfg = config.Config()
-    cell = "GM12878"
+    cfg = Config()
+    cell = cfg.cell
 
-    rep_ob = TFChip(cfg, cell, chr)
-    # data = rep_ob.get_ctcf_data()
-
+    rep_ob = TFChip(cfg, cell, mode="ig")
     rad_data, smc_data = rep_ob.get_cohesin_data()
-    print("done")
