@@ -30,9 +30,10 @@ class SegWay:
 
         labels = pd.read_csv(self.segway_label_file, sep="\t")
         for i in range(len(labels)):
-            segway_annotations.loc[segway_annotations["target"] == labels.loc[i]["old"]]["target"] = labels.loc[i][
+            segway_annotations.loc[segway_annotations["target"] == labels.loc[i]["old"], "target"] = labels.loc[i][
                 "description"]
 
+        segway_annotations = segway_annotations.loc[segway_annotations["target"] != "H3K9me1 only"]
         return segway_annotations.reset_index(drop=True)
 
     def segway_small_annotations(self):
