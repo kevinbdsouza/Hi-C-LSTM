@@ -89,5 +89,5 @@ class Config:
         self.tf_columns = ["HGNC symbol", "chromosome", "start"]
         self.run_tfs = False
         self.run_elements = True
-        self.element = "Loop_CTCFCohesin"
+        self.element = "NonLoop_CTCFCohesin"
         self.run_all_elements = False

@@ -63,9 +63,11 @@ class TFChip:
         if loops == "inside":
             within_loops = merged_data[merged_data["start"].isin(loop_data["pos"])]
             merged_data = pd.concat([within_loops, merged_data[merged_data["end"].isin(loop_data["pos"])]])
+            merged_data["target"] = "CTCF+Cohesin_Loop"
         elif loops == "outside":
             outside_loops = merged_data[~merged_data["start"].isin(loop_data["pos"])]
             merged_data = pd.concat([outside_loops, merged_data[~merged_data["end"].isin(loop_data["pos"])]])
+            merged_data["target"] = "CTCF+Cohesin_NonLoop"
 
         return merged_data
 
