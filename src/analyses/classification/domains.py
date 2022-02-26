@@ -101,7 +101,7 @@ class Domains:
             tadbs = pd.concat([tadbctcf, tadbs[tadbs["pos"].isin(ctcf_data["end"])]])
         elif ctcf == "negative":
             tadbctcf = tadbs[~tadbs["pos"].isin(ctcf_data["start"])]
-            tadbs = pd.concat([tadbctcf, ~tadbs[tadbs["pos"].isin(ctcf_data["end"])]])
+            tadbs = pd.concat([tadbctcf, tadbs[~tadbs["pos"].isin(ctcf_data["end"])]])
 
         return tadbs
 
