@@ -11,7 +11,7 @@ class SegWay:
     def __init__(self, cfg, chr):
         self.segway_small_annotations_path = "/data2/hic_lstm/downstream/segway_small/"
         self.segway_small_file_name = "segway.hg19.bed"
-        self.segway_small_label_file = "mnemonics.txt"
+        self.segway_label_file = self.segway_small_annotations_path + "mnemonics.txt"
         self.segway_gbr_annotations_path = "/data2/hic_lstm/downstream/segway_gbr_domain/gbr_hg19_ann/"
         self.cfg = cfg
         self.chr = 'chr' + str(chr)
@@ -27,6 +27,11 @@ class SegWay:
         Args:
             segway_annotations (DataFrame): Segway data to be converted
         """
+
+        labels = pd.read_csv(self.segway_label_file, sep="\t")
+        for i in range(len(labels)):
+            segway_annotations.loc[segway_annotations["target"] == labels.loc[i]["old"]]["target"] = labels.loc[i][
+                "description"]
 
         return segway_annotations.reset_index(drop=True)
 
