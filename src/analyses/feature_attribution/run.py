@@ -69,7 +69,7 @@ def get_top_tfs_chip(cfg, ig_df, chr):
 
         for j in range(start, end + 1):
             pos_chip_data = pos_chip_data.append({'pos': j, 'target': chip_data.loc[i, "target"], 'start': chip_data.loc[i, "start_full"],
-                 'end': chip_data.loc[i, "end_full"}, ignore_index=True)
+                 'end': chip_data.loc[i, "end_full"]}, ignore_index=True)
 
     pos_chip_data["pos"] = pos_chip_data["pos"] + cumpos
     ig_df = pd.merge(ig_df, pos_chip_data, on="pos")
