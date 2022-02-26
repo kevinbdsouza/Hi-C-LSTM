@@ -238,5 +238,4 @@ if __name__ == '__main__':
     if cfg.run_all_elements:
         run_all_elements(cfg, model)
     else:
-        cfg.run_tfs = True
         run_experiment(cfg, model)
