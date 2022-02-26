@@ -55,7 +55,7 @@ class Config:
         self.dec_learning_rate = 0.01
         self.decoder_epochs = 20
         self.decoder_train_list = [21, 19]
-        self.decoder_test_list = list(range(7, 21))
+        self.decoder_test_list = list(range(5, 23))
 
         "Output Directories"
         self.proj_dir = "/home/kevindsouza/Documents/projects/PhD/Hi-C-LSTM/"
@@ -84,11 +84,11 @@ class Config:
         self.ctcf_dots_threshold = 41
 
         "captum"
-        self.run_captum = True
+        self.run_captum = False
         self.tf_file_path = self.output_directory + "tf_db.csv"
         self.tf_columns = ["HGNC symbol", "chromosome", "start"]
         self.run_tfs = False
         self.run_chip = False
-        self.run_elements = False
+        self.run_elements = True
         self.element = "Segway"
-        self.run_all_elements = False
+        self.run_all_elements = True
