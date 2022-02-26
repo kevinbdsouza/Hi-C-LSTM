@@ -51,7 +51,6 @@ def get_top_tfs_chip(cfg, ig_df, chr):
         chr (int): The chromosome to which IG values belong.
     """
 
-    downstream_ob = DownstreamTasks(cfg, chr, mode='lstm')
     cumpos = get_cumpos(cfg, chr)
 
     tf_ob = TFChip(cfg, chr)
@@ -69,8 +68,7 @@ def get_top_tfs_chip(cfg, ig_df, chr):
         end = chip_data.loc[i, "end"]
 
         for j in range(start, end + 1):
-            pos_chip_data = pos_chip_data.append(
-                {'pos': j, 'target': chip_data.loc[i, "target"], 'start': chip_data.loc[i, "start_full"],
+            pos_chip_data = pos_chip_data.append({'pos': j, 'target': chip_data.loc[i, "target"], 'start': chip_data.loc[i, "start_full"],
                  'end': chip_data.loc[i, "end_full"}, ignore_index=True)
 
     pos_chip_data["pos"] = pos_chip_data["pos"] + cumpos
