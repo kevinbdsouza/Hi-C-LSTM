@@ -58,10 +58,23 @@ def get_top_tfs_chip(cfg, ig_df, chr):
     chip_data = tf_ob.get_chip_data()
 
     chip_data = chip_data.drop_duplicates(keep='first').reset_index(drop=True)
-    chip_data = downstream_ob.downstream_helper_ob.get_window_data(chip_data)
-    chip_data["pos"] = chip_data["pos"] + cumpos
-    ig_df = pd.merge(ig_df, chip_data, on="pos")
-    ig_df = ig_df[["pos", "ig"]]
+
+    pos_chip_data = pd.DataFrame(columns=["pos", "target", "start", "end"])
+    if chip_data.index[0] == 1:
+        chip_data.index -= 1
+
+    for i in range(0, chip_data.shape[0]):
+
+        start = chip_data.loc[i, "start"]
+        end = chip_data.loc[i, "end"]
+
+        for j in range(start, end + 1):
+            pos_chip_data = pos_chip_data.append(
+                {'pos': j, 'target': chip_data.loc[i, "target"], 'start': chip_data.loc[i, "start_full"],
+                 'end': chip_data.loc[i, "end_full"}, ignore_index=True)
+
+    pos_chip_data["pos"] = pos_chip_data["pos"] + cumpos
+    ig_df = pd.merge(ig_df, pos_chip_data, on="pos")
     ig_df["pos"] = ig_df["pos"] - cumpos
     ig_df.reset_index(drop=True, inplace=True)
     return ig_df

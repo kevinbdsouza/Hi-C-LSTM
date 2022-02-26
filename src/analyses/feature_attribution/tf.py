@@ -30,6 +30,7 @@ class TFChip:
         chip_data = pd.read_csv(os.path.join(self.tf_path, self.tf_bed_name), sep="\t", header=None)
         chip_data = chip_data.loc[chip_data[:][0] == self.chr]
         chip_data.columns = column_list
+        chip_data['target'] = "TF"
 
         chip_data["start"] = (chip_data["start_full"]).astype(int) // self.cfg.resolution
         chip_data["end"] = (chip_data["end_full"]).astype(int) // self.cfg.resolution
