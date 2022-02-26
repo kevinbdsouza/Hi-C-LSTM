@@ -6,16 +6,29 @@ from analyses.classification.loops import Loops
 
 class TFChip:
     def __init__(self, cfg, chr, mode="ig"):
-        self.file_path = os.path.join(cfg.downstream_dir, "ctcf")
+        self.ctcf_path = os.path.join(cfg.downstream_dir, "ctcf")
         self.cohesin_path = os.path.join(cfg.downstream_dir, "cohesin")
-        self.file_name = "ENCFF706QLS.bed"
+        self.tf_path = os.path.join(cfg.downstream_dir, "tfs")
+        self.ctcf_file_name = "ENCFF706QLS.bed"
         self.rad21_file_name = "rad21.bed"
         self.smc3_file_name = "smc3.bed"
-        self.pol2_file_name = "pol2.bam"
+        self.tf_bed_name = "ENCFF957SRJ.bed"
         self.cfg = cfg
         self.mode = mode
         self.loop_chr = chr
         self.chr = 'chr' + str(chr)
+
+    def get_chip_data(self):
+        """
+        get_chip_data() -> DataFrame
+        Gets CHipSeq positions. Filters columns. Converts them to desired resolution.
+        Args:
+            NA
+        """
+
+        tf_data = pd.read_csv(os.path.join(self.tf_path, self.tf_bed_name), sep="\t", header=None)
+
+        pass
 
     def get_ctcf_data(self):
         """
@@ -25,7 +38,7 @@ class TFChip:
             NA
         """
 
-        data = pd.read_csv(os.path.join(self.file_path, self.chr + ".bed"), sep="\t", header=None)
+        data = pd.read_csv(os.path.join(self.ctcf_path, self.chr + ".bed"), sep="\t", header=None)
         ctcf_data = self.alter_data(data)
         return ctcf_data
 

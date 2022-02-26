@@ -50,6 +50,9 @@ def get_top_tfs_chip(cfg, ig_df, chr):
         ig_df (DataFrame): Dataframe containing positions and IG values.
         chr (int): The chromosome to which IG values belong.
     """
+
+    tf_ob = TFChip(cfg, chr)
+    chip_data = tf_ob.get_chip_data()
     pass
 
 
@@ -211,7 +214,10 @@ def run_experiment(cfg, model):
 
         "attribute TFs"
         if cfg.run_tfs:
-            ig_elements = get_top_tfs_db(cfg, ig_df, chr)
+            if cfg.run_chip:
+                ig_elements = get_top_tfs_chip(cfg, ig_df, chr)
+            else:
+                ig_elements = get_top_tfs_db(cfg, ig_df, chr)
             main_df = pd.concat([main_df, ig_elements], axis=0)
         elif cfg.run_elements:
             "attribute elements"
