@@ -412,6 +412,7 @@ class DownstreamTasks:
                 sep="\t")
             embed_rows = embed_rows[self.df_columns]
             embed_rows = embed_rows.rename(columns={"i": "pos"})
+            embed_rows = embed_rows.drop_duplicates(keep='first').reset_index(drop=True)
 
             if cfg.class_element == "Gene Expression":
                 map = self.run_gene_expression(chr, embed_rows)
