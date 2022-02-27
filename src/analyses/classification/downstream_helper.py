@@ -143,8 +143,8 @@ class DownstreamHelper:
         print("done")
 
     def get_pos_data(self, window_labels, chr):
-        start = self.start_ends["chr" + str(chr)]["start"] + get_cumpos(cfg, chr)
-        stop = self.start_ends["chr" + str(chr)]["stop"] + get_cumpos(cfg, chr)
+        start = self.start_ends["chr" + str(chr)]["start"] + get_cumpos(self.cfg, chr)
+        stop = self.start_ends["chr" + str(chr)]["stop"] + get_cumpos(self.cfg, chr)
 
         rna_window_labels = window_labels.loc[
             (window_labels["start"] > self.start) & (window_labels["start"] < self.stop)].reset_index()
