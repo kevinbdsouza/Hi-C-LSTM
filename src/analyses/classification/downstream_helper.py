@@ -28,8 +28,7 @@ class DownstreamHelper:
         self.num_subc = 5
         self.embed_rows = None
         self.pred_rows = None
-        #self.start = self.start_ends["chr" + str(chr)]["start"] + get_cumpos(cfg, chr)
-        #self.stop = self.start_ends["chr" + str(chr)]["stop"] + get_cumpos(cfg, chr)
+        self.start, self.stop = None, None
 
     def cat_convert(self, y_test, y_valid, feature_matrix):
 
@@ -143,7 +142,10 @@ class DownstreamHelper:
 
         print("done")
 
-    def get_pos_data(self, window_labels):
+    def get_pos_data(self, window_labels, chr):
+        start = self.start_ends["chr" + str(chr)]["start"] + get_cumpos(cfg, chr)
+        stop = self.start_ends["chr" + str(chr)]["stop"] + get_cumpos(cfg, chr)
+
         rna_window_labels = window_labels.loc[
             (window_labels["start"] > self.start) & (window_labels["start"] < self.stop)].reset_index()
 
@@ -324,8 +326,8 @@ class DownstreamHelper:
 
         return feature_matrix
 
-    def get_feature_matrix(self, rna_window_labels):
-        functional_data = self.get_pos_data(rna_window_labels)
+    def get_feature_matrix(self, rna_window_labels, chr):
+        functional_data = self.get_pos_data(rna_window_labels, chr)
 
         feature_matrix = self.merge_features_target(functional_data)
 
