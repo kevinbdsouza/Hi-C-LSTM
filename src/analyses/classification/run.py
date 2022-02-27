@@ -22,8 +22,7 @@ class DownstreamTasks:
     Compute mAP, Accuaracy, PR curves, AuROC, and F-score.
     """
 
-    def __init__(self, cfg, chr):
-        self.chr = chr
+    def __init__(self, cfg):
         self.cfg = cfg
         self.saved_model_dir = cfg.model_dir
         self.calculate_map = True
@@ -74,18 +73,18 @@ class DownstreamTasks:
 
         return map
 
-    def run_gene_expression(self):
+    def run_gene_expression(self, chr):
         """
-        run_gene_expression() -> float
+        run_gene_expression(chr) -> float
         Gets gene expression data for given cell type and chromosome.
         Runs xgboost using representations from chosen method and celltype. Or runs baseline.
         Returns classification metrics.
         Args:
-            NA
+            chr (int): chromosome to run classification on.
         """
         print("Gene Expression start")
 
-        rna_seq_ob = GeneExp(self.cfg, self.chr)
+        rna_seq_ob = GeneExp(self.cfg, chr)
         rna_seq_ob.get_rna_seq()
         rna_seq_chr = rna_seq_ob.filter_rna_seq()
 
@@ -393,20 +392,21 @@ class DownstreamTasks:
 
         return mean_map
 
-    def run_experiment(self, cfg, model):
+    def run_experiment(self, model):
         """
 
         """
+        cfg = self.cfg
         map_frame = pd.DataFrame(columns=["chr", "map"])
         for chr in cfg.chr_test_list:
-            logging.info("Classification start Chromosome: {}".format(chr))
+            print("Classification start Chromosome: {}".format(chr))
 
-            if cfg.class_compute_representation:
+            if self.cfg.class_compute_representation:
                 "running test model to get representations"
                 test_model(model, cfg, chr)
 
             if cfg.class_element == "Gene Expression":
-                map = self.run_gene_expression()
+                map = self.run_gene_expression(chr)
             elif cfg.class_element == "Replication Timing":
                 map = self.run_rep_timings(cfg)
             elif cfg.class_element == "Enhancers":
@@ -436,13 +436,13 @@ class DownstreamTasks:
             cfg.output_directory + "%s_metrics_%s_%s.csv" % (cfg.class_method, cfg.cell, cfg.class_element),
             sep="\t")
 
-    def run_all_elements(self, cfg, model):
+    def run_all_elements(self, model):
         """
 
         """
-        for element in cfg.class_elements_list:
-            cfg.class_element = element
-            self.run_experiment(cfg, model)
+        for element in self.cfg.class_elements_list:
+            self.cfg.class_element = element
+            self.run_experiment(model)
 
 
 if __name__ == '__main__':
@@ -463,9 +463,9 @@ if __name__ == '__main__':
     model = SeqLSTM(cfg, device).to(device)
     model.load_weights()
 
-    downstream_ob = DownstreamTasks(cfg, chr)
+    downstream_ob = DownstreamTasks(cfg)
 
     if cfg.class_run_elements:
-        downstream_ob.run_experiment(cfg, model)
+        map = downstream_ob.run_experiment(model)
     elif cfg.class_run_all_elements:
-        downstream_ob.run_all_elements(cfg, model)
+        downstream_ob.run_all_elements(model)
