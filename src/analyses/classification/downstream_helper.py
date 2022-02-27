@@ -246,7 +246,7 @@ class DownstreamHelper:
         predictions = pd.DataFrame()
 
         for i in range(n_folds):
-            X_train = pd.DataFrame(columns=list(np.arange(feature_size)))
+            X_train = pd.DataFrame()
             y_train = pd.DataFrame()
             X_test = feature_matrix.iloc[i::n_folds, 0:feature_size]
             X_valid = feature_matrix.iloc[(i + 1) % n_folds::n_folds, 0:feature_size]
@@ -260,7 +260,7 @@ class DownstreamHelper:
                     X_train = pd.concat([X_train, fold_mat])
                     y_train = pd.concat([y_train, y_mat])
 
-            y_train = y_train.astype(int)
+            y_train = y_train[0].astype(int)
 
             if mode == "multi":
                 model = xgboost.XGBClassifier(n_estimators=5000, nthread=min(X_train.shape[1], 12), max_depth=6,

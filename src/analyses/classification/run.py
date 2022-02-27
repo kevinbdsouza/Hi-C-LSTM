@@ -70,7 +70,7 @@ class DownstreamTasks:
             try:
                 map = self.downstream_helper_ob.calculate_map(feature_matrix, mode="binary", exp=self.exp)
             except Exception as e:
-                print("Feature matrix is empty")
+                print(e)
                 return 0
 
         return map
