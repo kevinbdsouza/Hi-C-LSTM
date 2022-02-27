@@ -28,6 +28,7 @@ class DownstreamTasks:
         self.calculate_map = True
         self.exp = "map"
         self.downstream_helper_ob = DownstreamHelper(cfg)
+        self.df_columns = [str(i) for i in range(0,16)] + ["i"]
 
         self.pe_int_path = cfg.downstream_dir + "PE-interactions"
         self.fire_path = cfg.downstream_dir + "FIREs"
@@ -405,13 +406,15 @@ class DownstreamTasks:
             if self.cfg.class_compute_representation:
                 "running test model to get representations"
                 test_model(model, cfg, chr)
-            else:
-                pred_df = pd.read_csv(
-                    cfg.output_directory + "%s_%s_predictions_chr%s.csv" % (cfg.class_method, cfg.cell, str(chr)),
-                    sep="\t")
+
+            embed_rows = pd.read_csv(
+                cfg.output_directory + "%s_%s_predictions_chr%s.csv" % (cfg.class_method, cfg.cell, str(chr)),
+                sep="\t")
+            embed_rows = embed_rows[self.df_columns]
+            embed_rows = embed_rows.rename(columns={"i": "pos"})
 
             if cfg.class_element == "Gene Expression":
-                map = self.run_gene_expression(chr)
+                map = self.run_gene_expression(chr, embed_rows)
             elif cfg.class_element == "Replication Timing":
                 map = self.run_rep_timings(cfg)
             elif cfg.class_element == "Enhancers":
