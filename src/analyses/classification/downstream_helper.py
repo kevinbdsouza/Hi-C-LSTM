@@ -14,15 +14,11 @@ from sklearn.linear_model import LinearRegression
 from sklearn import preprocessing
 from sklearn.metrics import *
 import seaborn as sn
-# import matplotlib as mpl
-# mpl.use('module://backend_interagg')
 import matplotlib.pyplot as plt
-
-logger = logging.getLogger(__name__)
 
 
 class DownstreamHelper:
-    def __init__(self, cfg, chr, mode):
+    def __init__(self, cfg, chr):
         self.cfg = cfg
         self.chr = chr
         self.cell = cfg.cell

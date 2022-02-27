@@ -5,6 +5,10 @@ from analyses.classification.loops import Loops
 
 
 class TFChip:
+    """
+    Class to deal with Transcription factors and CHipSeq data.
+    Includes methods that help you handle, CTCF, Cohesin and CHipSeq data.
+    """
     def __init__(self, cfg, chr, mode="ig"):
         self.ctcf_path = os.path.join(cfg.downstream_dir, "ctcf")
         self.cohesin_path = os.path.join(cfg.downstream_dir, "cohesin")

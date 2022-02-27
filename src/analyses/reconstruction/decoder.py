@@ -196,7 +196,7 @@ class Decoder(nn.Module):
                     "Backward and optimize"
                     optimizer.zero_grad()
                     loss.backward()
-                    clip_grad_norm_(self.parameters(), max_norm=cfg.max_norm)
+                    clip_grad_norm_(self.parameters(), max_norm=cfg.dec_max_norm)
                     optimizer.step()
 
                     running_loss += loss.item()

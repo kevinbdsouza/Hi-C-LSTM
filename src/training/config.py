@@ -47,15 +47,16 @@ class Config:
         "decoder parameters"
         self.decoder_name = "hiclstm_fc"
         self.decoder = "fc"
-        self.compute_representation = False
-        self.save_representation = True
-        self.train_decoders = True
+        self.recon_compute_representation = False
+        self.recon_save_representation = False
+        self.train_decoders = False
         self.test_decoders = True
-        self.get_predictions = False
+        self.recon_get_predictions = False
         self.dec_learning_rate = 0.01
+        self.dec_max_norm = 10
         self.decoder_epochs = 20
         self.decoder_train_list = [21, 19]
-        self.decoder_test_list = list(range(5, 23))
+        self.decoder_test_list = list(range(22, 23))
 
         "Output Directories"
         self.proj_dir = "/home/kevindsouza/Documents/projects/PhD/Hi-C-LSTM/"
@@ -87,11 +88,27 @@ class Config:
         self.run_captum = False
         self.tf_file_path = self.output_directory + "tf_db.csv"
         self.tf_columns = ["HGNC symbol", "chromosome", "start"]
-        self.run_tfs = True
-        self.run_chip = True
-        self.run_elements = False
-        self.element = "Segway"
-        self.run_all_elements = False
-        self.elements_list = ["CTCF", "RAD21", "SMC3", "GBR", "TADs", "FIREs", "Domains", "Loop_Domains",
-                                "Merge_Domains", "TADBs", "TADBsCTCF+", "TADBsCTCF-", "Loop_CTCFCohesin",
-                                "NonLoop_CTCFCohesin"]
+        self.ig_run_tfs = True
+        self.ig_run_chip = True
+        self.ig_run_elements = False
+        self.ig_element = "Segway"
+        self.ig_run_all_elements = False
+        self.ig_elements_list = ["CTCF", "RAD21", "SMC3", "GBR", "TADs", "FIREs", "Domains", "Loop_Domains",
+                              "Merge_Domains", "TADBs", "TADBsCTCF+", "TADBsCTCF-", "Loop_CTCFCohesin",
+                              "NonLoop_CTCFCohesin"]
+
+        "classification"
+        if self.cell == "GM12878":
+            self.class_elements_list = ["Gene Expression", "Replication Timing", "Enhancers", "TSS",
+                                   "PE-Interactions", "FIREs", "TADs", "subTADs", "Loop Domains",
+                                   "TADBs", "subTADBs", "Subcompartments"]
+            self.metric_frame_columns = self.class_elements_list.append("chr")
+        else:
+            self.class_elements_list = ["Gene Expression", "Enhancers", "TSS", "TADs", "subTADs",
+                                   "Loop Domains", "TADBs", "subTADBs", "Subcompartments"]
+            self.metric_frame_columns = self.class_elements_list.append("chr")
+        self.class_compute_representation = False
+        self.class_element = "Gene Expression"
+        self.class_method = "hiclstm"
+        self.class_run_elements = True
+        self.class_run_all_elements = False

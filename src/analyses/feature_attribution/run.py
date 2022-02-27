@@ -126,7 +126,7 @@ def attribute_elements(cfg, chr, ig_df, element="ctcf"):
     """
 
     "use downstream obejct to access helper"
-    downstream_ob = DownstreamTasks(cfg, chr, mode='lstm')
+    downstream_ob = DownstreamTasks(cfg, chr)
     cumpos = get_cumpos(cfg, chr)
 
     ig_df = ig_df.astype({"pos": int})
@@ -235,26 +235,26 @@ def run_experiment(cfg, model):
                 quit()
 
         "attribute TFs"
-        if cfg.run_tfs:
-            if cfg.run_chip:
+        if cfg.ig_run_tfs:
+            if cfg.ig_run_chip:
                 ig_elements = get_top_tfs_chip(cfg, ig_df, chr)
             else:
                 ig_elements = get_top_tfs_db(cfg, ig_df, chr)
             main_df = pd.concat([main_df, ig_elements], axis=0)
-        elif cfg.run_elements:
+        elif cfg.ig_run_elements:
             "attribute elements"
-            ig_elements = attribute_elements(cfg, chr, ig_df, element=cfg.element)
+            ig_elements = attribute_elements(cfg, chr, ig_df, element=cfg.ig_element)
             main_df = pd.concat([main_df, ig_elements], axis=0)
 
     "sort TFs by IG values"
-    if cfg.run_tfs:
-        if not cfg.run_chip:
+    if cfg.ig_run_tfs:
+        if not cfg.ig_run_chip:
             main_df = main_df.groupby('target').agg({'ig': 'mean'})
         main_df = main_df.sort_values("ig", ascending=False)
         main_df.to_csv(cfg.output_directory + "ig_tf.csv", sep="\t")
-    elif cfg.run_elements:
+    elif cfg.ig_run_elements:
         "save element IG"
-        main_df.to_csv(cfg.output_directory + "ig_%s.csv" % cfg.element, sep="\t")
+        main_df.to_csv(cfg.output_directory + "ig_%s.csv" % cfg.ig_element, sep="\t")
 
 
 def run_all_elements(cfg, model):
@@ -268,7 +268,7 @@ def run_all_elements(cfg, model):
 
     cfg.run_elements = True
     cfg.run_tfs = False
-    for element in cfg.elements_list:
+    for element in cfg.ig_elements_list:
         cfg.element = element
         run_experiment(cfg, model)
 
@@ -282,7 +282,7 @@ if __name__ == '__main__':
     model = SeqLSTM(cfg, device).to(device)
     model.load_weights()
 
-    if cfg.run_all_elements:
+    if cfg.ig_run_all_elements:
         "run all elements"
         run_all_elements(cfg, model)
     else:

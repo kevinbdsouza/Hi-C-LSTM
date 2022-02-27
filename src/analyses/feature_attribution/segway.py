@@ -1,13 +1,12 @@
-import logging
 import pandas as pd
-import numpy as np
-import os
-import pickle
-from scipy.spatial import distance
 from training.config import Config
 
 
 class SegWay:
+    """
+    Class to deal with Segway and GBR data.
+    Includes methods that help you load and alter data.
+    """
     def __init__(self, cfg, chr):
         self.segway_small_annotations_path = "/data2/hic_lstm/downstream/segway_small/"
         self.segway_small_file_name = "segway.hg19.bed"

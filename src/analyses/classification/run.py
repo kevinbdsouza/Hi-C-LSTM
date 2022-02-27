@@ -1,5 +1,5 @@
 import logging
-from analyses.classification.rna_seq import RnaSeq
+from analyses.classification.rna_seq import GeneExp
 from training.config import Config
 import pandas as pd
 from analyses.classification.downstream_helper import DownstreamHelper
@@ -9,81 +9,89 @@ from analyses.classification.pe_interactions import PeInteractions
 from analyses.classification.loops import Loops
 from analyses.classification.domains import Domains
 from analyses.classification.subcompartments import Subcompartments
-import matplotlib as mpl
-
-mpl.use('module://backend_interagg')
-import matplotlib.pyplot as plt
 from training.model import SeqLSTM
 import torch
 from training.test_model import test_model
-import numpy as np
 
-logger = logging.getLogger(__name__)
 device = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
 
 
 class DownstreamTasks:
-    def __init__(self, cfg, chr, mode):
-        self.data_dir = "/data2/hic_lstm/downstream/"
-        self.rna_seq_path = self.data_dir + "RNA-seq"
-        self.pe_int_path = self.data_dir + "PE-interactions"
-        self.fire_path = self.data_dir + "FIREs"
-        self.rep_timing_path = self.data_dir + "replication_timing"
-        self.loop_path = self.data_dir + "loops"
-        self.domain_path = self.data_dir + "domains"
-        self.phylo_path = self.data_dir + "phylogenetic_scores"
-        self.subcompartment_path = self.data_dir + "subcompartments"
-        self.fire_cell_names = ['GM12878']  # , 'H1', 'IMR90', 'MES', 'MSC', 'NPC', 'TRO']
-        self.rep_cell_names = ['IMR90']  # , 'HUVEK', 'K562']
+    """
+    Class to run all downstream classification experiments using XGBoost.
+    Compute mAP, Accuaracy, PR curves, AuROC, and F-score.
+    """
+
+    def __init__(self, cfg, chr):
         self.chr = chr
-        self.pe_cell_names = ['E116']  # , 'E117', 'E123', 'E017']
-        self.loop_cell_names = ['GM12878']  # , 'IMR90', 'HUVEC', 'HMEC', 'K562', 'HeLa']
+        self.cfg = cfg
+        self.saved_model_dir = cfg.model_dir
+        self.calculate_map = True
+        self.exp = "map"
+        self.downstream_helper_ob = DownstreamHelper(cfg, chr)
+
+        self.pe_int_path = cfg.downstream_dir + "PE-interactions"
+        self.fire_path = cfg.downstream_dir + "FIREs"
+        self.rep_timing_path = cfg.downstream_dir + "replication_timing"
+        self.loop_path = cfg.downstream_dir + "loops"
+        self.domain_path = cfg.downstream_dir + "domains"
+        self.subcompartment_path = cfg.downstream_dir + "subcompartments"
+        self.fire_cell_names = ['GM12878']
+        self.rep_cell_names = ['IMR90']
+        self.pe_cell_names = ['E116']
+        self.loop_cell_names = ['GM12878']
         self.sbc_cell_names = ['GM12878']
-        self.chr_rna = str(chr)
         self.chr_pe = 'chr' + str(chr)
         self.chr_tad = 'chr' + str(chr)
         self.chr_rep = 'chr' + str(chr)
         self.chr_ctcf = 'chr' + str(chr)
         self.chr_tad = 'chr' + str(chr)
         self.chr_fire = chr
-        self.saved_model_dir = cfg.model_dir
-        self.calculate_map = True
-        self.exp = "map"
-        self.downstream_helper_ob = DownstreamHelper(cfg, chr, mode)
 
-    def run_rna_seq(self, cfg):
-        logging.info("RNA-Seq start")
+    def run_xgboost(self, window_labels):
+        """
+        run_xgboost(window_labels) -> float
+        Converts to cumulative indices. Depending on experiment, either runs baseline.
+        Or runs classification using representations from chosen method and cell type.
+        Return classifcation metrics.
+        Args:
+            window_labels (DataFrame): Contains start, end, target
+        """
+        window_labels = window_labels.drop_duplicates(keep='first').reset_index(drop=True)
+        window_labels = self.downstream_helper_ob.add_cum_pos(window_labels, mode="ends")
 
-        rna_seq_ob = RnaSeq(cfg)
-        rna_seq_ob.get_rna_seq(self.rna_seq_path)
-        rna_seq_chr = rna_seq_ob.filter_rna_seq(self.chr_rna)
+        if self.exp == "baseline":
+            feature_matrix = self.downstream_helper_ob.subc_baseline(Subcompartments, window_labels, mode="ends")
+        else:
+            feature_matrix = self.downstream_helper_ob.get_feature_matrix(window_labels)
 
-        rna_seq_chr['target'] = 0
+        if self.calculate_map:
+            try:
+                map = self.downstream_helper_ob.calculate_map(feature_matrix, mode="binary", exp=self.exp)
+            except Exception as e:
+                print("Feature matrix is empty")
+                return 0
 
-        # 1,58
-        for col in range(49, 50):
-            rna_seq_chr.loc[rna_seq_chr.iloc[:, col] >= 0.5, 'target'] = 1
-            rna_window_labels = rna_seq_chr.filter(['start', 'end', 'target'], axis=1)
-            rna_window_labels = rna_window_labels.drop_duplicates(keep='first').reset_index(drop=True)
-            rna_window_labels = rna_window_labels.drop([410, 598]).reset_index(drop=True)
+        return map
 
-            rna_window_labels = self.downstream_helper_ob.add_cum_pos(rna_window_labels, mode="ends")
+    def run_gene_expression(self):
+        """
+        run_gene_expression() -> float
+        Gets gene expression data for given cell type and chromosome.
+        Runs xgboost using representations from chosen method and celltype. Or runs baseline.
+        Returns classification metrics.
+        Args:
+            NA
+        """
+        print("Gene Expression start")
 
-            if self.exp == "baseline":
-                feature_matrix = self.downstream_helper_ob.subc_baseline(Subcompartments, rna_window_labels,
-                                                                         mode="ends")
-            else:
-                feature_matrix = self.downstream_helper_ob.get_feature_matrix(rna_window_labels)
+        rna_seq_ob = GeneExp(self.cfg, self.chr)
+        rna_seq_ob.get_rna_seq()
+        rna_seq_chr = rna_seq_ob.filter_rna_seq()
 
-            logging.info("chr : {} - cell : {}".format(str(self.chr), rna_seq_chr.columns[col]))
-
-            if feature_matrix.empty:
-                continue
-
-            if self.calculate_map:
-                mean_map = self.downstream_helper_ob.calculate_map(feature_matrix, mode="binary", exp=self.exp)
-
-        return mean_map
+        "runs xgboost"
+        map = self.run_xgboost(rna_seq_chr)
+        return map
 
     def run_pe(self, cfg):
         logging.info("PE start")
@@ -385,90 +393,79 @@ class DownstreamTasks:
 
         return mean_map
 
+    def run_experiment(self, cfg, model):
+        """
 
-def plot_combined(map_frame):
-    tasks = ["Gene Expression", "Replication Timing", "Enhancers", "TSS", "PE-Interactions", "FIREs",
-             "Non-loop Domains", "Loop Domains"]
+        """
+        map_frame = pd.DataFrame(columns=["chr", "map"])
+        for chr in cfg.chr_test_list:
+            logging.info("Classification start Chromosome: {}".format(chr))
 
-    df_main = pd.DataFrame(columns=["Tasks", "Hi-C-LSTM"])
-    df_main["Tasks"] = tasks
-    df_main["Hi-C-LSTM"] = [map_frame["gene_map"].mean(), map_frame["rep_map"].mean(),
-                            map_frame["enhancers_map"].mean(), map_frame["tss_map"].mean(),
-                            map_frame["pe_map"].mean(), map_frame["fire_map"].mean(),
-                            map_frame["domains_map"].mean(), map_frame["loops_map"].mean()]
+            if cfg.class_compute_representation:
+                "running test model to get representations"
+                test_model(model, cfg, chr)
 
-    plt.figure(figsize=(12, 10))
-    plt.xticks(rotation=90, fontsize=20)
-    plt.yticks(fontsize=20)
-    plt.xlabel("Prediction Target", fontsize=20)
-    plt.ylabel("mAP ", fontsize=20)
-    plt.plot('Tasks', 'Hi-C-LSTM', data=df_main, marker='o', markersize=16, color="C3",
-             linewidth=3,
-             label="Hi-C-LSTM")
-    plt.legend(fontsize=18)
-    plt.show()
+            if cfg.class_element == "Gene Expression":
+                map = self.run_gene_expression()
+            elif cfg.class_element == "Replication Timing":
+                map = self.run_rep_timings(cfg)
+            elif cfg.class_element == "Enhancers":
+                map = self.run_p_and_e(cfg)
+            elif cfg.class_element == "TSS":
+                map = self.run_tss(cfg)
+            elif cfg.class_element == "PE-Interactions":
+                map = self.run_pe(cfg)
+            elif cfg.class_element == "FIREs":
+                map = self.run_fires(cfg)
+            elif cfg.class_element == "TADs":
+                map = self.run_domains(cfg)
+            elif cfg.class_element == "subTADs":
+                map = self.run_domains(cfg)
+            elif cfg.class_element == "Loop Domains":
+                map = self.run_loops(cfg)
+            elif cfg.class_element == "TADBs":
+                map = self.run_domains(cfg)
+            elif cfg.class_element == "subTADBs":
+                map = self.run_domains(cfg)
+            elif cfg.class_element == "Subcompartments":
+                map = self.run_sub_compartments(cfg)
 
-    pass
+            map_frame = map_frame.append({"chr": chr, "map": map}, ignore_index=True)
+
+        map_frame.to_csv(
+            cfg.output_directory + "%s_metrics_%s_%s.csv" % (cfg.class_method, cfg.cell, cfg.class_element),
+            sep="\t")
+
+    def run_all_elements(self, cfg, model):
+        """
+
+        """
+        for element in cfg.class_elements_list:
+            cfg.class_element = element
+            self.run_experiment(cfg, model)
 
 
 if __name__ == '__main__':
-    cfg = Config()
-    test_chr = list(range(22, 23))
-    map_frame = pd.DataFrame(
-        columns=["chr", "Gene Expression", "Replication Timing", "Enhancers", "TSS", "PE-Interactions",
-                 "FIREs", "Non-loop Domains", "Loop Domains"])
+    """
+    Other mAP plots can be obtained by:
+    Changing the cell type,
+    The model associated with the cell type,
+    Other models like Sniper and SCA.
 
-    gene_map, pe_map, fire_map, rep_map, loops_map, domains_map, enhancers_map, tss_map = 0, 0, 0, 0, 0, 0, 0, 0
+    If you have all the data, you can use plot_combined function in analyses/plot/plot_fns.py
+    """
+
+    cfg = Config()
     cell = cfg.cell
     model_name = "shuffle_" + cell
 
-    # initalize model
-    model = SeqLSTM(cfg, device, model_name).to(device)
-
-    # load model weights
+    "load model"
+    model = SeqLSTM(cfg, device).to(device)
     model.load_weights()
 
-    for chr in test_chr:
-        logging.info("Downstream start Chromosome: {}".format(chr))
+    downstream_ob = DownstreamTasks(cfg, chr)
 
-        # running test model to get embeddings
-        # test_model(model, cfg, cell, chr)
-
-        downstream_ob = DownstreamTasks(cfg, chr, mode='lstm')
-
-        gene_map = downstream_ob.run_rna_seq(cfg)
-
-        pe_map = downstream_ob.run_pe(cfg)
-
-        fire_map = downstream_ob.run_fires(cfg)
-
-        rep_map = downstream_ob.run_rep_timings(cfg)
-
-        loops_map = downstream_ob.run_loops(cfg)
-
-        domains_map = downstream_ob.run_domains(cfg)
-
-        mapdict_subcomp = downstream_ob.run_sub_compartments(cfg)
-
-        enhancers_map = downstream_ob.run_p_and_e(cfg)
-
-        tss_map = downstream_ob.run_tss(cfg)
-
-        map_frame = map_frame.append(
-            {"chr": chr, "Gene Expression": gene_map, "Replication Timing": rep_map, "Enhancers": enhancers_map,
-             "TSS": tss_map, "PE-Interactions": pe_map, "FIREs": fire_map, "Non-loop Domains": domains_map,
-             "Loop Domains": loops_map},
-            ignore_index=True)
-
-    map_frame.to_csv(cfg.output_directory + "mapframe_%s.csv" % (cfg.cell), sep="\t")
-
-    plot_combined(map_frame)
-
-    print("done")
-
-    # Other mAP plots can be obtained by:
-    # Changing the cell type,
-    # The model associated with the cell type,
-    # Other models like Sniper and SCA.
-
-    # If you have all the data, you can use plot_combined function in analyses/plot/plot_fns.py
+    if cfg.class_run_elements:
+        downstream_ob.run_experiment(cfg, model)
+    elif cfg.class_run_all_elements:
+        downstream_ob.run_all_elements(cfg, model)

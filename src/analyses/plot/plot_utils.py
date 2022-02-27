@@ -146,6 +146,31 @@ def plot_euclid_heatmap(embeddings):
     pass
 
 
+def plot_combined(map_frame):
+    tasks = ["Gene Expression", "Replication Timing", "Enhancers", "TSS", "PE-Interactions", "FIREs",
+             "Non-loop Domains", "Loop Domains"]
+
+    df_main = pd.DataFrame(columns=["Tasks", "Hi-C-LSTM"])
+    df_main["Tasks"] = tasks
+    df_main["Hi-C-LSTM"] = [map_frame["gene_map"].mean(), map_frame["rep_map"].mean(),
+                            map_frame["enhancers_map"].mean(), map_frame["tss_map"].mean(),
+                            map_frame["pe_map"].mean(), map_frame["fire_map"].mean(),
+                            map_frame["domains_map"].mean(), map_frame["loops_map"].mean()]
+
+    plt.figure(figsize=(12, 10))
+    plt.xticks(rotation=90, fontsize=20)
+    plt.yticks(fontsize=20)
+    plt.xlabel("Prediction Target", fontsize=20)
+    plt.ylabel("mAP ", fontsize=20)
+    plt.plot('Tasks', 'Hi-C-LSTM', data=df_main, marker='o', markersize=16, color="C3",
+             linewidth=3,
+             label="Hi-C-LSTM")
+    plt.legend(fontsize=18)
+    plt.show()
+
+    pass
+
+
 def plot_gbr(main_df):
     """
     captum_test(cfg, model, chr) -> DataFrame
