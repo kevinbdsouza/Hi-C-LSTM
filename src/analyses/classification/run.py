@@ -63,7 +63,7 @@ class DownstreamTasks:
         if self.exp == "baseline":
             feature_matrix = self.downstream_helper_ob.subc_baseline(Subcompartments, window_labels, mode="ends")
         else:
-            feature_matrix = self.downstream_helper_ob.get_feature_matrix(window_labels)
+            feature_matrix = self.downstream_helper_ob.get_feature_matrix(window_labels, chr)
 
         if self.calculate_map:
             try:
