@@ -94,21 +94,25 @@ class Config:
         self.ig_element = "Segway"
         self.ig_run_all_elements = False
         self.ig_elements_list = ["CTCF", "RAD21", "SMC3", "GBR", "TADs", "FIREs", "Domains", "Loop_Domains",
-                              "Merge_Domains", "TADBs", "TADBsCTCF+", "TADBsCTCF-", "Loop_CTCFCohesin",
-                              "NonLoop_CTCFCohesin"]
+                                 "Merge_Domains", "TADBs", "TADBsCTCF+", "TADBsCTCF-", "Loop_CTCFCohesin",
+                                 "NonLoop_CTCFCohesin"]
 
         "classification"
         if self.cell == "GM12878":
             self.class_elements_list = ["Gene Expression", "Replication Timing", "Enhancers", "TSS",
-                                   "PE-Interactions", "FIREs", "TADs", "subTADs", "Loop Domains",
-                                   "TADBs", "subTADBs", "Subcompartments"]
+                                        "PE-Interactions", "FIREs", "TADs", "subTADs", "Loop Domains",
+                                        "TADBs", "subTADBs", "Subcompartments"]
             self.metric_frame_columns = self.class_elements_list.append("chr")
         else:
             self.class_elements_list = ["Gene Expression", "Enhancers", "TSS", "TADs", "subTADs",
-                                   "Loop Domains", "TADBs", "subTADBs", "Subcompartments"]
+                                        "Loop Domains", "TADBs", "subTADBs", "Subcompartments"]
             self.metric_frame_columns = self.class_elements_list.append("chr")
         self.class_compute_representation = False
         self.class_element = "Gene Expression"
         self.class_method = "hiclstm"
         self.class_run_elements = True
         self.class_run_all_elements = False
+        self.class_pr = False
+        self.class_experiment = "map"
+        self.class_mode = "binary"
+        self.compute_metrics = True

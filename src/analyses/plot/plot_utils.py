@@ -1,14 +1,9 @@
 import pandas as pd
 import numpy as np
 import seaborn as sns
-from training.data_utils import contactProbabilities
-# import matplotlib as mpl
-
-# mpl.use('module://backend_interagg')
+import seaborn as sn
 import training.config as config
 import matplotlib.pyplot as plt
-from mpl_toolkits import mplot3d
-from analyses.classification.domains import Domains
 
 
 def get_heatmaps(data):
@@ -144,6 +139,35 @@ def plot_euclid_heatmap(embeddings):
 
     simple_plot(euclid_heatmap)
     pass
+
+
+def plot_pr_curve(precision, recall):
+    plt.step(recall, precision, color='b', alpha=0.2, where='post')
+    # plt.fill_between(recall, precision, step='post', alpha=0.2, color='b')
+    plt.xlabel('Recall')
+    plt.ylabel('Precision')
+    plt.ylim([0.0, 1.05])
+    plt.xlim([0.0, 1.0])
+    plt.title('2-class Precision-Recall curve')
+    plt.savefig('XGBoost_PR')
+    plt.show()
+
+
+def plot_confusion_matrix(predictions):
+    conf_matrix = confusion_matrix(predictions[:, 7], predictions[:, 6])
+    conf_matrix = conf_matrix[1:, 1:]
+    df_cm = pd.DataFrame(conf_matrix)
+    df_cm = df_cm.div(df_cm.sum(axis=0), axis=1)
+
+    x_axis_labels = ["A2", "A1", "B1", "B2", "B3"]
+    y_axis_labels = ["A2",
+                     "A1", "B1", "B2", "B3"]
+
+    sn.set(font_scale=1.4)
+    sn.heatmap(df_cm, annot=True, cmap="YlGnBu", fmt="d", xticklabels=x_axis_labels,
+               yticklabels=y_axis_labels)  # font size
+
+    plt.show()
 
 
 def plot_combined(map_frame):

@@ -26,7 +26,6 @@ class DownstreamTasks:
         self.cfg = cfg
         self.saved_model_dir = cfg.model_dir
         self.calculate_map = True
-        self.exp = "map"
         self.downstream_helper_ob = DownstreamHelper(cfg)
         self.df_columns = [str(i) for i in range(0,16)] + ["i"]
 
@@ -58,26 +57,29 @@ class DownstreamTasks:
             window_labels (DataFrame): Contains start, end, target
             chr (int): chromosome to run xgboost on.
         """
+        map, accuracy, f_score, auroc = 0, 0, 0, 0
         window_labels = window_labels.drop_duplicates(keep='first').reset_index(drop=True)
         window_labels = self.downstream_helper_ob.add_cum_pos(window_labels, chr, mode="ends")
 
-        if self.exp == "baseline":
-            feature_matrix = self.downstream_helper_ob.subc_baseline(Subcompartments, window_labels, mode="ends")
+        if self.cfg.class_experiment == "subc_baseline":
+            feature_matrix = self.downstream_helper_ob.subc_baseline(window_labels, mode="ends")
+        elif self.cfg.class_experiment == "pca_baseline":
+            feature_matrix = self.downstream_helper_ob.subc_baseline(window_labels, mode="ends")
         else:
             feature_matrix = self.downstream_helper_ob.get_feature_matrix(embed_rows, window_labels, chr)
 
-        if self.calculate_map:
+        if self.cfg.compute_metrics:
             try:
-                map = self.downstream_helper_ob.calculate_map(feature_matrix, mode="binary", exp=self.exp)
+                map, accuracy, f_score, auroc = self.downstream_helper_ob.calculate_map(feature_matrix, mode="binary", exp=self.exp)
             except Exception as e:
                 print(e)
-                return 0
+                return map, accuracy, f_score, auroc
 
-        return map
+        return map, accuracy, f_score, auroc
 
     def run_gene_expression(self, chr, embed_rows):
         """
-        run_gene_expression(chr) -> float
+        run_gene_expression(chr, embed_rows) -> float
         Gets gene expression data for given cell type and chromosome.
         Runs xgboost using representations from chosen method and celltype. Or runs baseline.
         Returns classification metrics.
@@ -91,8 +93,8 @@ class DownstreamTasks:
         rna_seq_chr = rna_seq_ob.filter_rna_seq()
 
         "runs xgboost"
-        map = self.run_xgboost(embed_rows, rna_seq_chr, chr)
-        return map
+        map, accuracy, f_score, auroc = self.run_xgboost(embed_rows, rna_seq_chr, chr)
+        return map, accuracy, f_score, auroc
 
     def run_pe(self, cfg):
         logging.info("PE start")

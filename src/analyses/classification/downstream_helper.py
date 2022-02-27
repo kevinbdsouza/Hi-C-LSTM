@@ -1,9 +1,8 @@
-import logging
 import numpy as np
 import pandas as pd
 import xgboost
-from sklearn.metrics import average_precision_score
-from sklearn.metrics import precision_recall_curve
+from sklearn.metrics import average_precision_score, accuracy_score, precision_recall_curve, roc_auc_score
+from analyses.plot.plot_utils import plot_confusion_matrix, plot_pr_curve
 from sklearn.utils import resample
 from training.config import Config
 from training.data_utils import get_cumpos
@@ -12,9 +11,6 @@ from sklearn.neural_network import MLPRegressor
 from sklearn.model_selection import train_test_split
 from sklearn.linear_model import LinearRegression
 from sklearn import preprocessing
-from sklearn.metrics import *
-import seaborn as sn
-import matplotlib.pyplot as plt
 
 
 class DownstreamHelper:
@@ -23,7 +19,7 @@ class DownstreamHelper:
         self.chr = chr
         self.cell = cfg.cell
         self.start_ends = np.load(cfg.hic_path + cfg.start_end_file, allow_pickle=True).item()
-        self.feature_columns = [str(i) for i in range(0,16)]
+        self.feature_columns = [str(i) for i in range(0, 16)]
         self.chr_len = cfg.genome_len
         self.num_subc = 5
         self.embed_rows = None
@@ -65,9 +61,6 @@ class DownstreamHelper:
         frame[pos_columns] += cum_pos
 
         return frame
-
-    def get_representations(self):
-        pass
 
     def get_pos_data(self, window_labels, chr):
         """
@@ -123,7 +116,9 @@ class DownstreamHelper:
         return functional_data
 
     def get_preds_multi(self, y_hat, y_test):
+        """
 
+        """
         pred_data = pd.DataFrame(y_hat)
         pred_data['max'] = pred_data.idxmax(axis=1)
         pred_data["target"] = np.zeros((len(y_test),))
@@ -134,7 +129,9 @@ class DownstreamHelper:
         return pred_data
 
     def precision_function(self, pred_data):
+        """
 
+        """
         AP = []
         rec_levels = np.linspace(0, 1, num=11)
         num_classes = 5
@@ -197,49 +194,27 @@ class DownstreamHelper:
 
         return mean_ap
 
-    def plot_confusion_matrix(self, predictions):
+    def calculate_map(self, feature_matrix):
+        """
 
-        # predictions = np.load("/data2/hic_lstm/data/graph/predictions.npy")
-        conf_matrix = confusion_matrix(predictions[:, 7], predictions[:, 6])
-        conf_matrix = conf_matrix[1:, 1:]
-        df_cm = pd.DataFrame(conf_matrix)
-        df_cm = df_cm.div(df_cm.sum(axis=0), axis=1)
-
-        x_axis_labels = ["A2", "A1", "B1", "B2", "B3"]
-        y_axis_labels = ["A2", "A1", "B1", "B2", "B3"]
-
-        sn.set(font_scale=1.4)
-        sn.heatmap(df_cm, annot=True, cmap="YlGnBu", fmt="d", xticklabels=x_axis_labels,
-                   yticklabels=y_axis_labels)  # font size
-
-        plt.show()
-
-        print("done")
-
-    def plot_pr_curve(self, precision, recall):
-
-        plt.step(recall, precision, color='b', alpha=0.2, where='post')
-        # plt.fill_between(recall, precision, step='post', alpha=0.2, color='b')
-        plt.xlabel('Recall')
-        plt.ylabel('Precision')
-        plt.ylim([0.0, 1.05])
-        plt.xlim([0.0, 1.0])
-        plt.title('2-class Precision-Recall curve')
-        plt.savefig('XGBoost_PR')
-        plt.show()
-        pass
-
-    def calculate_map(self, feature_matrix, mode, exp):
-        mean_map = 0
+        """
+        mean_map, mean_accuracy, mean_f_score, mean_auroc = 0, 0, 0, 0
         n_folds = 3
-        n_recall = 11
+        cfg = self.cfg
 
-        if exp == "map" or exp == "confusion":
-            feature_size = self.cfg.pos_embed_size
-        elif exp == "baseline":
+        "if experiment is subc baseline, set number of features to 5."
+        if cfg.class_experiment == "subc_baseline":
             feature_size = self.num_subc
+        else:
+            feature_size = self.cfg.pos_embed_size
 
+        "initialize"
         average_precisions = np.zeros(n_folds)
+        f_score = np.zeros(n_folds)
+        accuarcy = np.zeros(n_folds)
+        auroc = np.zeros(n_folds)
+
+        "prepare feature matrix"
         feature_matrix = feature_matrix.dropna()
         feature_matrix = feature_matrix.replace({'target': {-1: 3, -2: 4, -3: 5}, })
         feature_matrix = feature_matrix.sample(frac=1)
@@ -248,6 +223,8 @@ class DownstreamHelper:
         for i in range(n_folds):
             X_train = pd.DataFrame()
             y_train = pd.DataFrame()
+
+            "set aside test and validation data"
             X_test = feature_matrix.iloc[i::n_folds, 0:feature_size]
             X_valid = feature_matrix.iloc[(i + 1) % n_folds::n_folds, 0:feature_size]
             y_test = feature_matrix.iloc[i::n_folds]["target"]
@@ -255,6 +232,7 @@ class DownstreamHelper:
 
             for j in range(n_folds):
                 if j != i and j != (i + 1) % n_folds:
+                    "prepare training data"
                     fold_mat = feature_matrix.iloc[j::n_folds, 0:feature_size]
                     y_mat = feature_matrix.iloc[j::n_folds]["target"]
                     X_train = pd.concat([X_train, fold_mat])
@@ -262,46 +240,72 @@ class DownstreamHelper:
 
             y_train = y_train[0].astype(int)
 
-            if mode == "multi":
+            if cfg.class_mode == "multi":
+                "use xgboost multiclass classifier when doing multiclass classification"
                 model = xgboost.XGBClassifier(n_estimators=5000, nthread=min(X_train.shape[1], 12), max_depth=6,
                                               objective='multi:softmax', num_class=6)
                 model.fit(X_train, y_train, eval_set=[(X_valid, y_valid)], eval_metric='mlogloss',
                           early_stopping_rounds=20,
                           verbose=False)
             else:
+                "use xgboost binary"
                 model = xgboost.XGBClassifier(n_estimators=5000, nthread=min(X_train.shape[1], 12), max_depth=6)
 
                 model.fit(X_train, y_train, eval_set=[(X_valid, y_valid)], eval_metric='map', early_stopping_rounds=20,
                           verbose=False)
 
+            "get model predictions"
             y_hat = model.predict_proba(X_test)
             y_test = y_test.astype(int)
 
-            if mode == "multi":
+            if cfg.class_mode == "multi":
+                "prepapre output if multiclass"
                 pred_data = self.get_preds_multi(y_hat, y_test)
-                if exp == "confusion":
+                if cfg.class_experiment == "confusion":
+                    "concat for future confusion matrix"
                     predictions = pd.concat([predictions, pred_data])
                 else:
+                    "run custom precision function to get mAP for multiclass"
                     average_precisions[i] = self.precision_function(pred_data)
 
-            elif mode == "binary":
+            elif cfg.class_mode == "binary":
+                "use existing function to get mAP for binary"
                 average_precisions[i] = average_precision_score(y_test, y_hat[:, 1])
+                accuarcy[i] = accuracy_score(y_test, np.argmax(y_hat, axis=1))
+                precision, recall, _ = precision_recall_curve(y_test, y_hat[:, 1])
+                f_score[i] = np.mean(2 * precision * recall / (precision + recall))
+                auroc[i] = roc_auc_score(y_test, y_hat[:, 1])
 
-            # precision, recall, _ = precision_recall_curve(y_test, y_hat[:, 1])
-            # self.plot_pr_curve(precision, recall)
+            if self.cfg.class_pr:
+                "plot pr curve"
+                plot_pr_curve(precision, recall)
 
-        # np.save('/data2/hic_lstm/downstream/RNA-seq/recall.npy', recall)
-        if exp == "confusion":
-            self.plot_confusion_matrix(predictions)
+        if cfg.class_experiment == "confusion":
+            "plot confusion matrix"
+            plot_confusion_matrix(predictions)
         else:
+            "nanmean"
             mean_map = np.nanmean(average_precisions)
+            mean_accuracy = np.nanmean(accuarcy)
+            mean_f_score = np.nanmean(f_score)
+            mean_auroc = np.nanmean(auroc)
 
+        "if nan return 0"
         if np.isnan(mean_map):
             mean_map = 0
+        if np.isnan(mean_accuracy):
+            mean_accuracy = 0
+        if np.isnan(mean_f_score):
+            mean_f_score = 0
+        if np.isnan(mean_auroc):
+            mean_auroc = 0
 
-        return mean_map
+        return mean_map, mean_accuracy, mean_f_score, mean_auroc
 
     def mlp_regressor(self, features):
+        """
+
+        """
         mode = "mlp"
 
         target_column = ['target']
@@ -336,7 +340,10 @@ class DownstreamHelper:
 
         return r_squared_test
 
-    def subc_baseline(self, Subcompartments, window_labels, mode):
+    def subc_baseline(self, window_labels, mode):
+        """
+
+        """
 
         # subc_features = pd.DataFrame(columns=list(np.arange(self.num_subc)))
         sc_ob = Subcompartments(self.cfg, "GM12878", self.chr, mode="Rao")
@@ -369,6 +376,9 @@ class DownstreamHelper:
         return temp_df
 
     def get_zero_pos(self, window_labels, col_list):
+        """
+
+        """
         ind_list = []
 
         # max_len = data.iloc[-1]["y2"]
@@ -400,6 +410,9 @@ class DownstreamHelper:
         return zero_frame
 
     def balance_classes(self, feature_matrix):
+        """
+
+        """
         if feature_matrix["target"].value_counts().index[0] == 1:
             bal_mode = "undersampling"
         else:
@@ -410,6 +423,9 @@ class DownstreamHelper:
         return feature_matrix
 
     def fix_class_imbalance(self, feature_matrix, mode='undersampling'):
+        """
+
+        """
         if mode == 'undersampling':
             feat_majority = feature_matrix[feature_matrix.target == 1]
             feat_minority = feature_matrix[feature_matrix.target == 0]
@@ -438,4 +454,4 @@ class DownstreamHelper:
 if __name__ == '__main__':
     cfg = Config()
     chr = 21
-    helper_ob = DownstreamHelper(cfg, chr, mode="lstm")
+    helper_ob = DownstreamHelper(cfg)
