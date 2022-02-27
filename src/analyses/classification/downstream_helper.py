@@ -147,7 +147,7 @@ class DownstreamHelper:
         stop = self.start_ends["chr" + str(chr)]["stop"] + get_cumpos(self.cfg, chr)
 
         rna_window_labels = window_labels.loc[
-            (window_labels["start"] > self.start) & (window_labels["start"] < self.stop)].reset_index()
+            (window_labels["start"] > start) & (window_labels["start"] < stop)].reset_index()
 
         rna_window_labels = rna_window_labels.reset_index(drop=True)
         functional_data = self.get_window_data(rna_window_labels)
