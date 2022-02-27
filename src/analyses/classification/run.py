@@ -399,7 +399,7 @@ class DownstreamTasks:
         """
         cfg = self.cfg
         map_frame = pd.DataFrame(columns=["chr", "map"])
-        for chr in cfg.chr_test_list:
+        for chr in cfg.decoder_test_list:
             print("Classification start Chromosome: {}".format(chr))
 
             if self.cfg.class_compute_representation:
