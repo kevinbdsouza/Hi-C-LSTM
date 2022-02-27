@@ -304,8 +304,8 @@ class DownstreamHelper:
 
         return r_squared_test
 
-    def add_cum_pos(self, frame, mode):
-        cum_pos = get_cumpos(self.cfg, self.chr)
+    def add_cum_pos(self, frame, chr, mode):
+        cum_pos = get_cumpos(self.cfg, chr)
 
         if mode == "ends":
             pos_columns = ["start", "end"]

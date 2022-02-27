@@ -47,17 +47,18 @@ class DownstreamTasks:
         self.chr_tad = 'chr' + str(chr)
         self.chr_fire = chr
 
-    def run_xgboost(self, window_labels):
+    def run_xgboost(self, window_labels, chr):
         """
-        run_xgboost(window_labels) -> float
+        run_xgboost(window_labels, chr) -> float
         Converts to cumulative indices. Depending on experiment, either runs baseline.
         Or runs classification using representations from chosen method and cell type.
         Return classifcation metrics.
         Args:
             window_labels (DataFrame): Contains start, end, target
+            chr (int): chromosome to run xgboost on.
         """
         window_labels = window_labels.drop_duplicates(keep='first').reset_index(drop=True)
-        window_labels = self.downstream_helper_ob.add_cum_pos(window_labels, mode="ends")
+        window_labels = self.downstream_helper_ob.add_cum_pos(window_labels, chr, mode="ends")
 
         if self.exp == "baseline":
             feature_matrix = self.downstream_helper_ob.subc_baseline(Subcompartments, window_labels, mode="ends")
@@ -89,7 +90,7 @@ class DownstreamTasks:
         rna_seq_chr = rna_seq_ob.filter_rna_seq()
 
         "runs xgboost"
-        map = self.run_xgboost(rna_seq_chr)
+        map = self.run_xgboost(rna_seq_chr, chr)
         return map
 
     def run_pe(self, cfg):
