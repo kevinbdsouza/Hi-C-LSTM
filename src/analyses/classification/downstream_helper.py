@@ -23,7 +23,7 @@ class DownstreamHelper:
         self.chr = chr
         self.cell = cfg.cell
         self.start_ends = np.load(cfg.hic_path + cfg.start_end_file, allow_pickle=True).item()
-        self.feature_columns = list(range(0, 16))
+        self.feature_columns = [str(i) for i in range(0,16)]
         self.chr_len = cfg.genome_len
         self.num_subc = 5
         self.embed_rows = None
