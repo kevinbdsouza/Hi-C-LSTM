@@ -70,7 +70,7 @@ class DownstreamTasks:
 
         if self.cfg.compute_metrics:
             try:
-                map, accuracy, f_score, auroc = self.downstream_helper_ob.calculate_map(feature_matrix, mode="binary", exp=self.exp)
+                map, accuracy, f_score, auroc = self.downstream_helper_ob.calculate_map(feature_matrix)
             except Exception as e:
                 print(e)
                 return map, accuracy, f_score, auroc
