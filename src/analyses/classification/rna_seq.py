@@ -37,9 +37,9 @@ class GeneExp:
                      7: 'info'}, inplace=True)
 
         "get protein coding, non protein coding, and reference free modes"
-        self.pc_data = pd.read_csv(self.pc_file, compression='gzip', header=0, sep="\s+", error_bad_lines=False)
-        self.nc_data = pd.read_csv(self.nc_file, compression='gzip', header=0, sep="\s+", error_bad_lines=False)
-        self.rb_data = pd.read_csv(self.rb_file, compression='gzip', header=0, sep="\s+", error_bad_lines=False)
+        self.pc_data = pd.read_csv(self.pc_file, compression='gzip', header=0, sep="\s+")
+        self.nc_data = pd.read_csv(self.nc_file, compression='gzip', header=0, sep="\s+")
+        self.rb_data = pd.read_csv(self.rb_file, compression='gzip', header=0, sep="\s+")
 
     def filter_rna_seq(self):
         """
