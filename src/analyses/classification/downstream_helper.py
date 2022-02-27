@@ -31,6 +31,9 @@ class DownstreamHelper:
         self.start, self.stop = None, None
 
     def cat_convert(self, y_test, y_valid, feature_matrix):
+        """
+
+        """
 
         categorical_convert = LabelEncoder()
 
@@ -47,6 +50,77 @@ class DownstreamHelper:
             new_y_cols.append(y)
 
         return new_y_cols[0], new_y_cols[1], feature_matrix
+
+    def add_cum_pos(self, frame, chr, mode):
+        """
+
+        """
+        cum_pos = get_cumpos(self.cfg, chr)
+
+        if mode == "ends":
+            pos_columns = ["start", "end"]
+        elif mode == "pos":
+            pos_columns = ["pos"]
+
+        frame[pos_columns] += cum_pos
+
+        return frame
+
+    def get_representations(self):
+        pass
+
+    def get_pos_data(self, window_labels, chr):
+        """
+
+        """
+        start = self.start_ends["chr" + str(chr)]["start"] + get_cumpos(self.cfg, chr)
+        stop = self.start_ends["chr" + str(chr)]["stop"] + get_cumpos(self.cfg, chr)
+
+        rna_window_labels = window_labels.loc[
+            (window_labels["start"] > start) & (window_labels["start"] < stop)].reset_index()
+
+        rna_window_labels = rna_window_labels.reset_index(drop=True)
+        functional_data = self.get_window_data(rna_window_labels)
+
+        return functional_data
+
+    def merge_features_target(self, embed_rows, functional_data):
+        """
+
+        """
+        feature_matrix = pd.merge(embed_rows, functional_data, on="pos")
+        feature_matrix = feature_matrix[(feature_matrix[self.feature_columns] != 0).all(axis=1)]
+        feature_matrix = feature_matrix.loc[(feature_matrix["target"].isna() != True)]
+
+        return feature_matrix
+
+    def get_feature_matrix(self, embed_rows, rna_window_labels, chr):
+        """
+
+        """
+        functional_data = self.get_pos_data(rna_window_labels, chr)
+        feature_matrix = self.merge_features_target(embed_rows, functional_data)
+
+        return feature_matrix
+
+    def get_window_data(self, frame):
+        """
+
+        """
+        functional_data = pd.DataFrame(columns=["pos", "target"])
+        if frame.index[0] == 1:
+            frame.index -= 1
+
+        for i in range(0, frame.shape[0]):
+
+            start = frame.loc[i, "start"]
+            end = frame.loc[i, "end"]
+
+            for j in range(start, end + 1):
+                functional_data = functional_data.append({'pos': j, 'target': frame.loc[i, "target"]},
+                                                         ignore_index=True)
+
+        return functional_data
 
     def get_preds_multi(self, y_hat, y_test):
 
@@ -141,50 +215,6 @@ class DownstreamHelper:
         plt.show()
 
         print("done")
-
-    def get_pos_data(self, window_labels, chr):
-        start = self.start_ends["chr" + str(chr)]["start"] + get_cumpos(self.cfg, chr)
-        stop = self.start_ends["chr" + str(chr)]["stop"] + get_cumpos(self.cfg, chr)
-
-        rna_window_labels = window_labels.loc[
-            (window_labels["start"] > start) & (window_labels["start"] < stop)].reset_index()
-
-        rna_window_labels = rna_window_labels.reset_index(drop=True)
-        functional_data = self.get_window_data(rna_window_labels)
-
-        return functional_data
-
-    def subc_baseline(self, Subcompartments, window_labels, mode):
-
-        # subc_features = pd.DataFrame(columns=list(np.arange(self.num_subc)))
-        sc_ob = Subcompartments(self.cfg, "GM12878", self.chr, mode="Rao")
-        sc_data = sc_ob.get_sc_data()
-
-        sc_data = sc_data.filter(['start', 'end', 'target'], axis=1)
-        sc_data = sc_data.drop_duplicates(keep='first').reset_index(drop=True)
-        sc_data = self.add_cum_pos(sc_data, mode="ends")
-        sc_data = sc_data.replace({'target': {-1: 3, -2: 4, -3: 5}, })
-        sc_data = sc_data.loc[sc_data["target"] != 0]
-
-        if mode == "ends":
-            functional_data = self.get_pos_data(window_labels)
-        else:
-            functional_data = window_labels
-
-        sc_functional_data = self.get_pos_data(sc_data)
-        sc_functional_data = sc_functional_data.rename(columns={"target": "label"})
-        sc_functional_data = sc_functional_data.dropna()
-        sc_merged_data = pd.merge(sc_functional_data, functional_data, on=['pos'])
-
-        nR = len(sc_merged_data)
-        temp = np.zeros((nR, self.num_subc + 1))
-        temp[np.arange(nR), sc_merged_data["label"].astype(int)] = 1
-
-        temp = temp[:, 1:]
-        temp_df = pd.DataFrame(temp)
-        temp_df["target"] = sc_merged_data["target"]
-
-        return temp_df
 
     def plot_pr_curve(self, precision, recall):
 
@@ -306,32 +336,37 @@ class DownstreamHelper:
 
         return r_squared_test
 
-    def add_cum_pos(self, frame, chr, mode):
-        cum_pos = get_cumpos(self.cfg, chr)
+    def subc_baseline(self, Subcompartments, window_labels, mode):
+
+        # subc_features = pd.DataFrame(columns=list(np.arange(self.num_subc)))
+        sc_ob = Subcompartments(self.cfg, "GM12878", self.chr, mode="Rao")
+        sc_data = sc_ob.get_sc_data()
+
+        sc_data = sc_data.filter(['start', 'end', 'target'], axis=1)
+        sc_data = sc_data.drop_duplicates(keep='first').reset_index(drop=True)
+        sc_data = self.add_cum_pos(sc_data, mode="ends")
+        sc_data = sc_data.replace({'target': {-1: 3, -2: 4, -3: 5}, })
+        sc_data = sc_data.loc[sc_data["target"] != 0]
 
         if mode == "ends":
-            pos_columns = ["start", "end"]
-        elif mode == "pos":
-            pos_columns = ["pos"]
+            functional_data = self.get_pos_data(window_labels)
+        else:
+            functional_data = window_labels
 
-        frame[pos_columns] += cum_pos
+        sc_functional_data = self.get_pos_data(sc_data)
+        sc_functional_data = sc_functional_data.rename(columns={"target": "label"})
+        sc_functional_data = sc_functional_data.dropna()
+        sc_merged_data = pd.merge(sc_functional_data, functional_data, on=['pos'])
 
-        return frame
+        nR = len(sc_merged_data)
+        temp = np.zeros((nR, self.num_subc + 1))
+        temp[np.arange(nR), sc_merged_data["label"].astype(int)] = 1
 
-    def merge_features_target(self, functional_data):
-        feature_matrix = pd.merge(self.embed_rows, functional_data, on="pos")
+        temp = temp[:, 1:]
+        temp_df = pd.DataFrame(temp)
+        temp_df["target"] = sc_merged_data["target"]
 
-        feature_matrix = feature_matrix[(feature_matrix[self.feature_columns] != 0).all(axis=1)]
-        feature_matrix = feature_matrix.loc[(feature_matrix["target"].isna() != True)]
-
-        return feature_matrix
-
-    def get_feature_matrix(self, rna_window_labels, chr):
-        functional_data = self.get_pos_data(rna_window_labels, chr)
-
-        feature_matrix = self.merge_features_target(functional_data)
-
-        return feature_matrix
+        return temp_df
 
     def get_zero_pos(self, window_labels, col_list):
         ind_list = []
@@ -363,22 +398,6 @@ class DownstreamHelper:
         zero_frame = pd.DataFrame(np.transpose(zero_ind), columns=['pos'])
         zero_frame["target"] = pd.Series(np.zeros(len(zero_frame))).astype(int)
         return zero_frame
-
-    def get_window_data(self, frame):
-        functional_data = pd.DataFrame(columns=["pos", "target"])
-        if frame.index[0] == 1:
-            frame.index -= 1
-
-        for i in range(0, frame.shape[0]):
-
-            start = frame.loc[i, "start"]
-            end = frame.loc[i, "end"]
-
-            for j in range(start, end + 1):
-                functional_data = functional_data.append({'pos': j, 'target': frame.loc[i, "target"]},
-                                                         ignore_index=True)
-
-        return functional_data
 
     def balance_classes(self, feature_matrix):
         if feature_matrix["target"].value_counts().index[0] == 1:

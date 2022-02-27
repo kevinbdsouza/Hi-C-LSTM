@@ -47,7 +47,7 @@ class DownstreamTasks:
         self.chr_tad = 'chr' + str(chr)
         self.chr_fire = chr
 
-    def run_xgboost(self, window_labels, chr):
+    def run_xgboost(self, embed_rows, window_labels, chr):
         """
         run_xgboost(window_labels, chr) -> float
         Converts to cumulative indices. Depending on experiment, either runs baseline.
@@ -63,7 +63,7 @@ class DownstreamTasks:
         if self.exp == "baseline":
             feature_matrix = self.downstream_helper_ob.subc_baseline(Subcompartments, window_labels, mode="ends")
         else:
-            feature_matrix = self.downstream_helper_ob.get_feature_matrix(window_labels, chr)
+            feature_matrix = self.downstream_helper_ob.get_feature_matrix(embed_rows, window_labels, chr)
 
         if self.calculate_map:
             try:
@@ -74,7 +74,7 @@ class DownstreamTasks:
 
         return map
 
-    def run_gene_expression(self, chr):
+    def run_gene_expression(self, chr, embed_rows):
         """
         run_gene_expression(chr) -> float
         Gets gene expression data for given cell type and chromosome.
@@ -90,7 +90,7 @@ class DownstreamTasks:
         rna_seq_chr = rna_seq_ob.filter_rna_seq()
 
         "runs xgboost"
-        map = self.run_xgboost(rna_seq_chr, chr)
+        map = self.run_xgboost(embed_rows, rna_seq_chr, chr)
         return map
 
     def run_pe(self, cfg):
@@ -405,6 +405,10 @@ class DownstreamTasks:
             if self.cfg.class_compute_representation:
                 "running test model to get representations"
                 test_model(model, cfg, chr)
+            else:
+                pred_df = pd.read_csv(
+                    cfg.output_directory + "%s_%s_predictions_chr%s.csv" % (cfg.class_method, cfg.cell, str(chr)),
+                    sep="\t")
 
             if cfg.class_element == "Gene Expression":
                 map = self.run_gene_expression(chr)
