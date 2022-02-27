@@ -18,18 +18,18 @@ import matplotlib.pyplot as plt
 
 
 class DownstreamHelper:
-    def __init__(self, cfg, chr):
+    def __init__(self, cfg):
         self.cfg = cfg
         self.chr = chr
         self.cell = cfg.cell
         self.start_ends = np.load(cfg.hic_path + cfg.start_end_file, allow_pickle=True).item()
-        self.start = self.start_ends["chr" + str(chr)]["start"] + get_cumpos(cfg, chr)
-        self.stop = self.start_ends["chr" + str(chr)]["stop"] + get_cumpos(cfg, chr)
         self.feature_columns = list(range(0, 16))
         self.chr_len = cfg.genome_len
         self.num_subc = 5
         self.embed_rows = None
         self.pred_rows = None
+        #self.start = self.start_ends["chr" + str(chr)]["start"] + get_cumpos(cfg, chr)
+        #self.stop = self.start_ends["chr" + str(chr)]["stop"] + get_cumpos(cfg, chr)
 
     def cat_convert(self, y_test, y_valid, feature_matrix):
 

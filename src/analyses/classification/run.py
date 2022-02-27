@@ -27,7 +27,7 @@ class DownstreamTasks:
         self.saved_model_dir = cfg.model_dir
         self.calculate_map = True
         self.exp = "map"
-        self.downstream_helper_ob = DownstreamHelper(cfg, chr)
+        self.downstream_helper_ob = DownstreamHelper(cfg)
 
         self.pe_int_path = cfg.downstream_dir + "PE-interactions"
         self.fire_path = cfg.downstream_dir + "FIREs"
