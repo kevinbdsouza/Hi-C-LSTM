@@ -397,7 +397,7 @@ class DownstreamTasks:
             elif cfg.class_element == "Replication Timing":
                 map, accuracy, f_score, auroc = self.run_rep_timing(chr, embed_rows)
             elif cfg.class_element == "Enhancers":
-                map, accuracy, f_score, auroc = self.run_p_and_e(chr, embed_rows)
+                map, accuracy, f_score, auroc = self.run_enhancers(chr, embed_rows)
             elif cfg.class_element == "TSS":
                 map, accuracy, f_score, auroc = self.run_tss(cfg)
             elif cfg.class_element == "PE-Interactions":
