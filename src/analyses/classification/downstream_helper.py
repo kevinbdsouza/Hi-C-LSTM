@@ -3,6 +3,7 @@ import pandas as pd
 import xgboost
 from sklearn.metrics import average_precision_score, accuracy_score, precision_recall_curve, roc_auc_score
 from analyses.plot.plot_utils import plot_confusion_matrix, plot_pr_curve
+from analyses.classification.subcompartments import Subcompartments
 from sklearn.utils import resample
 from training.config import Config
 from training.data_utils import get_cumpos

@@ -68,7 +68,7 @@ class DownstreamTasks:
         if zero_target:
             features = pd.DataFrame()
             features = features.append(feature_matrix)
-            zero_features = self.downstream_helper_ob.add_cum_pos(zero_pos_frame, mode="pos")
+            zero_features = self.downstream_helper_ob.add_cum_pos(zero_pos_frame, chr, mode="pos")
 
             if self.cfg.class_experiment == "baseline":
                 zero_features = self.downstream_helper_ob.subc_baseline(zero_features, mode="pos")
