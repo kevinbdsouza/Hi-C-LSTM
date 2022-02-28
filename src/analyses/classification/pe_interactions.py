@@ -35,15 +35,19 @@ class PeInteractions:
 
         "filter chromosome"
         pe_data = pe_data.loc[pe_data['window_chrom'] == self.chr].reset_index(drop=True)
-
         return pe_data
 
     def get_cell(self, column):
         return re.split(r"\|\s*", column)[0]
 
     def filter_pe_data(self, pe_data):
-        if self.cfg.cell == "GM12878":
-            pe_data["cell"] = pe_data["window_name"].apply(self.get_cell)
+        """
+
+        """
+
+        "filters cell"
+        pe_data["cell"] = pe_data["window_name"].apply(self.get_cell)
+        pe_data = pe_data.loc[pe_data["cell"] == self.cfg.cell]
 
         if self.cfg.class_element == "Enhancers":
             pe_data = pe_data.filter(['enhancer_start', 'enhancer_end', 'label'], axis=1)
