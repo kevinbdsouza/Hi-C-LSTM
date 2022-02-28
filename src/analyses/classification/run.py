@@ -166,36 +166,25 @@ class DownstreamTasks:
         map, accuracy, f_score, auroc = self.run_xgboost(embed_rows, pe_chr, chr, zero_target=True, mode="ends")
         return map, accuracy, f_score, auroc
 
-    def run_pe(self, cfg):
-        logging.info("PE start")
+    def run_pe(self, chr, embed_rows):
+        """
+        run_pe(chr, embed_rows) -> float, float, float, float
+        Gets TSS data for given cell type and chromosome.
+        Runs xgboost using representations from chosen method and celltype. Or runs baseline.
+        Returns classification metrics.
+        Args:
+            chr (int): chromosome to run classification on.
+            embed_rows (DataFrame): Dataframe with representations and positions.
+        """
+        print("PE start")
 
-        pe_ob = PeInteractions(cfg)
-        pe_ob.get_pe_data(self.pe_int_path)
-        pe_data_chr = pe_ob.filter_pe_data(self.chr_pe)
+        pe_ob = PeInteractions(cfg, chr)
+        pe_chr = pe_ob.get_pe_data()
+        pe_chr = pe_ob.filter_pe_data(pe_chr)
 
-        for cell in self.pe_cell_names:
-            pe_data_chr_cell = pe_data_chr.loc[pe_data_chr['cell'] == cell]
-            pe_window_labels = pe_data_chr_cell.filter(['window_start', 'window_end', 'label'], axis=1)
-            pe_window_labels.rename(columns={'window_start': 'start', 'window_end': 'end', 'label': 'target'},
-                                    inplace=True)
-            pe_window_labels = pe_window_labels.drop_duplicates(keep='first').reset_index(drop=True)
-
-            pe_window_labels = self.downstream_helper_ob.add_cum_pos(pe_window_labels, mode="ends")
-
-            if self.exp == "baseline":
-                feature_matrix = self.downstream_helper_ob.subc_baseline(Subcompartments, pe_window_labels, mode="ends")
-            else:
-                feature_matrix = self.downstream_helper_ob.get_feature_matrix(pe_window_labels)
-
-            logging.info("chr : {} - cell : {}".format(str(self.chr), cell))
-
-            if feature_matrix.empty:
-                continue
-
-            if self.calculate_map:
-                mean_map = self.downstream_helper_ob.calculate_map(feature_matrix, mode="binary", exp=self.exp)
-
-        return mean_map
+        "runs xgboost"
+        map, accuracy, f_score, auroc = self.run_xgboost(embed_rows, pe_chr, chr, zero_target=False, mode="ends")
+        return map, accuracy, f_score, auroc
 
     def run_fires(self, cfg):
         logging.info("fires start")
@@ -375,7 +364,7 @@ class DownstreamTasks:
             elif cfg.class_element == "TSS":
                 map, accuracy, f_score, auroc = self.run_tss(chr, embed_rows)
             elif cfg.class_element == "PE-Interactions":
-                map, accuracy, f_score, auroc = self.run_pe(cfg)
+                map, accuracy, f_score, auroc = self.run_pe(chr, embed_rows)
             elif cfg.class_element == "FIREs":
                 map, accuracy, f_score, auroc = self.run_fires(cfg)
             elif cfg.class_element == "TADs":

@@ -58,6 +58,10 @@ class PeInteractions:
             pe_data = pe_data.filter(['promoter_start', 'promoter_end', 'label'], axis=1)
             pe_data.rename(columns={'promoter_start': 'start', 'promoter_end': 'end', 'label': 'target'}, inplace=True)
             pe_data = pe_data.assign(target=1)
+        elif self.cfg.class_element == "PE-Interactions":
+            pe_data = pe_data.filter(['window_start', 'window_end', 'label'], axis=1)
+            pe_data.rename(columns={'window_start': 'start', 'window_end': 'end', 'label': 'target'}, inplace=True)
+            pe_data = pe_data.assign(target=1)
         return pe_data
 
 
