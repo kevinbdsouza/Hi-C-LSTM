@@ -10,7 +10,7 @@ class Rep_timing:
     """
 
     def __init__(self, cfg, chr):
-        self.rep_path = cfg.downstream_dir + "replication_timing"
+        self.rep_path = os.path.join(cfg.downstream_dir, "replication_timing")
         self.full_path = os.path.join(self.rep_path, "GM12878.bedgraph")
         self.cfg = cfg
         self.cell = cfg.cell
