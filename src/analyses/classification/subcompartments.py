@@ -1,7 +1,6 @@
 import pandas as pd
 import os
 from training import config
-from analyses.classification.downstream_helper import DownstreamHelper
 
 
 class Subcompartments:
@@ -15,7 +14,6 @@ class Subcompartments:
         self.cell_path = os.path.join(cfg.downstream_dir, "subcompartments", self.exp_name)
         self.cfg = cfg
         self.chr = chr
-        self.down_helper_ob = DownstreamHelper(cfg, chr, mode="test")
 
     def get_sc_data(self):
         data = pd.read_csv(self.cell_path, sep="\s+", header=None)
