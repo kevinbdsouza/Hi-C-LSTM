@@ -23,9 +23,6 @@ class Loops:
 
     def get_loop_data(self):
         data = pd.read_csv(self.cell_path, sep="\s+")
-        new_header = data.iloc[0]
-        data = data[1:]
-        data.columns = new_header
         data = data.loc[data['chr1'] == str(self.chr)].reset_index(drop=True)
 
         data = self.alter_data(data)
