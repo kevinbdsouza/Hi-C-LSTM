@@ -29,13 +29,10 @@ class DownstreamTasks:
         self.downstream_helper_ob = DownstreamHelper(cfg)
         self.df_columns = [str(i) for i in range(0, 16)] + ["i"]
 
-
         self.loop_path = cfg.downstream_dir + "loops"
         self.domain_path = cfg.downstream_dir + "domains"
         self.subcompartment_path = cfg.downstream_dir + "subcompartments"
-        self.chr_tad = 'chr' + str(chr)
         self.chr_ctcf = 'chr' + str(chr)
-        self.chr_tad = 'chr' + str(chr)
 
     def run_xgboost(self, embed_rows, window_labels, chr, zero_target=True, mode="ends"):
         """
@@ -204,6 +201,25 @@ class DownstreamTasks:
         map, accuracy, f_score, auroc = self.run_xgboost(embed_rows, fire_chr, chr, zero_target=False, mode="ends")
         return map, accuracy, f_score, auroc
 
+    def run_domains(self, chr, embed_rows):
+        """
+        run_domains(chr, embed_rows) -> float, float, float, float
+        Gets TAD, subTAD, and boundaries data for given cell type and chromosome.
+        Runs xgboost using representations from chosen method and celltype. Or runs baseline.
+        Returns classification metrics.
+        Args:
+            chr (int): chromosome to run classification on.
+            embed_rows (DataFrame): Dataframe with representations and positions.
+        """
+        print("Domain start")
+
+        domain_ob = Domains(cfg, chr, mode="class")
+        domain_chr = domain_ob.get_tad_data()
+
+        "runs xgboost"
+        map, accuracy, f_score, auroc = self.run_xgboost(embed_rows, domain_chr, chr, zero_target=True, mode="ends")
+        return map, accuracy, f_score, auroc
+
     def run_loops(self, cfg):
         logging.info("loop start")
 
@@ -232,49 +248,6 @@ class DownstreamTasks:
                     features = self.downstream_helper_ob.get_feature_matrix(temp_data)
 
                 feature_matrix = feature_matrix.append(features)
-
-            zero_features = self.downstream_helper_ob.add_cum_pos(zero_pos_frame, mode="pos")
-            if self.exp == "baseline":
-                zero_features = self.downstream_helper_ob.subc_baseline(Subcompartments, zero_features, mode="pos")
-            else:
-                zero_features = self.downstream_helper_ob.merge_features_target(zero_features)
-
-            feature_matrix = feature_matrix.append(zero_features)
-
-            logging.info("chr : {} - cell : {}".format(str(self.chr), cell))
-
-            if feature_matrix.empty:
-                continue
-
-            if self.calculate_map:
-                mean_map = self.downstream_helper_ob.calculate_map(feature_matrix, mode="binary", exp=self.exp)
-
-        return mean_map
-
-    def run_domains(self, cfg):
-        logging.info("domain start")
-
-        for cell in self.loop_cell_names:
-            domain_ob = Domains(cfg, cell, chr)
-            domain_data = domain_ob.get_domain_data()
-
-            col_list = ['x1', 'x2']
-            zero_pos_frame = self.downstream_helper_ob.get_zero_pos(domain_data, col_list)
-
-            feature_matrix = pd.DataFrame()
-
-            domain_data.rename(columns={'x1': 'start', 'x2': 'end'},
-                               inplace=True)
-
-            domain_data = domain_data.filter(['start', 'end', 'target'], axis=1)
-            domain_data = domain_data.drop_duplicates(keep='first').reset_index(drop=True)
-            domain_data = self.downstream_helper_ob.add_cum_pos(domain_data, mode="ends")
-            if self.exp == "baseline":
-                features = self.downstream_helper_ob.subc_baseline(Subcompartments, domain_data, mode="ends")
-            else:
-                features = self.downstream_helper_ob.get_feature_matrix(domain_data)
-
-            feature_matrix = feature_matrix.append(features)
 
             zero_features = self.downstream_helper_ob.add_cum_pos(zero_pos_frame, mode="pos")
             if self.exp == "baseline":
@@ -356,17 +329,17 @@ class DownstreamTasks:
             elif cfg.class_element == "FIREs":
                 map, accuracy, f_score, auroc = self.run_fires(chr, embed_rows)
             elif cfg.class_element == "TADs":
-                map, accuracy, f_score, auroc = self.run_domains(cfg)
+                map, accuracy, f_score, auroc = self.run_domains(chr, embed_rows)
             elif cfg.class_element == "subTADs":
-                map, accuracy, f_score, auroc = self.run_domains(cfg)
+                map, accuracy, f_score, auroc = self.run_domains(chr, embed_rows)
             elif cfg.class_element == "Loop Domains":
-                map, accuracy, f_score, auroc = self.run_loops(cfg)
+                map, accuracy, f_score, auroc = self.run_loops(chr, embed_rows)
             elif cfg.class_element == "TADBs":
-                map, accuracy, f_score, auroc = self.run_domains(cfg)
+                map, accuracy, f_score, auroc = self.run_domains(chr, embed_rows)
             elif cfg.class_element == "subTADBs":
-                map, accuracy, f_score, auroc = self.run_domains(cfg)
+                map, accuracy, f_score, auroc = self.run_domains(chr, embed_rows)
             elif cfg.class_element == "Subcompartments":
-                map, accuracy, f_score, auroc = self.run_sub_compartments(cfg)
+                map, accuracy, f_score, auroc = self.run_sub_compartments(chr, embed_rows)
 
             map_frame = map_frame.append(
                 {"chr": chr, "map": map, "fscore": f_score, "auroc": auroc, "accuracy": accuracy}, ignore_index=True)

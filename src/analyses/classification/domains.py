@@ -16,7 +16,7 @@ class Domains:
         self.chr = chr
         self.chr_tad = 'chr' + str(chr)
         self.mode = mode
-        self.down_helper_ob = DownstreamHelper(cfg, chr, mode="test")
+        self.down_helper_ob = DownstreamHelper(cfg)
         self.tad_file = cfg.downstream_dir + "/FIREs/" + 'TAD_boundaries.xlsx'
 
     def get_domain_data(self):
