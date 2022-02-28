@@ -51,8 +51,7 @@ class PeInteractions:
 
         if self.cfg.class_element == "Enhancers":
             pe_data = pe_data.filter(['enhancer_start', 'enhancer_end', 'label'], axis=1)
-            pe_data = pe_data.rename(columns={'enhancer_start': 'start', 'enhancer_end': 'end', 'label': 'target'},
-                                     inplace=True)
+            pe_data.rename(columns={'enhancer_start': 'start', 'enhancer_end': 'end', 'label': 'target'}, inplace=True)
             pe_data = pe_data.assign(target=1)
         return pe_data
 
