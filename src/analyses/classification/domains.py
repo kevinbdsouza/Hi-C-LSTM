@@ -140,7 +140,9 @@ class Domains:
         df_start = tads[["start", "target"]].rename(columns={"start": "pos"})
         df_end = tads[["end", "target"]].rename(columns={"end": "pos"})
         tadbs = pd.concat([df_start, df_end])
-        tadbs["target"] = "TADBs"
+
+        if self.mode == "ig":
+            tadbs["target"] = "TADBs"
 
         "Form CTCF+ or CTCF- TAD boundaries"
         ctcf_data = tf_ob.get_ctcf_data()
