@@ -383,28 +383,30 @@ class DownstreamHelper:
 
         """
         ind_list = []
-
-        # max_len = data.iloc[-1]["y2"]
         max_len = self.start_ends["chr" + str(chr)]["stop"]
         mask_vec = np.zeros(max_len, bool)
         n_run = len(col_list) // 2
 
-        for i in range(window_labels.shape[0]):
+        if col_list[0]!= "pos":
+            for i in range(window_labels.shape[0]):
 
-            count = 0
-            for j in range(n_run):
-                start = window_labels.loc[i, col_list[count]]
-                count += 1
-                end = window_labels.loc[i, col_list[count]]
-                count += 1
+                count = 0
+                for j in range(n_run):
+                    start = window_labels.loc[i, col_list[count]]
+                    count += 1
+                    end = window_labels.loc[i, col_list[count]]
+                    count += 1
 
-                if start >= max_len or end >= max_len:
-                    break
+                    if start >= max_len or end >= max_len:
+                        break
 
-                for k in range(start, end + 1):
-                    ind_list.append(k)
+                    for k in range(start, end + 1):
+                        ind_list.append(k)
 
-        ind_ar = np.array(ind_list)
+            ind_ar = np.array(ind_list)
+        else:
+            ind_ar = np.array(window_labels["pos"])
+
         mask_vec[ind_ar] = True
         zero_vec = np.invert(mask_vec)
         zero_ind = np.nonzero(zero_vec)
