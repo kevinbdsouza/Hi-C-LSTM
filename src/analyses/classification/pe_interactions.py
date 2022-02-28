@@ -38,9 +38,12 @@ class PeInteractions:
 
         return pe_data
 
+    def get_cell(self, column):
+        return re.split(r"\|\s*", column)[0]
+
     def filter_pe_data(self, pe_data):
         if self.cfg.cell == "GM12878":
-            cell_line = re.split(r"\|\s*", pe_data.loc["window_name"])[0]
+            pe_data["cell"] = pe_data["window_name"].apply(self.get_cell)
 
         if self.cfg.class_element == "Enhancers":
             pe_data = pe_data.filter(['enhancer_start', 'enhancer_end', 'label'], axis=1)
