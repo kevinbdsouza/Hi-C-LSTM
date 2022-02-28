@@ -146,6 +146,26 @@ class DownstreamTasks:
         map, accuracy, f_score, auroc = self.run_xgboost(embed_rows, pe_chr, chr, zero_target=True, mode="ends")
         return map, accuracy, f_score, auroc
 
+    def run_tss(self, chr, embed_rows):
+        """
+        run_tss(chr, embed_rows) -> float, float, float, float
+        Gets TSS data for given cell type and chromosome.
+        Runs xgboost using representations from chosen method and celltype. Or runs baseline.
+        Returns classification metrics.
+        Args:
+            chr (int): chromosome to run classification on.
+            embed_rows (DataFrame): Dataframe with representations and positions.
+        """
+        print("TSS start")
+
+        pe_ob = PeInteractions(cfg, chr)
+        pe_chr = pe_ob.get_pe_data()
+        pe_chr = pe_ob.filter_pe_data(pe_chr)
+
+        "runs xgboost"
+        map, accuracy, f_score, auroc = self.run_xgboost(embed_rows, pe_chr, chr, zero_target=True, mode="ends")
+        return map, accuracy, f_score, auroc
+
     def run_pe(self, cfg):
         logging.info("PE start")
 
@@ -324,52 +344,6 @@ class DownstreamTasks:
 
         return mean_map
 
-    def run_tss(self, cfg):
-        logging.info("TSS start")
-        pe_ob = PeInteractions(cfg)
-        pe_ob.get_pe_data(self.pe_int_path)
-        pe_data_chr = pe_ob.filter_pe_data(self.chr_pe)
-
-        for cell in self.pe_cell_names:
-            pe_data_chr_cell = pe_data_chr.loc[pe_data_chr['cell'] == cell]
-            pe_window_labels = pe_data_chr_cell.filter(['promoter_start', 'promoter_end', 'label'], axis=1)
-            pe_window_labels.rename(columns={'promoter_start': 'pos', 'label': 'target'},
-                                    inplace=True)
-            pe_window_labels['pos_dup'] = pe_window_labels['pos']
-            pe_window_labels = pe_window_labels.assign(target=1)
-            pe_window_labels = pe_window_labels.drop_duplicates(keep='first').reset_index(drop=True)
-
-            col_list = ['pos', 'pos_dup']
-            zero_pos_frame = self.downstream_helper_ob.get_zero_pos(pe_window_labels, col_list)
-
-            feature_matrix = pd.DataFrame()
-
-            pe_window_labels = pe_window_labels[['pos', 'target']]
-            pe_window_labels = self.downstream_helper_ob.add_cum_pos(pe_window_labels, mode="pos")
-            if self.exp == "baseline":
-                features = self.downstream_helper_ob.subc_baseline(Subcompartments, pe_window_labels, mode="pos")
-            else:
-                features = self.downstream_helper_ob.merge_features_target(pe_window_labels)
-            feature_matrix = feature_matrix.append(features)
-
-            zero_features = self.downstream_helper_ob.add_cum_pos(zero_pos_frame, mode="pos")
-            if self.exp == "baseline":
-                zero_features = self.downstream_helper_ob.subc_baseline(Subcompartments, zero_features, mode="pos")
-            else:
-                zero_features = self.downstream_helper_ob.merge_features_target(zero_features)
-
-            feature_matrix = feature_matrix.append(zero_features)
-
-            logging.info("chr : {} - cell : {}".format(str(self.chr), cell))
-
-            if feature_matrix.empty:
-                continue
-
-            if self.calculate_map:
-                mean_map = self.downstream_helper_ob.calculate_map(feature_matrix, mode="binary", exp=self.exp)
-
-        return mean_map
-
     def run_experiment(self, model):
         """
 
@@ -399,7 +373,7 @@ class DownstreamTasks:
             elif cfg.class_element == "Enhancers":
                 map, accuracy, f_score, auroc = self.run_enhancers(chr, embed_rows)
             elif cfg.class_element == "TSS":
-                map, accuracy, f_score, auroc = self.run_tss(cfg)
+                map, accuracy, f_score, auroc = self.run_tss(chr, embed_rows)
             elif cfg.class_element == "PE-Interactions":
                 map, accuracy, f_score, auroc = self.run_pe(cfg)
             elif cfg.class_element == "FIREs":

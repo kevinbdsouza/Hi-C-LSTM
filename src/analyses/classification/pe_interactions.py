@@ -49,9 +49,14 @@ class PeInteractions:
         pe_data["cell"] = pe_data["window_name"].apply(self.get_cell)
         pe_data = pe_data.loc[pe_data["cell"] == self.cfg.cell]
 
+        "apply changes according to element"
         if self.cfg.class_element == "Enhancers":
             pe_data = pe_data.filter(['enhancer_start', 'enhancer_end', 'label'], axis=1)
             pe_data.rename(columns={'enhancer_start': 'start', 'enhancer_end': 'end', 'label': 'target'}, inplace=True)
+            pe_data = pe_data.assign(target=1)
+        elif self.cfg.class_element == "TSS":
+            pe_data = pe_data.filter(['promoter_start', 'promoter_end', 'label'], axis=1)
+            pe_data.rename(columns={'promoter_start': 'start', 'promoter_end': 'end', 'label': 'target'}, inplace=True)
             pe_data = pe_data.assign(target=1)
         return pe_data
 
