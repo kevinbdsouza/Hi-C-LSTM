@@ -1,52 +1,57 @@
 import pandas as pd
 import re
+import os
+from training.config import Config
 
 
 class PeInteractions:
-    def __init__(self, cfg):
-        self.pe_data = None
+    """
+    Class to get Promoters, Enhancers, and interaction data from given cell type.
+    Alter it and provide for classification.
+    """
+
+    def __init__(self, cfg, chr):
         self.cfg = cfg
+        self.chr = 'chr' + str(chr)
+        self.pe_int_path = os.path.join(cfg.downstream_dir, "PE-interactions")
+        self.pairs_file = os.path.join(self.pe_int_path, "pairs.csv")
 
-    def get_pe_data(self, pe_int_path):
-        pe_pairs = pd.read_csv(pe_int_path + '/pairs.csv', sep=",")
-        pe_pairs = pe_pairs.sort_values(by=['window_start']).reset_index(drop=True)
+    def get_pe_data(self):
+        """
+        get_rep_data() -> No return object
+        Gets Replication Timing data.
+        Args:
+            NA
+        """
 
-        ''' decimate by 25 to get the positions at 25 bp resolution '''
-        pe_pairs = pe_pairs.drop_duplicates(subset="promoter_name", keep='first').reset_index(drop=True)
-        pe_pairs["window_start"] = pe_pairs["window_start"] // self.cfg.resolution
-        pe_pairs["window_end"] = pe_pairs["window_end"] // self.cfg.resolution
-        pe_pairs["promoter_start"] = pe_pairs["promoter_start"] // self.cfg.resolution
-        pe_pairs["promoter_end"] = pe_pairs["promoter_end"] // self.cfg.resolution
-        pe_pairs["enhancer_start"] = pe_pairs["enhancer_start"] // self.cfg.resolution
-        pe_pairs["enhancer_end"] = pe_pairs["enhancer_end"] // self.cfg.resolution
-        pe_pairs["cell"] = None
+        "load pairs"
+        pe_data = pd.read_csv(self.pairs_file, sep=",")
+        pe_data = pe_data.sort_values(by=['window_start']).reset_index(drop=True)
 
-        self.pe_data = pe_pairs
+        "covert to resolution"
+        columns = ["window_start", "window_end", "promoter_start", "promoter_end", "enhancer_start", "enhancer_end"]
+        pe_data = pe_data.drop_duplicates(subset="promoter_name", keep='first').reset_index(drop=True)
+        pe_data[columns] = pe_data[columns] // self.cfg.resolution
 
-    def filter_pe_data(self, chrom):
-        pe_data_chr = self.pe_data.loc[self.pe_data['window_chrom'] == chrom].reset_index(drop=True)
+        "filter chromosome"
+        pe_data = pe_data.loc[pe_data['window_chrom'] == self.chr].reset_index(drop=True)
 
-        for i in range(len(pe_data_chr)):
-            cell_line = re.split(r"\|\s*", pe_data_chr.iloc[i]["window_name"])[0]
-            if cell_line == "K562":
-                pe_data_chr.loc[i, "cell"] = 'E123'
-            elif cell_line == "HeLa-S3":
-                pe_data_chr.loc[i, "cell"] = 'E117'
-            elif cell_line == "GM12878":
-                pe_data_chr.loc[i, "cell"] = 'E116'
-            elif cell_line == "IMR90":
-                pe_data_chr.loc[i, "cell"] = 'E017'
+        return pe_data
 
-        return pe_data_chr
+    def filter_pe_data(self, pe_data):
+        if self.cfg.cell == "GM12878":
+            cell_line = re.split(r"\|\s*", pe_data.loc["window_name"])[0]
+
+        if self.cfg.class_element == "Enhancers":
+            pe_data = pe_data.filter(['enhancer_start', 'enhancer_end', 'label'], axis=1)
+            pe_data = pe_data.rename(columns={'enhancer_start': 'start', 'enhancer_end': 'end', 'label': 'target'},
+                                     inplace=True)
+            pe_data = pe_data.assign(target=1)
+        return pe_data
 
 
 if __name__ == '__main__':
-    rna_seq_path = "/opt/data/latent/data/downstream/RNA-seq"
-    pe_int_path = "/opt/data/latent/data/downstream/PE-interactions"
+    chr = 21
+    cfg = Config()
 
-    chromosome = 'chr21'
-    cell_name = 'E003'
-
-    pe_ob = PeInteractions()
-    pe_ob.get_pe_data(pe_int_path)
-    print("done")
+    pe_ob = PeInteractions(cfg, chr)

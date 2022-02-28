@@ -18,7 +18,7 @@ class Rep_timing:
 
     def get_rep_data(self):
         """
-        get_rep_data() -> No return object
+        get_rep_data() -> Dataframe
         Gets Replication Timing data.
         Args:
             NA
@@ -45,4 +45,4 @@ class Rep_timing:
 if __name__ == '__main__':
     chr = 21
     cfg = Config()
-    rep_ob = Rep_timing(cfg)
+    rep_ob = Rep_timing(cfg, chr)

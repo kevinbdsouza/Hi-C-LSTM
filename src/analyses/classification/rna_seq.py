@@ -43,7 +43,7 @@ class GeneExp:
 
     def filter_rna_seq(self):
         """
-        filter_rna_seq() -> No return object
+        filter_rna_seq() -> Dataframe
         Filters chromosome. Combined modes based on gene id. Converts to resolution.
         Filters cell type.
         Args:
@@ -54,11 +54,11 @@ class GeneExp:
         gene_info_chr = self.gene_info.loc[self.gene_info['chr'] == self.chr]
 
         "combine by gene id"
-        pc_data_chr = self.pc_data.merge(gene_info_chr, on=['gene_id'], how='inner')
-        nc_data_chr = self.nc_data.merge(gene_info_chr, on=['gene_id'], how='inner')
-        rb_data_chr = self.rb_data.merge(gene_info_chr, on=['gene_id'], how='inner')
+        self.pc_data = self.pc_data.merge(gene_info_chr, on=['gene_id'], how='inner')
+        self.nc_data = self.nc_data.merge(gene_info_chr, on=['gene_id'], how='inner')
+        self.rb_data = self.rb_data.merge(gene_info_chr, on=['gene_id'], how='inner')
 
-        rna_seq_chr = pd.concat([pc_data_chr, nc_data_chr, rb_data_chr], ignore_index=True)
+        rna_seq_chr = pd.concat([self.pc_data, self.nc_data, self.rb_data], ignore_index=True)
         rna_seq_chr = rna_seq_chr.sort_values(by=['start']).reset_index(drop=True)
 
         "convert to resolution"

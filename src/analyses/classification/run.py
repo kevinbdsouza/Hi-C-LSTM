@@ -29,20 +29,19 @@ class DownstreamTasks:
         self.downstream_helper_ob = DownstreamHelper(cfg)
         self.df_columns = [str(i) for i in range(0, 16)] + ["i"]
 
-        self.pe_int_path = cfg.downstream_dir + "PE-interactions"
+
         self.fire_path = cfg.downstream_dir + "FIREs"
         self.loop_path = cfg.downstream_dir + "loops"
         self.domain_path = cfg.downstream_dir + "domains"
         self.subcompartment_path = cfg.downstream_dir + "subcompartments"
-        self.chr_pe = 'chr' + str(chr)
         self.chr_tad = 'chr' + str(chr)
         self.chr_ctcf = 'chr' + str(chr)
         self.chr_tad = 'chr' + str(chr)
         self.chr_fire = chr
 
-    def run_xgboost(self, embed_rows, window_labels, chr, mode="ends"):
+    def run_xgboost(self, embed_rows, window_labels, chr, zero_target=True, mode="ends"):
         """
-        run_xgboost(window_labels, chr) -> float
+        run_xgboost(window_labels, chr) -> float, float, float, float
         Converts to cumulative indices. Depending on experiment, either runs baseline.
         Or runs classification using representations from chosen method and cell type.
         Return classifcation metrics.
@@ -52,6 +51,11 @@ class DownstreamTasks:
         """
         map, accuracy, f_score, auroc = 0, 0, 0, 0
         window_labels = window_labels.drop_duplicates(keep='first').reset_index(drop=True)
+
+        if zero_target:
+            col_list = ['start', 'end']
+            zero_pos_frame = self.downstream_helper_ob.get_zero_pos(window_labels, col_list)
+
         window_labels = self.downstream_helper_ob.add_cum_pos(window_labels, chr, mode=mode)
 
         if self.cfg.class_experiment == "subc_baseline":
@@ -60,6 +64,19 @@ class DownstreamTasks:
             feature_matrix = self.downstream_helper_ob.subc_baseline(window_labels, mode="ends")
         else:
             feature_matrix = self.downstream_helper_ob.get_feature_matrix(embed_rows, window_labels, chr)
+
+        if zero_target:
+            features = pd.DataFrame()
+            features = features.append(feature_matrix)
+            zero_features = self.downstream_helper_ob.add_cum_pos(zero_pos_frame, mode="pos")
+
+            if self.cfg.class_experiment == "baseline":
+                zero_features = self.downstream_helper_ob.subc_baseline(zero_features, mode="pos")
+            else:
+                zero_features = self.downstream_helper_ob.merge_features_target(zero_features)
+
+            features = features.append(zero_features)
+            feature_matrix = features.copy()
 
         if self.cfg.compute_metrics:
             try:
@@ -72,7 +89,7 @@ class DownstreamTasks:
 
     def run_gene_expression(self, chr, embed_rows):
         """
-        run_gene_expression(chr, embed_rows) -> float
+        run_gene_expression(chr, embed_rows) -> float, float, float, float
         Gets gene expression data for given cell type and chromosome.
         Runs xgboost using representations from chosen method and celltype. Or runs baseline.
         Returns classification metrics.
@@ -87,7 +104,46 @@ class DownstreamTasks:
         rna_seq_chr = rna_seq_ob.filter_rna_seq()
 
         "runs xgboost"
-        map, accuracy, f_score, auroc = self.run_xgboost(embed_rows, rna_seq_chr, chr, mode="ends")
+        map, accuracy, f_score, auroc = self.run_xgboost(embed_rows, rna_seq_chr, chr, zero_target=False, mode="ends")
+        return map, accuracy, f_score, auroc
+
+    def run_rep_timing(self, chr, embed_rows):
+        """
+        run_rep_timing(chr, embed_rows) -> float, float, float, float
+        Gets replication timing data for given cell type and chromosome.
+        Runs xgboost using representations from chosen method and celltype. Or runs baseline.
+        Returns classification metrics.
+        Args:
+            chr (int): chromosome to run classification on.
+            embed_rows (DataFrame): Dataframe with representations and positions.
+        """
+        print("Replication Timing start")
+
+        rep_ob = Rep_timing(self.cfg, chr)
+        rep_chr = rep_ob.get_rep_data()
+
+        "runs xgboost"
+        map, accuracy, f_score, auroc = self.run_xgboost(embed_rows, rep_chr, chr, zero_target=False, mode="ends")
+        return map, accuracy, f_score, auroc
+
+    def run_enhancers(self, chr, embed_rows):
+        """
+        run_enhancers(chr, embed_rows) -> float, float, float, float
+        Gets Enhancer data for given cell type and chromosome.
+        Runs xgboost using representations from chosen method and celltype. Or runs baseline.
+        Returns classification metrics.
+        Args:
+            chr (int): chromosome to run classification on.
+            embed_rows (DataFrame): Dataframe with representations and positions.
+        """
+        print("Enhancer start")
+
+        pe_ob = PeInteractions(cfg, chr)
+        pe_chr = pe_ob.get_pe_data()
+        pe_chr = pe_ob.filter_pe_data(pe_chr)
+
+        "runs xgboost"
+        map, accuracy, f_score, auroc = self.run_xgboost(embed_rows, pe_chr, chr, zero_target=True, mode="ends")
         return map, accuracy, f_score, auroc
 
     def run_pe(self, cfg):
@@ -150,25 +206,6 @@ class DownstreamTasks:
                 mean_map = self.downstream_helper_ob.calculate_map(feature_matrix, mode="binary", exp=self.exp)
 
         return mean_map
-
-    def run_rep_timing(self, chr, embed_rows):
-        """
-        run_rep_timing(chr, embed_rows) -> float
-        Gets replication timing data for given cell type and chromosome.
-        Runs xgboost using representations from chosen method and celltype. Or runs baseline.
-        Returns classification metrics.
-        Args:
-            chr (int): chromosome to run classification on.
-            embed_rows (DataFrame): Dataframe with representations and positions.
-        """
-        print("Gene Expression start")
-
-        rep_ob = Rep_timing(self.cfg, chr)
-        rep_chr = rep_ob.get_rep_data()
-
-        "runs xgboost"
-        map, accuracy, f_score, auroc = self.run_xgboost(embed_rows, rep_chr, chr, mode="ends")
-        return map, accuracy, f_score, auroc
 
     def run_loops(self, cfg):
         logging.info("loop start")
@@ -287,52 +324,6 @@ class DownstreamTasks:
 
         return mean_map
 
-    def run_p_and_e(self, cfg):
-        logging.info("P and E start")
-        pe_ob = PeInteractions(cfg)
-        pe_ob.get_pe_data(self.pe_int_path)
-        pe_data_chr = pe_ob.filter_pe_data(self.chr_pe)
-
-        element_list = ["enhancer"]
-        for e in element_list:
-            for cell in self.pe_cell_names:
-                pe_data_chr_cell = pe_data_chr.loc[pe_data_chr['cell'] == cell]
-                pe_window_labels = pe_data_chr_cell.filter([e + '_start', e + '_end', 'label'], axis=1)
-                pe_window_labels.rename(columns={e + '_start': 'start', e + '_end': 'end', 'label': 'target'},
-                                        inplace=True)
-                pe_window_labels = pe_window_labels.assign(target=1)
-                pe_window_labels = pe_window_labels.drop_duplicates(keep='first').reset_index(drop=True)
-
-                col_list = ['start', 'end']
-                zero_pos_frame = self.downstream_helper_ob.get_zero_pos(pe_window_labels, col_list)
-
-                feature_matrix = pd.DataFrame()
-
-                pe_window_labels = self.downstream_helper_ob.add_cum_pos(pe_window_labels, mode="ends")
-                if self.exp == "baseline":
-                    features = self.downstream_helper_ob.subc_baseline(Subcompartments, pe_window_labels, mode="ends")
-                else:
-                    features = self.downstream_helper_ob.get_feature_matrix(pe_window_labels)
-                feature_matrix = feature_matrix.append(features)
-
-                zero_features = self.downstream_helper_ob.add_cum_pos(zero_pos_frame, mode="pos")
-                if self.exp == "baseline":
-                    zero_features = self.downstream_helper_ob.subc_baseline(Subcompartments, zero_features, mode="pos")
-                else:
-                    zero_features = self.downstream_helper_ob.merge_features_target(zero_features)
-
-                feature_matrix = feature_matrix.append(zero_features)
-
-                logging.info("chr : {} - cell : {}".format(str(self.chr), cell))
-
-                if feature_matrix.empty:
-                    continue
-
-                if self.calculate_map:
-                    mean_map = self.downstream_helper_ob.calculate_map(feature_matrix, mode="binary", exp=self.exp)
-
-        return mean_map
-
     def run_tss(self, cfg):
         logging.info("TSS start")
         pe_ob = PeInteractions(cfg)
@@ -406,7 +397,7 @@ class DownstreamTasks:
             elif cfg.class_element == "Replication Timing":
                 map, accuracy, f_score, auroc = self.run_rep_timing(chr, embed_rows)
             elif cfg.class_element == "Enhancers":
-                map, accuracy, f_score, auroc = self.run_p_and_e(cfg)
+                map, accuracy, f_score, auroc = self.run_p_and_e(chr, embed_rows)
             elif cfg.class_element == "TSS":
                 map, accuracy, f_score, auroc = self.run_tss(cfg)
             elif cfg.class_element == "PE-Interactions":
