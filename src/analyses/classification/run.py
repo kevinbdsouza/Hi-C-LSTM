@@ -232,10 +232,10 @@ class DownstreamTasks:
         elif self.cfg.class_element == "TADBs":
             tf_ob = TFChip(cfg, chr)
             tadb_chr = domain_ob.get_tad_boundaries(tf_ob, ctcf="all")
-            map, accuracy, f_score, auroc = self.run_xgboost(embed_rows, tadb_chr, chr, zero_target=True, mode="ends")
+            map, accuracy, f_score, auroc = self.run_xgboost(embed_rows, tadb_chr, chr, zero_target=True, mode="pos")
         elif self.cfg.class_element == "subTADBs":
             domain_chr = domain_ob.get_tad_data()
-            map, accuracy, f_score, auroc = self.run_xgboost(embed_rows, domain_chr, chr, zero_target=True, mode="ends")
+            map, accuracy, f_score, auroc = self.run_xgboost(embed_rows, domain_chr, chr, zero_target=True, mode="pos")
 
         return map, accuracy, f_score, auroc
 
