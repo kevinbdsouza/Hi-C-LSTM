@@ -270,11 +270,14 @@ class DownstreamHelper:
 
             elif cfg.class_mode == "binary":
                 "use existing function to get mAP for binary"
-                average_precisions[i] = average_precision_score(y_test, y_hat[:, 1])
-                accuarcy[i] = accuracy_score(y_test, np.argmax(y_hat, axis=1))
-                precision, recall, _ = precision_recall_curve(y_test, y_hat[:, 1])
-                f_score[i] = np.mean(2 * precision * recall / (precision + recall))
-                auroc[i] = roc_auc_score(y_test, y_hat[:, 1])
+                try:
+                    average_precisions[i] = average_precision_score(y_test, y_hat[:, 1])
+                    accuarcy[i] = accuracy_score(y_test, np.argmax(y_hat, axis=1))
+                    precision, recall, _ = precision_recall_curve(y_test, y_hat[:, 1])
+                    f_score[i] = np.mean(2 * precision * recall / (precision + recall))
+                    auroc[i] = roc_auc_score(y_test, y_hat[:, 1])
+                except Exception as e:
+                    print(e)
 
             if self.cfg.class_pr:
                 "plot pr curve"
