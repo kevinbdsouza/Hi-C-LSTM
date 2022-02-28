@@ -69,7 +69,6 @@ class GeneExp:
         rna_seq_chr['target'] = 0
         rna_seq_chr.loc[rna_seq_chr.iloc[:, self.cell_column] >= 0.5, 'target'] = 1
         rna_seq_chr = rna_seq_chr.filter(['start', 'end', 'target'], axis=1)
-        # rna_window_labels = rna_window_labels.drop([410, 598]).reset_index(drop=True)
         return rna_seq_chr
 
 

@@ -27,27 +27,20 @@ class DownstreamTasks:
         self.saved_model_dir = cfg.model_dir
         self.calculate_map = True
         self.downstream_helper_ob = DownstreamHelper(cfg)
-        self.df_columns = [str(i) for i in range(0,16)] + ["i"]
+        self.df_columns = [str(i) for i in range(0, 16)] + ["i"]
 
         self.pe_int_path = cfg.downstream_dir + "PE-interactions"
         self.fire_path = cfg.downstream_dir + "FIREs"
-        self.rep_timing_path = cfg.downstream_dir + "replication_timing"
         self.loop_path = cfg.downstream_dir + "loops"
         self.domain_path = cfg.downstream_dir + "domains"
         self.subcompartment_path = cfg.downstream_dir + "subcompartments"
-        self.fire_cell_names = ['GM12878']
-        self.rep_cell_names = ['IMR90']
-        self.pe_cell_names = ['E116']
-        self.loop_cell_names = ['GM12878']
-        self.sbc_cell_names = ['GM12878']
         self.chr_pe = 'chr' + str(chr)
         self.chr_tad = 'chr' + str(chr)
-        self.chr_rep = 'chr' + str(chr)
         self.chr_ctcf = 'chr' + str(chr)
         self.chr_tad = 'chr' + str(chr)
         self.chr_fire = chr
 
-    def run_xgboost(self, embed_rows, window_labels, chr):
+    def run_xgboost(self, embed_rows, window_labels, chr, mode="ends"):
         """
         run_xgboost(window_labels, chr) -> float
         Converts to cumulative indices. Depending on experiment, either runs baseline.
@@ -59,7 +52,7 @@ class DownstreamTasks:
         """
         map, accuracy, f_score, auroc = 0, 0, 0, 0
         window_labels = window_labels.drop_duplicates(keep='first').reset_index(drop=True)
-        window_labels = self.downstream_helper_ob.add_cum_pos(window_labels, chr, mode="ends")
+        window_labels = self.downstream_helper_ob.add_cum_pos(window_labels, chr, mode=mode)
 
         if self.cfg.class_experiment == "subc_baseline":
             feature_matrix = self.downstream_helper_ob.subc_baseline(window_labels, mode="ends")
@@ -85,6 +78,7 @@ class DownstreamTasks:
         Returns classification metrics.
         Args:
             chr (int): chromosome to run classification on.
+            embed_rows (DataFrame): Dataframe with representations and positions.
         """
         print("Gene Expression start")
 
@@ -93,7 +87,7 @@ class DownstreamTasks:
         rna_seq_chr = rna_seq_ob.filter_rna_seq()
 
         "runs xgboost"
-        map, accuracy, f_score, auroc = self.run_xgboost(embed_rows, rna_seq_chr, chr)
+        map, accuracy, f_score, auroc = self.run_xgboost(embed_rows, rna_seq_chr, chr, mode="ends")
         return map, accuracy, f_score, auroc
 
     def run_pe(self, cfg):
@@ -157,35 +151,24 @@ class DownstreamTasks:
 
         return mean_map
 
-    def run_rep_timings(self, cfg):
-        logging.info("rep start")
+    def run_rep_timing(self, chr, embed_rows):
+        """
+        run_rep_timing(chr, embed_rows) -> float
+        Gets replication timing data for given cell type and chromosome.
+        Runs xgboost using representations from chosen method and celltype. Or runs baseline.
+        Returns classification metrics.
+        Args:
+            chr (int): chromosome to run classification on.
+            embed_rows (DataFrame): Dataframe with representations and positions.
+        """
+        print("Gene Expression start")
 
-        rep_ob = Rep_timing(cfg)
-        rep_ob.get_rep_data(self.rep_timing_path, self.rep_cell_names)
-        rep_filtered = rep_ob.filter_rep_data(self.chr_rep)
+        rep_ob = Rep_timing(self.cfg, chr)
+        rep_chr = rep_ob.get_rep_data()
 
-        for i, cell in enumerate(self.rep_cell_names):
-
-            rep_data_cell = rep_filtered[i]
-            rep_data_cell = rep_data_cell.filter(['start', 'end', 'target'], axis=1)
-            rep_data_cell = rep_data_cell.drop_duplicates(keep='first').reset_index(drop=True)
-
-            rep_data_cell = self.downstream_helper_ob.add_cum_pos(rep_data_cell, mode="ends")
-
-            if self.exp == "baseline":
-                feature_matrix = self.downstream_helper_ob.subc_baseline(Subcompartments, rep_data_cell, mode="ends")
-            else:
-                feature_matrix = self.downstream_helper_ob.get_feature_matrix(rep_data_cell)
-
-            logging.info("chr : {} - cell : {}".format(str(self.chr), cell))
-
-            if feature_matrix.empty:
-                continue
-
-            if self.calculate_map:
-                mean_map = self.downstream_helper_ob.calculate_map(feature_matrix, mode="binary", exp=self.exp)
-
-        return mean_map
+        "runs xgboost"
+        map, accuracy, f_score, auroc = self.run_xgboost(embed_rows, rep_chr, chr, mode="ends")
+        return map, accuracy, f_score, auroc
 
     def run_loops(self, cfg):
         logging.info("loop start")
@@ -401,7 +384,7 @@ class DownstreamTasks:
 
         """
         cfg = self.cfg
-        map_frame = pd.DataFrame(columns=["chr", "map"])
+        map_frame = pd.DataFrame(columns=["chr", "map", "fscore", "accuracy", "auroc"])
         for chr in cfg.decoder_test_list:
             print("Classification start Chromosome: {}".format(chr))
 
@@ -409,6 +392,7 @@ class DownstreamTasks:
                 "running test model to get representations"
                 test_model(model, cfg, chr)
 
+            "load representations and filter"
             embed_rows = pd.read_csv(
                 cfg.output_directory + "%s_%s_predictions_chr%s.csv" % (cfg.class_method, cfg.cell, str(chr)),
                 sep="\t")
@@ -416,32 +400,34 @@ class DownstreamTasks:
             embed_rows = embed_rows.rename(columns={"i": "pos"})
             embed_rows = embed_rows.drop_duplicates(keep='first').reset_index(drop=True)
 
+            "run element"
             if cfg.class_element == "Gene Expression":
-                map = self.run_gene_expression(chr, embed_rows)
+                map, accuracy, f_score, auroc = self.run_gene_expression(chr, embed_rows)
             elif cfg.class_element == "Replication Timing":
-                map = self.run_rep_timings(cfg)
+                map, accuracy, f_score, auroc = self.run_rep_timing(chr, embed_rows)
             elif cfg.class_element == "Enhancers":
-                map = self.run_p_and_e(cfg)
+                map, accuracy, f_score, auroc = self.run_p_and_e(cfg)
             elif cfg.class_element == "TSS":
-                map = self.run_tss(cfg)
+                map, accuracy, f_score, auroc = self.run_tss(cfg)
             elif cfg.class_element == "PE-Interactions":
-                map = self.run_pe(cfg)
+                map, accuracy, f_score, auroc = self.run_pe(cfg)
             elif cfg.class_element == "FIREs":
-                map = self.run_fires(cfg)
+                map, accuracy, f_score, auroc = self.run_fires(cfg)
             elif cfg.class_element == "TADs":
-                map = self.run_domains(cfg)
+                map, accuracy, f_score, auroc = self.run_domains(cfg)
             elif cfg.class_element == "subTADs":
-                map = self.run_domains(cfg)
+                map, accuracy, f_score, auroc = self.run_domains(cfg)
             elif cfg.class_element == "Loop Domains":
-                map = self.run_loops(cfg)
+                map, accuracy, f_score, auroc = self.run_loops(cfg)
             elif cfg.class_element == "TADBs":
-                map = self.run_domains(cfg)
+                map, accuracy, f_score, auroc = self.run_domains(cfg)
             elif cfg.class_element == "subTADBs":
-                map = self.run_domains(cfg)
+                map, accuracy, f_score, auroc = self.run_domains(cfg)
             elif cfg.class_element == "Subcompartments":
-                map = self.run_sub_compartments(cfg)
+                map, accuracy, f_score, auroc = self.run_sub_compartments(cfg)
 
-            map_frame = map_frame.append({"chr": chr, "map": map}, ignore_index=True)
+            map_frame = map_frame.append(
+                {"chr": chr, "map": map, "fscore": f_score, "auroc": auroc, "accuracy": accuracy}, ignore_index=True)
 
         map_frame.to_csv(
             cfg.output_directory + "%s_metrics_%s_%s.csv" % (cfg.class_method, cfg.cell, cfg.class_element),
