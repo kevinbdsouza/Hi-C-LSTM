@@ -1,7 +1,7 @@
 import pandas as pd
 import os
 import numpy as np
-from training import config
+from training.config import Config
 from analyses.classification.downstream_helper import DownstreamHelper
 
 
@@ -22,11 +22,19 @@ class Loops:
         self.down_helper_ob = DownstreamHelper(cfg)
 
     def get_loop_data(self):
+        """
+        get_loop_data() -> Dataframe
+        Gets Loop data. Filter columns. Set Target.
+        Args:
+            NA
+        """
+
+        "load loop data"
         data = pd.read_csv(self.cell_path, sep="\s+")
         data = data.loc[data['chr1'] == str(self.chr)].reset_index(drop=True)
 
+        "alter loop data"
         data = self.alter_data(data)
-
         pos_matrix = pd.DataFrame()
         for i in range(2):
             if i == 0:
@@ -45,25 +53,26 @@ class Loops:
         return pos_matrix
 
     def alter_data(self, data):
-        data["x1"] = (data["x1"]).astype(int) // self.cfg.resolution
-        data["x2"] = (data["x2"]).astype(int) // self.cfg.resolution
-        data["y1"] = (data["y1"]).astype(int) // self.cfg.resolution
-        data["y2"] = (data["y2"]).astype(int) // self.cfg.resolution
+        """
+        alter_data(data) -> Dataframe
+        Convert to resolution and filter columns.
+        Args:
+            data (Dataframe): Dataframe containing positions and target.
+        """
 
+        "convert to resolution"
+        cols = ["x1", "x2", "y1", "y2"]
+        data[cols] = (data[cols]).astype(int) // self.cfg.resolution
+
+        "filter columns"
         data["target"] = pd.Series(np.ones(len(data))).astype(int)
         data = data.filter(['x1', 'x2', 'y1', 'y2', 'target'], axis=1)
-
         return data
 
 
 if __name__ == '__main__':
-    data_dir = "/data2/hic_lstm/downstream"
-
     chr = 21
-    cfg = config.Config()
-    cell = "GM12878"
+    cfg = Config()
 
-    rep_ob = Loops(cfg, cell, chr)
+    rep_ob = Loops(cfg, chr, mode="class")
     data = rep_ob.get_loop_data()
-
-    print("done")

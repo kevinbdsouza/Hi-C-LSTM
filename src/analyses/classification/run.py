@@ -254,7 +254,7 @@ class DownstreamTasks:
 
         "runs xgboost"
         self.cfg.class_mode = "binary"
-        map, accuracy, f_score, auroc = self.run_xgboost(embed_rows, loop_chr, chr, zero_target=False, mode="ends")
+        map, accuracy, f_score, auroc = self.run_xgboost(embed_rows, loop_chr, chr, zero_target=True, mode="ends")
         return map, accuracy, f_score, auroc
 
     def run_sub_compartments(self, cfg):
