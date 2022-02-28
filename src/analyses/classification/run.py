@@ -200,10 +200,6 @@ class DownstreamTasks:
         fire_ob.get_fire_data()
         fire_chr = fire_ob.filter_fire_data()
 
-
-        fire_chr = fire_chr.filter(['start', 'end', cell + '_l'], axis=1)
-        fire_chr.rename(columns={cell + '_l': 'target'}, inplace=True)
-
         "runs xgboost"
         map, accuracy, f_score, auroc = self.run_xgboost(embed_rows, fire_chr, chr, zero_target=False, mode="ends")
         return map, accuracy, f_score, auroc
