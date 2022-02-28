@@ -410,8 +410,8 @@ class DownstreamHelper:
         mask_vec[ind_ar] = True
         zero_vec = np.invert(mask_vec)
         zero_ind = np.nonzero(zero_vec)
-        if window_labels.shape[0] <= len(zero_ind):
-            zero_ind = zero_ind[:window_labels.shape[0]]
+        if window_labels.shape[0] <= len(zero_ind[0]):
+            zero_ind = zero_ind[0][:window_labels.shape[0]]
         zero_frame = pd.DataFrame(np.transpose(zero_ind), columns=['pos'])
         zero_frame["target"] = pd.Series(np.zeros(len(zero_frame))).astype(int)
         return zero_frame
