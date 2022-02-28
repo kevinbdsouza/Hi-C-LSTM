@@ -16,7 +16,6 @@ from sklearn import preprocessing
 class DownstreamHelper:
     def __init__(self, cfg):
         self.cfg = cfg
-        self.chr = chr
         self.cell = cfg.cell
         self.start_ends = np.load(cfg.hic_path + cfg.start_end_file, allow_pickle=True).item()
         self.feature_columns = [str(i) for i in range(0, 16)]
@@ -375,14 +374,14 @@ class DownstreamHelper:
 
         return temp_df
 
-    def get_zero_pos(self, window_labels, col_list):
+    def get_zero_pos(self, window_labels, col_list, chr):
         """
 
         """
         ind_list = []
 
         # max_len = data.iloc[-1]["y2"]
-        max_len = self.start_ends["chr" + str(self.chr)]["stop"]
+        max_len = self.start_ends["chr" + str(chr)]["stop"]
         mask_vec = np.zeros(max_len, bool)
         n_run = len(col_list) // 2
 

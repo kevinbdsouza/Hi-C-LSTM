@@ -54,7 +54,7 @@ class DownstreamTasks:
 
         if zero_target:
             col_list = ['start', 'end']
-            zero_pos_frame = self.downstream_helper_ob.get_zero_pos(window_labels, col_list)
+            zero_pos_frame = self.downstream_helper_ob.get_zero_pos(window_labels, col_list, chr)
 
         window_labels = self.downstream_helper_ob.add_cum_pos(window_labels, chr, mode=mode)
 
