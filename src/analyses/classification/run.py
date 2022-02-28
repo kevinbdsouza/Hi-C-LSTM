@@ -9,6 +9,7 @@ from analyses.classification.pe_interactions import PeInteractions
 from analyses.classification.loops import Loops
 from analyses.classification.domains import Domains
 from analyses.classification.subcompartments import Subcompartments
+from analyses.feature_attribution.tf import TFChip
 from training.model import SeqLSTM
 import torch
 from training.test_model import test_model
@@ -229,8 +230,9 @@ class DownstreamTasks:
             domain_chr = domain_ob.get_tad_data()
             map, accuracy, f_score, auroc = self.run_xgboost(embed_rows, domain_chr, chr, zero_target=True, mode="ends")
         elif self.cfg.class_element == "TADBs":
-            domain_chr = domain_ob.get_tad_data()
-            map, accuracy, f_score, auroc = self.run_xgboost(embed_rows, domain_chr, chr, zero_target=True, mode="ends")
+            tf_ob = TFChip(cfg, chr)
+            tadb_chr = domain_ob.get_tad_boundaries(tf_ob, ctcf="all")
+            map, accuracy, f_score, auroc = self.run_xgboost(embed_rows, tadb_chr, chr, zero_target=True, mode="ends")
         elif self.cfg.class_element == "subTADBs":
             domain_chr = domain_ob.get_tad_data()
             map, accuracy, f_score, auroc = self.run_xgboost(embed_rows, domain_chr, chr, zero_target=True, mode="ends")
