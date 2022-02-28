@@ -73,7 +73,7 @@ class DownstreamTasks:
             if self.cfg.class_experiment == "baseline":
                 zero_features = self.downstream_helper_ob.subc_baseline(zero_features, mode="pos")
             else:
-                zero_features = self.downstream_helper_ob.merge_features_target(zero_features)
+                zero_features = self.downstream_helper_ob.merge_features_target(embed_rows, zero_features)
 
             features = features.append(zero_features)
             feature_matrix = features.copy()
