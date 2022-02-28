@@ -30,14 +30,12 @@ class DownstreamTasks:
         self.df_columns = [str(i) for i in range(0, 16)] + ["i"]
 
 
-        self.fire_path = cfg.downstream_dir + "FIREs"
         self.loop_path = cfg.downstream_dir + "loops"
         self.domain_path = cfg.downstream_dir + "domains"
         self.subcompartment_path = cfg.downstream_dir + "subcompartments"
         self.chr_tad = 'chr' + str(chr)
         self.chr_ctcf = 'chr' + str(chr)
         self.chr_tad = 'chr' + str(chr)
-        self.chr_fire = chr
 
     def run_xgboost(self, embed_rows, window_labels, chr, zero_target=True, mode="ends"):
         """
@@ -169,7 +167,7 @@ class DownstreamTasks:
     def run_pe(self, chr, embed_rows):
         """
         run_pe(chr, embed_rows) -> float, float, float, float
-        Gets TSS data for given cell type and chromosome.
+        Gets PE interaction data for given cell type and chromosome.
         Runs xgboost using representations from chosen method and celltype. Or runs baseline.
         Returns classification metrics.
         Args:
@@ -186,35 +184,29 @@ class DownstreamTasks:
         map, accuracy, f_score, auroc = self.run_xgboost(embed_rows, pe_chr, chr, zero_target=False, mode="ends")
         return map, accuracy, f_score, auroc
 
-    def run_fires(self, cfg):
-        logging.info("fires start")
+    def run_fires(self, chr, embed_rows):
+        """
+        run_fires(chr, embed_rows) -> float, float, float, float
+        Gets FIRE data for given cell type and chromosome.
+        Runs xgboost using representations from chosen method and celltype. Or runs baseline.
+        Returns classification metrics.
+        Args:
+            chr (int): chromosome to run classification on.
+            embed_rows (DataFrame): Dataframe with representations and positions.
+        """
+        print("FIRE start")
 
-        fire_ob = Fires(cfg)
-        fire_ob.get_fire_data(self.fire_path)
-        fire_labeled = fire_ob.filter_fire_data(self.chr_fire)
+        fire_ob = Fires(cfg, chr, mode="class")
+        fire_ob.get_fire_data()
+        fire_chr = fire_ob.filter_fire_data()
 
-        for cell in self.fire_cell_names:
-            fire_window_labels = fire_labeled.filter(['start', 'end', cell + '_l'], axis=1)
-            fire_window_labels.rename(columns={cell + '_l': 'target'}, inplace=True)
-            fire_window_labels = fire_window_labels.drop_duplicates(keep='first').reset_index(drop=True)
 
-            fire_window_labels = self.downstream_helper_ob.add_cum_pos(fire_window_labels, mode="ends")
+        fire_chr = fire_chr.filter(['start', 'end', cell + '_l'], axis=1)
+        fire_chr.rename(columns={cell + '_l': 'target'}, inplace=True)
 
-            if self.exp == "baseline":
-                feature_matrix = self.downstream_helper_ob.subc_baseline(Subcompartments, fire_window_labels,
-                                                                         mode="ends")
-            else:
-                feature_matrix = self.downstream_helper_ob.get_feature_matrix(fire_window_labels)
-
-            logging.info("chr : {} - cell : {}".format(str(self.chr), cell))
-
-            if feature_matrix.empty:
-                continue
-
-            if self.calculate_map:
-                mean_map = self.downstream_helper_ob.calculate_map(feature_matrix, mode="binary", exp=self.exp)
-
-        return mean_map
+        "runs xgboost"
+        map, accuracy, f_score, auroc = self.run_xgboost(embed_rows, fire_chr, chr, zero_target=False, mode="ends")
+        return map, accuracy, f_score, auroc
 
     def run_loops(self, cfg):
         logging.info("loop start")
@@ -366,7 +358,7 @@ class DownstreamTasks:
             elif cfg.class_element == "PE-Interactions":
                 map, accuracy, f_score, auroc = self.run_pe(chr, embed_rows)
             elif cfg.class_element == "FIREs":
-                map, accuracy, f_score, auroc = self.run_fires(cfg)
+                map, accuracy, f_score, auroc = self.run_fires(chr, embed_rows)
             elif cfg.class_element == "TADs":
                 map, accuracy, f_score, auroc = self.run_domains(cfg)
             elif cfg.class_element == "subTADs":

@@ -38,11 +38,20 @@ class PeInteractions:
         return pe_data
 
     def get_cell(self, column):
+        """
+        get_cell(column) -> list
+        Gets Cell type.
+        Args:
+            column (string): Expression involving cell type.
+        """
         return re.split(r"\|\s*", column)[0]
 
     def filter_pe_data(self, pe_data):
         """
-
+        filter_pe_data(pe_data) -> Dataframe
+        Filter cell type, and applies changes according to element.
+        Args:
+            pe_data (Dataframe): Dataframe containing p, e, and window data.
         """
 
         "filters cell"
