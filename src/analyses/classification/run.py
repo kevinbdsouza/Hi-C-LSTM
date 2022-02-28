@@ -47,7 +47,10 @@ class DownstreamTasks:
         window_labels = window_labels.drop_duplicates(keep='first').reset_index(drop=True)
 
         if zero_target:
-            col_list = ['start', 'end']
+            if mode=="ends":
+                col_list = ['start', 'end']
+            else:
+                col_list = ['pos']
             zero_pos_frame = self.downstream_helper_ob.get_zero_pos(window_labels, col_list, chr)
 
         window_labels = self.downstream_helper_ob.add_cum_pos(window_labels, chr, mode=mode)
