@@ -29,8 +29,6 @@ class DownstreamTasks:
         self.downstream_helper_ob = DownstreamHelper(cfg)
         self.df_columns = [str(i) for i in range(0, 16)] + ["i"]
 
-        self.loop_path = cfg.downstream_dir + "loops"
-        self.domain_path = cfg.downstream_dir + "domains"
         self.subcompartment_path = cfg.downstream_dir + "subcompartments"
         self.chr_ctcf = 'chr' + str(chr)
 
@@ -75,6 +73,7 @@ class DownstreamTasks:
 
         if self.cfg.compute_metrics:
             try:
+                self.downstream_helper_ob.cfg.class_mode = self.cfg.class_mode
                 map, accuracy, f_score, auroc = self.downstream_helper_ob.calculate_map(feature_matrix)
             except Exception as e:
                 print(e)
@@ -99,6 +98,7 @@ class DownstreamTasks:
         rna_seq_chr = rna_seq_ob.filter_rna_seq()
 
         "runs xgboost"
+        self.cfg.class_mode = "binary"
         map, accuracy, f_score, auroc = self.run_xgboost(embed_rows, rna_seq_chr, chr, zero_target=False, mode="ends")
         return map, accuracy, f_score, auroc
 
@@ -118,6 +118,7 @@ class DownstreamTasks:
         rep_chr = rep_ob.get_rep_data()
 
         "runs xgboost"
+        self.cfg.class_mode = "binary"
         map, accuracy, f_score, auroc = self.run_xgboost(embed_rows, rep_chr, chr, zero_target=False, mode="ends")
         return map, accuracy, f_score, auroc
 
@@ -138,6 +139,7 @@ class DownstreamTasks:
         pe_chr = pe_ob.filter_pe_data(pe_chr)
 
         "runs xgboost"
+        self.cfg.class_mode = "binary"
         map, accuracy, f_score, auroc = self.run_xgboost(embed_rows, pe_chr, chr, zero_target=True, mode="ends")
         return map, accuracy, f_score, auroc
 
@@ -158,6 +160,7 @@ class DownstreamTasks:
         pe_chr = pe_ob.filter_pe_data(pe_chr)
 
         "runs xgboost"
+        self.cfg.class_mode = "binary"
         map, accuracy, f_score, auroc = self.run_xgboost(embed_rows, pe_chr, chr, zero_target=True, mode="ends")
         return map, accuracy, f_score, auroc
 
@@ -178,6 +181,7 @@ class DownstreamTasks:
         pe_chr = pe_ob.filter_pe_data(pe_chr)
 
         "runs xgboost"
+        self.cfg.class_mode = "binary"
         map, accuracy, f_score, auroc = self.run_xgboost(embed_rows, pe_chr, chr, zero_target=False, mode="ends")
         return map, accuracy, f_score, auroc
 
@@ -198,6 +202,7 @@ class DownstreamTasks:
         fire_chr = fire_ob.filter_fire_data()
 
         "runs xgboost"
+        self.cfg.class_mode = "binary"
         map, accuracy, f_score, auroc = self.run_xgboost(embed_rows, fire_chr, chr, zero_target=False, mode="ends")
         return map, accuracy, f_score, auroc
 
@@ -214,58 +219,43 @@ class DownstreamTasks:
         print("Domain start")
 
         domain_ob = Domains(cfg, chr, mode="class")
-        domain_chr = domain_ob.get_tad_data()
+        self.cfg.class_mode = "binary"
 
-        "runs xgboost"
-        map, accuracy, f_score, auroc = self.run_xgboost(embed_rows, domain_chr, chr, zero_target=True, mode="ends")
+        "get data and run xgboost according to type of domain element"
+        if self.cfg.class_element == "TADs":
+            domain_chr = domain_ob.get_tad_data()
+            map, accuracy, f_score, auroc = self.run_xgboost(embed_rows, domain_chr, chr, zero_target=True, mode="ends")
+        elif self.cfg.class_element == "subTADs":
+            domain_chr = domain_ob.get_tad_data()
+            map, accuracy, f_score, auroc = self.run_xgboost(embed_rows, domain_chr, chr, zero_target=True, mode="ends")
+        elif self.cfg.class_element == "TADBs":
+            domain_chr = domain_ob.get_tad_data()
+            map, accuracy, f_score, auroc = self.run_xgboost(embed_rows, domain_chr, chr, zero_target=True, mode="ends")
+        elif self.cfg.class_element == "subTADBs":
+            domain_chr = domain_ob.get_tad_data()
+            map, accuracy, f_score, auroc = self.run_xgboost(embed_rows, domain_chr, chr, zero_target=True, mode="ends")
+
         return map, accuracy, f_score, auroc
 
-    def run_loops(self, cfg):
-        logging.info("loop start")
+    def run_loops(self, chr, embed_rows):
+        """
+        run_loops(chr, embed_rows) -> float, float, float, float
+        Gets loop data for given cell type and chromosome.
+        Runs xgboost using representations from chosen method and celltype. Or runs baseline.
+        Returns classification metrics.
+        Args:
+            chr (int): chromosome to run classification on.
+            embed_rows (DataFrame): Dataframe with representations and positions.
+        """
+        print("Loop Domain start")
 
-        for cell in self.loop_cell_names:
-            loop_ob = Loops(cfg, cell, chr)
-            loop_data = loop_ob.get_loop_data()
+        loop_ob = Loops(cfg, chr, mode="class")
+        loop_chr = loop_ob.get_loop_data()
 
-            col_list = ['x1', 'x2', 'y1', 'y2']
-            zero_pos_frame = self.downstream_helper_ob.get_zero_pos(loop_data, col_list)
-
-            feature_matrix = pd.DataFrame()
-            for i in range(2):
-                if i == 0:
-                    temp_data = loop_data.rename(columns={'x1': 'start', 'x2': 'end'},
-                                                 inplace=False)
-                else:
-                    temp_data = loop_data.rename(columns={'y1': 'start', 'y2': 'end'},
-                                                 inplace=False)
-
-                temp_data = temp_data.filter(['start', 'end', 'target'], axis=1)
-                temp_data = temp_data.drop_duplicates(keep='first').reset_index(drop=True)
-                temp_data = self.downstream_helper_ob.add_cum_pos(temp_data, mode="ends")
-                if self.exp == "baseline":
-                    features = self.downstream_helper_ob.subc_baseline(Subcompartments, temp_data, mode="ends")
-                else:
-                    features = self.downstream_helper_ob.get_feature_matrix(temp_data)
-
-                feature_matrix = feature_matrix.append(features)
-
-            zero_features = self.downstream_helper_ob.add_cum_pos(zero_pos_frame, mode="pos")
-            if self.exp == "baseline":
-                zero_features = self.downstream_helper_ob.subc_baseline(Subcompartments, zero_features, mode="pos")
-            else:
-                zero_features = self.downstream_helper_ob.merge_features_target(zero_features)
-
-            feature_matrix = feature_matrix.append(zero_features)
-
-            logging.info("chr : {} - cell : {}".format(str(self.chr), cell))
-
-            if feature_matrix.empty:
-                continue
-
-            if self.calculate_map:
-                mean_map = self.downstream_helper_ob.calculate_map(feature_matrix, mode="binary", exp=self.exp)
-
-        return mean_map
+        "runs xgboost"
+        self.cfg.class_mode = "binary"
+        map, accuracy, f_score, auroc = self.run_xgboost(embed_rows, loop_chr, chr, zero_target=False, mode="ends")
+        return map, accuracy, f_score, auroc
 
     def run_sub_compartments(self, cfg):
         logging.info("subcompartment start")
