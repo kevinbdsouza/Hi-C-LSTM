@@ -87,11 +87,12 @@ class DownstreamHelper:
 
         return feature_matrix
 
-    def get_feature_matrix(self, embed_rows, rna_window_labels, chr):
+    def get_feature_matrix(self, embed_rows, functional_data, chr, mode="ends"):
         """
 
         """
-        functional_data = self.get_pos_data(rna_window_labels, chr)
+        if mode == "ends":
+            functional_data = self.get_pos_data(functional_data, chr)
         feature_matrix = self.merge_features_target(embed_rows, functional_data)
 
         return feature_matrix

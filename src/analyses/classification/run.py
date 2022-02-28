@@ -60,7 +60,7 @@ class DownstreamTasks:
         elif self.cfg.class_experiment == "pca_baseline":
             feature_matrix = self.downstream_helper_ob.subc_baseline(window_labels, mode="ends")
         else:
-            feature_matrix = self.downstream_helper_ob.get_feature_matrix(embed_rows, window_labels, chr)
+            feature_matrix = self.downstream_helper_ob.get_feature_matrix(embed_rows, window_labels, chr, mode=mode)
 
         if zero_target:
             features = pd.DataFrame()
