@@ -31,6 +31,7 @@ class Fires:
         fires["start"] = fires["start"] // self.cfg.resolution
         fires["end"] = fires["end"] // self.cfg.resolution
 
+        "filter relevant columns"
         fire_chosen = fires.iloc[:, 0:10]
         self.fire_data = fire_chosen
 
