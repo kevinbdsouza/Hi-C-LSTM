@@ -53,9 +53,9 @@ class DownstreamTasks:
         window_labels = self.downstream_helper_ob.add_cum_pos(window_labels, chr, mode=mode)
 
         if self.cfg.class_experiment == "subc_baseline":
-            feature_matrix = self.downstream_helper_ob.subc_baseline(window_labels, chr)
+            feature_matrix = self.downstream_helper_ob.subc_baseline(window_labels, chr, mode=mode)
         elif self.cfg.class_experiment == "pca_baseline":
-            feature_matrix = self.downstream_helper_ob.subc_baseline(window_labels, chr)
+            feature_matrix = self.downstream_helper_ob.subc_baseline(window_labels, chr, mode=mode)
         else:
             feature_matrix = self.downstream_helper_ob.get_feature_matrix(embed_rows, window_labels, chr, mode=mode)
 
@@ -65,9 +65,9 @@ class DownstreamTasks:
             zero_features = self.downstream_helper_ob.add_cum_pos(zero_pos_frame, chr, mode="pos")
 
             if self.cfg.class_experiment == "subc_baseline":
-                zero_features = self.downstream_helper_ob.subc_baseline(zero_features, chr)
+                zero_features = self.downstream_helper_ob.subc_baseline(zero_features, chr, mode="pos")
             elif self.cfg.class_experiment == "pca_baseline":
-                zero_features = self.downstream_helper_ob.subc_baseline(zero_features, chr)
+                zero_features = self.downstream_helper_ob.subc_baseline(zero_features, chr, mode="pos")
             else:
                 zero_features = self.downstream_helper_ob.merge_features_target(embed_rows, zero_features)
 
