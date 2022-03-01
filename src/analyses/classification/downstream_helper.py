@@ -130,7 +130,8 @@ class DownstreamHelper:
         """
 
         """
-        AP_list = []
+
+        ap_list = []
         fscore_list = []
         rec_levels = np.linspace(0, 1, num=11)
 
@@ -183,14 +184,16 @@ class DownstreamHelper:
 
             if maxAP != []:
                 meanAP = np.sum(maxAP) / len(rec_levels)
+                fscore = np.mean(2 * np.array(maxAP) * rec_levels / (np.array(maxAP) + rec_levels))
             else:
                 meanAP = 0
+                fscore = 0
 
-            AP_list.append(meanAP)
-            fscore_list.append(np.mean(2 * np.array(maxAP) * rec_levels / (np.array(maxAP) + rec_levels)))
+            ap_list.append(meanAP)
+            fscore_list.append(fscore)
 
 
-        mean_ap = np.mean(AP_list)
+        mean_ap = np.mean(ap_list)
         mean_fscore = np.mean(fscore_list)
 
         return mean_ap, mean_fscore
