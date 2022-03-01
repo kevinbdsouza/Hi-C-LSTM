@@ -56,23 +56,22 @@ def get_genomic_coord(chr, bin_idx, cfg):
     return (bin_idx - chr_start) * cfg.resolution
 
 
-def load_hic(cfg, cell, chr):
+def load_hic(cfg, chr):
     """
-    load_hic(cfg, cell, chr) -> Dataframe
+    load_hic(cfg, chr) -> Dataframe
     Loads data from Hi-C txt files, converts indices to specified resolution.
     Supports only those values of resolution that Juicer can extract from Hi-C txt file.
     Supports only those cell types for which Hi-C txt files exist.
     To check how to create the Hi-C txt file, refer to the documentation.
     Args:
         cfg (Config): the configuration to use for the experiment.
-        cell (string): the cell type to extract Hi-C from.
         chr (int): the chromosome to extract Hi-C from.
     Raises:
         Error: Hi-C txt file does not exist or error during Juicer extraction.
         Skips: if error during extraction using Juicer Tools, prints out empty txt file
     """
     try:
-        data = pd.read_csv("%s%s/%s/hic_chr%s.txt" % (cfg.hic_path, cell, chr, chr), sep="\t", names=['i', 'j', 'v'])
+        data = pd.read_csv("%s%s/%s/hic_chr%s.txt" % (cfg.hic_path, cfg.cell, chr, chr), sep="\t", names=['i', 'j', 'v'])
         data = data.dropna()
         data[['i', 'j']] = data[['i', 'j']] / cfg.resolution
         data[['i', 'j']] = data[['i', 'j']].astype('int64')
@@ -193,9 +192,9 @@ def contactProbabilities(values, smoothing=8, delta=1e-10):
     return contact_prob
 
 
-def get_data(cfg, cell, chr):
+def get_data(cfg, chr):
     """
-    get_data(cfg, cell, chr) -> List, List
+    get_data(cfg, chr) -> List, List
     Loads data from Hi-C txt files, organizes them into input ids and values.
     Supports varying values of sequence length in the configuration file.
     Supports only those values of resolution that Juicer can extract from Hi-C txt file.
@@ -203,13 +202,12 @@ def get_data(cfg, cell, chr):
     To check how to create the Hi-C txt file, refer to the documentation.
     Args:
         cfg (Config): the configuration to use for the experiment.
-        cell (string): the cell type to extract Hi-C from.
         chr (int): the chromosome to extract Hi-C from.
     Raises:
         Error: Hi-C txt file does not exist or error during Juicer extraction.
         Skips: if error during extraction using Juicer Tools, prints out empty txt file
     """
-    data = load_hic(cfg, cell, chr)
+    data = load_hic(cfg, chr)
     input_idx, values = get_samples_sparse(data, chr, cfg)
 
     return input_idx, values
@@ -277,9 +275,9 @@ def get_data_loader_batch_chr(cfg):
     return data_loader
 
 
-def save_processed_data(cfg, cell):
+def save_processed_data(cfg):
     """
-    save_processed_data(cfg, cell) -> No return object
+    save_processed_data(cfg) -> No return object
     Gets data for Hi-C txt files, organizes them into input ids and values.
     Saves them in the processed directory.
     Supports varying values of sequence length in the configuration file.
@@ -288,7 +286,6 @@ def save_processed_data(cfg, cell):
     To check how to create the Hi-C txt file, refer to the documentation.
     Args:
         cfg (Config): the configuration to use for the experiment.
-        cell (string): the cell type to extract Hi-C from.
     Raises:
         Error: Hi-C txt file does not exist or error during Juicer extraction.
         Skips: if error during extraction using Juicer Tools, prints out empty txt file
@@ -296,26 +293,25 @@ def save_processed_data(cfg, cell):
     for chr in cfg.chr_train_list:
         print("Saving input data for Chr", str(chr), "in the specified processed directory")
 
-        idx, val = get_data(cfg, cell, chr)
+        idx, val = get_data(cfg, chr)
         torch.save(idx, cfg.processed_data_dir + 'input_idx_chr' + str(chr) + '.pth')
         torch.save(val, cfg.processed_data_dir + 'values_chr' + str(chr) + '.pth')
 
 
-def scHiC_preprocess(cfg, cell):
+def scHiC_preprocess(cfg):
     """
-    scHiC_preprocess(cfg, cell) -> No return object
+    scHiC_preprocess(cfg) -> No return object
     Gets bar codes and positions from pairs file.
     Matched them with bar codes from percentages file.
     Creates a DataFrame corresponding pairwise hg19 contact values.
     Saves the resulting DataFrame in the ScHiC data directory.
     Args:
         cfg (Config): the configuration to use for the experiment.
-        cell (string): the cell type to extract Hi-C from.
         """
 
     chr_list = [19, 20, 21, 22]
     columns = ['x1', 'y1', 'bar1', 'bar2']
-    full_pairs_path = cfg.hic_path + cell + cfg.schic_pairs_file
+    full_pairs_path = cfg.hic_path + cfg.cell + cfg.schic_pairs_file
     pairs = pd.read_csv(full_pairs_path, sep="\t",
                         names=['chrA', 'x1', 'x2', 'chrB', 'y1', 'y2', 'a', 'b', 'c', 'd', 'e', 'bar1', 'bar2',
                                'l', 'i', 'j', 'k'])
@@ -324,24 +320,24 @@ def scHiC_preprocess(cfg, cell):
         pairs = pairs.loc[pairs["chrA"] == "human_chr" + str(chr)]
         pairs = pairs.loc[pairs["chrB"] == "human_chr" + str(chr)]
         pairs = pairs[columns]
-        pairs.to_csv(cfg.hic_path + cell + '/' + str(chr) + '/' + "pairs_" + str(chr) + '.txt', sep="\t")
+        pairs.to_csv(cfg.hic_path + cfg.cell + '/' + str(chr) + '/' + "pairs_" + str(chr) + '.txt', sep="\t")
 
-    full_read_path = cfg.hic_path + cell + cfg.schic_reads_file
+    full_read_path = cfg.hic_path + cfg.cell + cfg.schic_reads_file
     reads = pd.read_csv(full_read_path, sep="\t",
                         names=['a', 'b', 'reads_hg19', 'd', 'e', 'f', 'bar1', 'bar2', 'i', 'j', 'k', 'l', 'm', 'n',
                                'o', 'p', 'q'])
     reads = reads[['reads_hg19', 'bar1', 'bar2']]
 
     for chr in chr_list:
-        pairs = pd.read_csv(cfg.hic_path + cell + '/' + str(chr) + '/' + "pairs_" + str(chr) + '.txt', sep="\t")
+        pairs = pd.read_csv(cfg.hic_path + cfg.cell + '/' + str(chr) + '/' + "pairs_" + str(chr) + '.txt', sep="\t")
         merged_pairs = pairs.merge(reads, on=["bar1", "bar2"])
         merged_pairs = merged_pairs[["x1", "y1", "reads_hg19"]]
         merged_pairs = merged_pairs.rename(columns={"x1": "i", "y1": "j", "reads_hg19": "v"})
-        merged_pairs.to_csv(cfg.hic_path + cell + '/' + str(chr) + '/' + "hic_chr" + str(chr) + '.txt', sep="\t")
+        merged_pairs.to_csv(cfg.hic_path + cfg.cell + '/' + str(chr) + '/' + "hic_chr" + str(chr) + '.txt', sep="\t")
 
 
 if __name__ == "__main__":
     cfg = config.Config()
     cell = cfg.cell
-    save_processed_data(cfg, cell)
-    scHiC_preprocess(cfg, cell)
+    save_processed_data(cfg)
+    scHiC_preprocess(cfg)

@@ -371,7 +371,7 @@ class SeqLSTM(nn.Module):
         sign = main_pred_df["ig"] > 0
         main_pred_df["ig"] = sign * (
                 (main_pred_df["ig"] - main_pred_df[sign]["ig"].min()) / main_pred_df["ig"].max()) \
-                              + ~sign * -((main_pred_df["ig"] - main_pred_df[~sign]["ig"].max()) / main_pred_df[
+                             + ~sign * -((main_pred_df["ig"] - main_pred_df[~sign]["ig"].max()) / main_pred_df[
             "ig"].min())
         main_pred_df["pos"] = main_pred_df.index
         return main_pred_df

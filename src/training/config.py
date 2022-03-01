@@ -15,7 +15,7 @@ class Config:
         self.resolution = 10000
         self.cell = "GM12878"
         self.chr_train_list = list(range(1, 23))
-        self.chr_test_list = list(range(1, 23))
+        self.chr_test_list = list(range(22, 23))
 
         "Model Paramters"
         self.pos_embed_size = 16
@@ -47,6 +47,7 @@ class Config:
         "decoder parameters"
         self.decoder_name = "hiclstm_fc"
         self.decoder = "fc"
+        self.compute_pca = True
         self.recon_compute_representation = False
         self.recon_save_representation = False
         self.train_decoders = False
@@ -116,3 +117,5 @@ class Config:
         self.class_experiment = "subc_baseline"
         self.class_mode = "binary"
         self.compute_metrics = True
+        self.n_folds = 3
+        self.regression_mode = "mlp"
