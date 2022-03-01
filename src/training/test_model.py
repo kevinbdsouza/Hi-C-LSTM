@@ -28,7 +28,7 @@ def compute_pca(cfg, chr):
     data['i_binidx'] = get_bin_idx(np.full(data.shape[0], chr), data['i'], cfg)
     data['j_binidx'] = get_bin_idx(np.full(data.shape[0], chr), data['j'], cfg)
     data["v"] = contactProbabilities(data["v"])
-    hic_mat, st = get_heatmaps(data)
+    hic_mat, st = get_heatmaps(data, no_pred=True)
 
     pca_ob = PCA(n_components=cfg.pos_embed_size)
     pca_ob.fit(hic_mat)

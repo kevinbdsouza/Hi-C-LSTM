@@ -6,7 +6,7 @@ import training.config as config
 import matplotlib.pyplot as plt
 
 
-def get_heatmaps(data):
+def get_heatmaps(data, no_pred=False):
     st = int(data["i"].min())
     data["i"] = data["i"] - st
     data["j"] = data["j"] - st
@@ -17,7 +17,11 @@ def get_heatmaps(data):
     hic_mat = np.zeros((nr, nr))
     hic_mat[rows, cols] = np.array(data["v"])
     hic_upper = np.triu(hic_mat)
-    hic_mat[cols, rows] = np.array(data["pred"])
+    if no_pred:
+        hic_mat[cols, rows] = np.array(data["v"])
+    else:
+        hic_mat[cols, rows] = np.array(data["pred"])
+
     hic_lower = np.tril(hic_mat)
     hic_mat = hic_upper + hic_lower
     hic_mat[np.diag_indices_from(hic_mat)] /= 2
