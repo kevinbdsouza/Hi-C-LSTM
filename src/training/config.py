@@ -109,7 +109,7 @@ class Config:
             self.metric_frame_columns = self.class_elements_list.append("chr")
         self.class_compute_representation = False
         self.class_element = "Gene Expression"
-        self.class_method = "hiclstm"
+        self.class_method = "baseline"
         self.class_run_elements = True
         self.class_run_all_elements = False
         self.class_pr = False
