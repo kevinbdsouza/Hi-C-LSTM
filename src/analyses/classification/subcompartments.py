@@ -37,6 +37,7 @@ class Subcompartments:
         data["start"] = (data["start"]).astype(int) // self.cfg.resolution
         data["end"] = (data["end"]).astype(int) // self.cfg.resolution
         data = data.filter(['start', 'end', 'target'], axis=1)
+        data = data.replace({'target': {-1: 3, -2: 1, -3: 5, 1: 4}, })
         return data
 
 

@@ -307,7 +307,6 @@ class DownstreamHelper:
 
         "prepare feature matrix"
         feature_matrix = feature_matrix.dropna()
-        feature_matrix = feature_matrix.replace({'target': {-1: 3, -2: 1, -3: 5, 1: 4}, })
         feature_matrix = feature_matrix.sample(frac=1)
         predictions = pd.DataFrame()
 
