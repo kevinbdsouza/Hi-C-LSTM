@@ -266,8 +266,6 @@ class DownstreamHelper:
                     num_classes = len(y_test.unique())
                     average_precisions[i] = self.precision_function(pred_data, num_classes)
                     accuarcy[i] = accuracy_score(y_test, np.argmax(y_hat, axis=1))
-                    precision, recall, _ = precision_recall_curve(y_test, y_hat)
-                    f_score[i] = np.mean(2 * precision * recall / (precision + recall))
                     auroc[i] = roc_auc_score(y_test, y_hat)
 
             elif cfg.class_mode == "binary":
