@@ -360,7 +360,7 @@ class DownstreamHelper:
         sc_data = sc_data.drop_duplicates(keep='first').reset_index(drop=True)
         sc_data = self.add_cum_pos(sc_data, chr, mode="ends")
         sc_data = sc_data.replace({'target': {-1: 3, -2: 1, -3: 5, 1: 4}, })
-        sc_data = sc_data.loc[sc_data["target"] != 0]
+        self.num_subc = len(sc_data["target"].unique())
 
         if mode == "ends":
             functional_data = self.get_pos_data(window_labels, chr)
@@ -368,13 +368,11 @@ class DownstreamHelper:
             functional_data = window_labels
 
         sc_functional_data = self.get_pos_data(sc_data, chr)
-        sc_functional_data = sc_functional_data.rename(columns={"target": "label"})
         sc_functional_data = sc_functional_data.dropna()
         sc_merged_data = pd.merge(sc_functional_data, functional_data, on=['pos'])
 
-        nR = len(sc_merged_data)
-        temp = np.zeros((nR, self.num_subc + 1))
-        temp[np.arange(nR), sc_merged_data["label"].astype(int)] = 1
+        temp = np.zeros((sc_merged_data.shape[0], self.num_subc + 1))
+        temp[np.arange(sc_merged_data.shape[0]), sc_merged_data["target"].astype(int)] = 1
 
         temp = temp[:, 1:]
         temp_df = pd.DataFrame(temp)
