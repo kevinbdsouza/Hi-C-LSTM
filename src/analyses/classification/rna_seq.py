@@ -22,7 +22,11 @@ class GeneExp:
         self.nc_file = os.path.join(self.gene_exp_path, "57epigenomes.RPKM.nc.gz")
         self.rb_file = os.path.join(self.gene_exp_path, "57epigenomes.RPKM.rb.gz")
         if cfg.cell == "GM12878":
-            self.cell_column = 49
+            self.cell_column = "E116"
+        elif cfg.cell == "H1hESC":
+            self.cell_column = "E003"
+        elif cfg.cell == "HFFhTERT":
+            self.cell_column = "E055"
 
     def get_rna_seq(self):
         """
@@ -67,7 +71,7 @@ class GeneExp:
 
         "filer by cell"
         rna_seq_chr['target'] = 0
-        rna_seq_chr.loc[rna_seq_chr.iloc[:, self.cell_column] >= 0.5, 'target'] = 1
+        rna_seq_chr.loc[rna_seq_chr.loc[:, self.cell_column] >= 0.5, 'target'] = 1
         rna_seq_chr = rna_seq_chr.filter(['start', 'end', 'target'], axis=1)
         return rna_seq_chr
 

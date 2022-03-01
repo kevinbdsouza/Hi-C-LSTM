@@ -13,7 +13,7 @@ class Config:
         self.num_chr = 23
         self.genome_len = 288091
         self.resolution = 10000
-        self.cell = "GM12878"
+        self.cell = "H1hESC"
         self.chr_train_list = list(range(1, 23))
         self.chr_test_list = list(range(22, 23))
 

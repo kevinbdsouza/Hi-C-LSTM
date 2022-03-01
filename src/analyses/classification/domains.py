@@ -11,6 +11,7 @@ class Domains:
     Apply relevant filters.
     Merge non loop domains.
     """
+
     def __init__(self, cfg, chr, mode="ig"):
         self.rep_data = []
         self.base_name = "_domains.txt"
@@ -86,6 +87,31 @@ class Domains:
             tad_data_chr['target'] = "TADs"
         return tad_data_chr
 
+    def get_subTAD_data(self):
+        """
+        get_subTAD_data() -> Dataframe
+        Gets subTAD data. Converts to resolution. Filters chromosome and columns.
+        Args:
+            NA
+        """
+
+        pass
+
+    def get_subtad_boundaries(self):
+        """
+        get_subtad_boundaries() -> Dataframe
+        Gets subTAD boundary data.
+        Args:
+            NA
+        """
+
+        "converts subTAD start and ends to boundary positions."
+        tads = self.get_subTAD_data()
+        df_start = tads[["start", "target"]].rename(columns={"start": "pos"})
+        df_end = tads[["end", "target"]].rename(columns={"end": "pos"})
+        tadbs = pd.concat([df_start, df_end])
+        return tadbs
+
     def augment_tad_negatives(self, tad_df):
         """
         augment_tad_negatives(tad_df) -> Dataframe
@@ -129,7 +155,7 @@ class Domains:
     def get_tad_boundaries(self, tf_ob, ctcf="positive"):
         """
         get_tad_boundaries(tf_ob, ctcf) -> Dataframe
-        Method to Merge TADs and other contact domains.
+        Method to get TAD boundaries. Check overlap with CTCF positions.
         Args:
             tf_ob (TFChip): Object to obtain CTCF data.
             ctcf (string): one of positive, negative, and all
