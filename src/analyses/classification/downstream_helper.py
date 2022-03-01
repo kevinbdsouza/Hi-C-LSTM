@@ -130,7 +130,8 @@ class DownstreamHelper:
         """
 
         """
-        AP = []
+        AP_list = []
+        fscore_list = []
         rec_levels = np.linspace(0, 1, num=11)
 
         for cls in range(num_classes):
@@ -185,11 +186,14 @@ class DownstreamHelper:
             else:
                 meanAP = 0
 
-            AP.append(meanAP)
+            AP_list.append(meanAP)
+            fscore_list.append(np.mean(2 * np.array(maxAP) * rec_levels / (np.array(maxAP) + rec_levels)))
 
-        mean_ap = np.mean(AP)
 
-        return mean_ap
+        mean_ap = np.mean(AP_list)
+        mean_fscore = np.mean(fscore_list)
+
+        return mean_ap, mean_fscore
 
     def calculate_map(self, feature_matrix):
         """
@@ -264,7 +268,7 @@ class DownstreamHelper:
                 else:
                     "run custom precision function to get mAP for multiclass"
                     num_classes = len(y_test.unique())
-                    average_precisions[i] = self.precision_function(pred_data, num_classes)
+                    average_precisions[i], f_score[i] = self.precision_function(pred_data, num_classes)
                     accuarcy[i] = accuracy_score(y_test, np.argmax(y_hat, axis=1))
                     auroc[i] = roc_auc_score(y_test, y_hat)
 
