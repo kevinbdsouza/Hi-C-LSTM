@@ -368,11 +368,12 @@ class DownstreamHelper:
             functional_data = window_labels
 
         sc_functional_data = self.get_pos_data(sc_data, chr)
+        sc_functional_data = sc_functional_data.rename(columns={"target": "sc"})
         sc_functional_data = sc_functional_data.dropna()
         sc_merged_data = pd.merge(sc_functional_data, functional_data, on=['pos'])
 
         temp = np.zeros((sc_merged_data.shape[0], self.num_subc + 1))
-        temp[np.arange(sc_merged_data.shape[0]), sc_merged_data["target"].astype(int)] = 1
+        temp[np.arange(sc_merged_data.shape[0]), sc_merged_data["sc"].astype(int)] = 1
 
         temp = temp[:, 1:]
         temp_df = pd.DataFrame(temp)
