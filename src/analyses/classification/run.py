@@ -64,8 +64,10 @@ class DownstreamTasks:
             features = features.append(feature_matrix)
             zero_features = self.downstream_helper_ob.add_cum_pos(zero_pos_frame, chr, mode="pos")
 
-            if self.cfg.class_experiment == "baseline":
-                zero_features = self.downstream_helper_ob.subc_baseline(zero_features, mode="pos")
+            if self.cfg.class_experiment == "subc_baseline":
+                zero_features = self.downstream_helper_ob.subc_baseline(zero_features, chr)
+            elif self.cfg.class_experiment == "pca_baseline":
+                zero_features = self.downstream_helper_ob.subc_baseline(zero_features, chr)
             else:
                 zero_features = self.downstream_helper_ob.merge_features_target(embed_rows, zero_features)
 
