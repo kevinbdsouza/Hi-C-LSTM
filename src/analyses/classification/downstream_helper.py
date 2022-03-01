@@ -192,7 +192,6 @@ class DownstreamHelper:
             ap_list.append(meanAP)
             fscore_list.append(fscore)
 
-
         mean_ap = np.mean(ap_list)
         mean_fscore = np.mean(fscore_list)
 
@@ -350,27 +349,25 @@ class DownstreamHelper:
 
         return r_squared_test
 
-    def subc_baseline(self, window_labels, mode):
+    def subc_baseline(self, window_labels, chr, mode="ends"):
         """
 
         """
 
-        # subc_features = pd.DataFrame(columns=list(np.arange(self.num_subc)))
-        sc_ob = Subcompartments(self.cfg, "GM12878", self.chr, mode="Rao")
+        sc_ob = Subcompartments(self.cfg, chr)
         sc_data = sc_ob.get_sc_data()
 
-        sc_data = sc_data.filter(['start', 'end', 'target'], axis=1)
         sc_data = sc_data.drop_duplicates(keep='first').reset_index(drop=True)
-        sc_data = self.add_cum_pos(sc_data, mode="ends")
-        sc_data = sc_data.replace({'target': {-1: 3, -2: 4, -3: 5}, })
+        sc_data = self.add_cum_pos(sc_data, chr, mode="ends")
+        sc_data = sc_data.replace({'target': {-1: 3, -2: 1, -3: 5, 1: 4}, })
         sc_data = sc_data.loc[sc_data["target"] != 0]
 
         if mode == "ends":
-            functional_data = self.get_pos_data(window_labels)
+            functional_data = self.get_pos_data(window_labels, chr)
         else:
             functional_data = window_labels
 
-        sc_functional_data = self.get_pos_data(sc_data)
+        sc_functional_data = self.get_pos_data(sc_data, chr)
         sc_functional_data = sc_functional_data.rename(columns={"target": "label"})
         sc_functional_data = sc_functional_data.dropna()
         sc_merged_data = pd.merge(sc_functional_data, functional_data, on=['pos'])

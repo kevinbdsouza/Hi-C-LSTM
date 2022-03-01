@@ -53,9 +53,9 @@ class DownstreamTasks:
         window_labels = self.downstream_helper_ob.add_cum_pos(window_labels, chr, mode=mode)
 
         if self.cfg.class_experiment == "subc_baseline":
-            feature_matrix = self.downstream_helper_ob.subc_baseline(window_labels, mode="ends")
+            feature_matrix = self.downstream_helper_ob.subc_baseline(window_labels, chr)
         elif self.cfg.class_experiment == "pca_baseline":
-            feature_matrix = self.downstream_helper_ob.subc_baseline(window_labels, mode="ends")
+            feature_matrix = self.downstream_helper_ob.subc_baseline(window_labels, chr)
         else:
             feature_matrix = self.downstream_helper_ob.get_feature_matrix(embed_rows, window_labels, chr, mode=mode)
 
