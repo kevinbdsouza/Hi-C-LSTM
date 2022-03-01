@@ -52,7 +52,7 @@ class DownstreamTasks:
 
         window_labels = self.downstream_helper_ob.add_cum_pos(window_labels, chr, mode=mode)
 
-        if self.cfg.class_experiment == "subc_baseline":
+        if self.cfg.class_experiment == "subc":
             feature_matrix = self.downstream_helper_ob.subc_baseline(window_labels, chr, mode=mode)
         else:
             feature_matrix = self.downstream_helper_ob.get_feature_matrix(embed_rows, window_labels, chr, mode=mode)
@@ -62,7 +62,7 @@ class DownstreamTasks:
             features = features.append(feature_matrix)
             zero_features = self.downstream_helper_ob.add_cum_pos(zero_pos_frame, chr, mode="pos")
 
-            if self.cfg.class_experiment == "subc_baseline":
+            if self.cfg.class_experiment == "subc":
                 zero_features = self.downstream_helper_ob.subc_baseline(zero_features, chr, mode="pos")
             else:
                 zero_features = self.downstream_helper_ob.merge_features_target(embed_rows, zero_features)
@@ -293,7 +293,7 @@ class DownstreamTasks:
                 "running test model to get representations"
                 test_model(model, cfg, chr)
 
-            if cfg.class_method != "subc_baseline":
+            if cfg.class_method != "subc":
                 "load representations and filter"
                 cfg.class_experiment = cfg.class_method
                 embed_rows = pd.read_csv(
@@ -303,7 +303,7 @@ class DownstreamTasks:
                 embed_rows = embed_rows.rename(columns={"i": "pos"})
                 embed_rows = embed_rows.drop_duplicates(keep='first').reset_index(drop=True)
             else:
-                "directly uses baseline"
+                "directly uses subc baseline"
                 embed_rows = None
 
             "run element"
