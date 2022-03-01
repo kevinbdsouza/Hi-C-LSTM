@@ -122,20 +122,16 @@ class DownstreamHelper:
         """
         pred_data = pd.DataFrame(y_hat)
         pred_data['max'] = pred_data.idxmax(axis=1)
-        pred_data["target"] = np.zeros((len(y_test),))
-        for i in range(len(y_test)):
-            pred_data.loc[i, "target"] = y_test.iloc[i]
-
+        pred_data["target"] = np.array(y_test)
         pred_data["target"] = pred_data["target"].astype(int)
         return pred_data
 
-    def precision_function(self, pred_data):
+    def precision_function(self, pred_data, num_classes):
         """
 
         """
         AP = []
         rec_levels = np.linspace(0, 1, num=11)
-        num_classes = 4
 
         for cls in range(num_classes):
             ranked_prob = np.array(pred_data.loc[:, cls]).argsort()[
@@ -217,7 +213,7 @@ class DownstreamHelper:
 
         "prepare feature matrix"
         feature_matrix = feature_matrix.dropna()
-        feature_matrix = feature_matrix.replace({'target': {-1: 3, -2: 4, -3: 5}, })
+        feature_matrix = feature_matrix.replace({'target': {-1: 3, -2: 1, -3: 5, 1: 4}, })
         feature_matrix = feature_matrix.sample(frac=1)
         predictions = pd.DataFrame()
 
@@ -267,7 +263,8 @@ class DownstreamHelper:
                     predictions = pd.concat([predictions, pred_data])
                 else:
                     "run custom precision function to get mAP for multiclass"
-                    average_precisions[i] = self.precision_function(pred_data)
+                    num_classes = len(y_test.unique())
+                    average_precisions[i] = self.precision_function(pred_data, num_classes)
 
             elif cfg.class_mode == "binary":
                 "use existing function to get mAP for binary"
@@ -388,7 +385,7 @@ class DownstreamHelper:
         mask_vec = np.zeros(max_len, bool)
         n_run = len(col_list) // 2
 
-        if col_list[0]!= "pos":
+        if col_list[0] != "pos":
             for i in range(window_labels.shape[0]):
 
                 count = 0
