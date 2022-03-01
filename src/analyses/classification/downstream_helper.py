@@ -273,7 +273,7 @@ class DownstreamHelper:
                     num_classes = len(y_test.unique())
                     average_precisions[i], f_score[i] = self.precision_function(pred_data, num_classes)
                     accuarcy[i] = accuracy_score(y_test, np.argmax(y_hat, axis=1))
-                    auroc[i] = roc_auc_score(y_test, y_hat)
+                    auroc[i] = roc_auc_score(y_test, y_hat, multi_class='ovr')
 
             elif cfg.class_mode == "binary":
                 "use existing function to get mAP for binary"
