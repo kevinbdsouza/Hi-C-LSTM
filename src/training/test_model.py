@@ -21,19 +21,23 @@ def compute_pca(cfg, chr):
         chr (int): chromsome to run PCA on.
     """
 
-    pca_columns = list(np.arange(cfg.pos_embed_size)) + ["i"]
-    pred_df = pd.DataFrame(columns=pca_columns)
-
+    "load data"
     data = load_hic(cfg, chr)
-    data['i_binidx'] = get_bin_idx(np.full(data.shape[0], chr), data['i'], cfg)
-    data['j_binidx'] = get_bin_idx(np.full(data.shape[0], chr), data['j'], cfg)
     data["v"] = contactProbabilities(data["v"])
+
+    "get heatmap"
     hic_mat, st = get_heatmaps(data, no_pred=True)
 
+    "do pca"
     pca_ob = PCA(n_components=cfg.pos_embed_size)
     pca_ob.fit(hic_mat)
     hic_mat = pca_ob.transform(hic_mat)
 
+    "fill dataframe"
+    pred_df = pd.DataFrame()
+    pred_df = pd.concat([pred_df, pd.DataFrame(hic_mat)])
+    pred_df["i"] = pred_df.index + st
+    pred_df['i'] = get_bin_idx(np.full(pred_df.shape[0], chr), pred_df['i'], cfg)
     return pred_df
 
 
@@ -60,6 +64,9 @@ def test_model(model, cfg, chr):
         pred_df.to_csv(cfg.output_directory + "hiclstm_%s_predictions_chr%s.csv" % (cfg.cell, str(chr)), sep="\t")
     else:
         pred_df = compute_pca(cfg, chr)
+        "save predictions"
+        pred_df.to_csv(cfg.output_directory + "pca_%s_predictions_chr%s.csv" % (cfg.cell, str(chr)),
+                       sep="\t")
 
 
 if __name__ == '__main__':
