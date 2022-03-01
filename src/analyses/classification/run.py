@@ -30,9 +30,6 @@ class DownstreamTasks:
         self.downstream_helper_ob = DownstreamHelper(cfg)
         self.df_columns = [str(i) for i in range(0, 16)] + ["i"]
 
-        self.subcompartment_path = cfg.downstream_dir + "subcompartments"
-        self.chr_ctcf = 'chr' + str(chr)
-
     def run_xgboost(self, embed_rows, window_labels, chr, zero_target=True, mode="ends"):
         """
         run_xgboost(window_labels, chr) -> float, float, float, float
@@ -47,7 +44,7 @@ class DownstreamTasks:
         window_labels = window_labels.drop_duplicates(keep='first').reset_index(drop=True)
 
         if zero_target:
-            if mode=="ends":
+            if mode == "ends":
                 col_list = ['start', 'end']
             else:
                 col_list = ['pos']
@@ -283,7 +280,11 @@ class DownstreamTasks:
 
     def run_experiment(self, model):
         """
-
+        run_experiment(model) -> No return object
+        Runs xgboost for the given model and specifief element.
+        Uses provide configuration. Saves classification metrics in CSV file.
+        Args:
+            model (SeqLSTM): Model whose representations need to be used to run xgboost.
         """
         cfg = self.cfg
         map_frame = pd.DataFrame(columns=["chr", "map", "fscore", "accuracy", "auroc"])
@@ -294,13 +295,18 @@ class DownstreamTasks:
                 "running test model to get representations"
                 test_model(model, cfg, chr)
 
-            "load representations and filter"
-            embed_rows = pd.read_csv(
-                cfg.output_directory + "%s_%s_predictions_chr%s.csv" % (cfg.class_method, cfg.cell, str(chr)),
-                sep="\t")
-            embed_rows = embed_rows[self.df_columns]
-            embed_rows = embed_rows.rename(columns={"i": "pos"})
-            embed_rows = embed_rows.drop_duplicates(keep='first').reset_index(drop=True)
+            if cfg.class_method != "baseline":
+                "load representations and filter"
+                cfg.class_experiment = cfg.class_method
+                embed_rows = pd.read_csv(
+                    cfg.output_directory + "%s_%s_predictions_chr%s.csv" % (cfg.class_method, cfg.cell, str(chr)),
+                    sep="\t")
+                embed_rows = embed_rows[self.df_columns]
+                embed_rows = embed_rows.rename(columns={"i": "pos"})
+                embed_rows = embed_rows.drop_duplicates(keep='first').reset_index(drop=True)
+            else:
+                "directly uses baseline"
+                embed_rows = None
 
             "run element"
             if cfg.class_element == "Gene Expression":
@@ -337,7 +343,11 @@ class DownstreamTasks:
 
     def run_all_elements(self, model):
         """
-
+        run_all_elements(model) -> No return object
+        Runs xgboost for the given model and all classification elements.
+        Uses provide configuration. Saves classification metrics in CSV file.
+        Args:
+            model (SeqLSTM): Model whose representations need to be used to run xgboost.
         """
         for element in self.cfg.class_elements_list:
             self.cfg.class_element = element
@@ -346,12 +356,13 @@ class DownstreamTasks:
 
 if __name__ == '__main__':
     """
-    Other mAP plots can be obtained by:
-    Changing the cell type,
-    The model associated with the cell type,
-    Other models like Sniper and SCA.
-
-    If you have all the data, you can use plot_combined function in analyses/plot/plot_fns.py
+    Script to run xgboost for representations from class_method specified in config. One of hiclstm, sniper, and sca.
+    Baselines like pca_baseline, subc_baseline can be specified in class_experiment in config. 
+    If class_experiment is not specified as baseline, assumes experiment is based on one of the methods. 
+    Sets class_experiment as class_method. 
+    All experiments except for Subcompartments are binary. Subcompartments is multiclass.
+    To change the cell type, specify the cell in config. 
+    The appropriate model and elements for cell type will be loaded.
     """
 
     cfg = Config()
