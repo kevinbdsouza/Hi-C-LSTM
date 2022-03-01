@@ -1,7 +1,7 @@
 import numpy as np
 import pandas as pd
 import xgboost
-from sklearn.metrics import average_precision_score, accuracy_score, precision_recall_curve, roc_auc_score
+from sklearn.metrics import average_precision_score, accuracy_score, precision_recall_curve, roc_auc_score, r2_score
 from analyses.plot.plot_utils import plot_confusion_matrix, plot_pr_curve
 from analyses.classification.subcompartments import Subcompartments
 from sklearn.utils import resample
@@ -135,7 +135,7 @@ class DownstreamHelper:
         """
         AP = []
         rec_levels = np.linspace(0, 1, num=11)
-        num_classes = 5
+        num_classes = 4
 
         for cls in range(num_classes):
             ranked_prob = np.array(pred_data.loc[:, cls]).argsort()[
