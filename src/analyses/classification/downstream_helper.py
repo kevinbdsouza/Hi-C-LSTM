@@ -126,6 +126,44 @@ class DownstreamHelper:
         pred_data["target"] = pred_data["target"].astype(int)
         return pred_data
 
+    def get_zero_pos(self, window_labels, col_list, chr):
+        """
+
+        """
+        ind_list = []
+        max_len = self.start_ends["chr" + str(chr)]["stop"]
+        mask_vec = np.zeros(max_len, bool)
+        n_run = len(col_list) // 2
+
+        if col_list[0] != "pos":
+            for i in range(window_labels.shape[0]):
+
+                count = 0
+                for j in range(n_run):
+                    start = window_labels.loc[i, col_list[count]]
+                    count += 1
+                    end = window_labels.loc[i, col_list[count]]
+                    count += 1
+
+                    if start >= max_len or end >= max_len:
+                        break
+
+                    for k in range(start, end + 1):
+                        ind_list.append(k)
+
+            ind_ar = np.array(ind_list)
+        else:
+            ind_ar = np.array(window_labels["pos"])
+
+        mask_vec[ind_ar] = True
+        zero_vec = np.invert(mask_vec)
+        zero_ind = np.nonzero(zero_vec)
+        if window_labels.shape[0] <= len(zero_ind[0]):
+            zero_ind = zero_ind[0][:window_labels.shape[0]]
+        zero_frame = pd.DataFrame(np.transpose(zero_ind), columns=['pos'])
+        zero_frame["target"] = pd.Series(np.zeros(len(zero_frame))).astype(int)
+        return zero_frame
+
     def precision_function(self, pred_data, num_classes):
         """
 
@@ -311,44 +349,6 @@ class DownstreamHelper:
 
         return mean_map, mean_accuracy, mean_f_score, mean_auroc
 
-    def mlp_regressor(self, features):
-        """
-
-        """
-        mode = "mlp"
-
-        target_column = ['target']
-        pos_column = ['pos']
-        predictors = list(set(list(features.columns)) - set(target_column) - set(pos_column))
-
-        X = features[predictors].values
-        y = features[target_column].values
-
-        X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.30, random_state=40)
-        min_max_scaler = preprocessing.MinMaxScaler()
-        X_train = min_max_scaler.fit_transform(X_train)
-        X_test = min_max_scaler.fit_transform(X_test)
-
-        if mode == "mlp":
-            mlp = MLPRegressor(hidden_layer_sizes=(64, 32,), activation='relu', solver='adam', max_iter=2000000,
-                               learning_rate_init=0.1)
-            mlp.fit(X_train, abs(y_train))
-
-            ytrain_predict = mlp.predict(X_train)
-            ytest_predict = mlp.predict(X_test)
-
-            r_squared_train = mlp.score(X_train, abs(y_train))
-            r_squared_test = mlp.score(X_test, abs(y_test))
-        else:
-            linear_model = LinearRegression().fit(X_train, abs(y_train))
-
-            y_predict = linear_model.predict(X_test)
-
-            r_squared_test = r2_score(y_true=abs(y_test), y_pred=y_predict,
-                                      multioutput="uniform_average")
-
-        return r_squared_test
-
     def subc_baseline(self, window_labels, chr, mode="ends"):
         """
 
@@ -376,44 +376,6 @@ class DownstreamHelper:
         subc_baseline["target"] = sc_functional_data["target"]
 
         return subc_baseline
-
-    def get_zero_pos(self, window_labels, col_list, chr):
-        """
-
-        """
-        ind_list = []
-        max_len = self.start_ends["chr" + str(chr)]["stop"]
-        mask_vec = np.zeros(max_len, bool)
-        n_run = len(col_list) // 2
-
-        if col_list[0] != "pos":
-            for i in range(window_labels.shape[0]):
-
-                count = 0
-                for j in range(n_run):
-                    start = window_labels.loc[i, col_list[count]]
-                    count += 1
-                    end = window_labels.loc[i, col_list[count]]
-                    count += 1
-
-                    if start >= max_len or end >= max_len:
-                        break
-
-                    for k in range(start, end + 1):
-                        ind_list.append(k)
-
-            ind_ar = np.array(ind_list)
-        else:
-            ind_ar = np.array(window_labels["pos"])
-
-        mask_vec[ind_ar] = True
-        zero_vec = np.invert(mask_vec)
-        zero_ind = np.nonzero(zero_vec)
-        if window_labels.shape[0] <= len(zero_ind[0]):
-            zero_ind = zero_ind[0][:window_labels.shape[0]]
-        zero_frame = pd.DataFrame(np.transpose(zero_ind), columns=['pos'])
-        zero_frame["target"] = pd.Series(np.zeros(len(zero_frame))).astype(int)
-        return zero_frame
 
     def balance_classes(self, feature_matrix):
         """
@@ -455,6 +417,44 @@ class DownstreamHelper:
             feature_matrix = pd.concat([feat_minority_upsampled, feat_majority]).reset_index(drop=True)
 
         return feature_matrix
+
+    def mlp_regressor(self, features):
+        """
+
+        """
+        mode = "mlp"
+
+        target_column = ['target']
+        pos_column = ['pos']
+        predictors = list(set(list(features.columns)) - set(target_column) - set(pos_column))
+
+        X = features[predictors].values
+        y = features[target_column].values
+
+        X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.30, random_state=40)
+        min_max_scaler = preprocessing.MinMaxScaler()
+        X_train = min_max_scaler.fit_transform(X_train)
+        X_test = min_max_scaler.fit_transform(X_test)
+
+        if mode == "mlp":
+            mlp = MLPRegressor(hidden_layer_sizes=(64, 32,), activation='relu', solver='adam', max_iter=2000000,
+                               learning_rate_init=0.1)
+            mlp.fit(X_train, abs(y_train))
+
+            ytrain_predict = mlp.predict(X_train)
+            ytest_predict = mlp.predict(X_test)
+
+            r_squared_train = mlp.score(X_train, abs(y_train))
+            r_squared_test = mlp.score(X_test, abs(y_test))
+        else:
+            linear_model = LinearRegression().fit(X_train, abs(y_train))
+
+            y_predict = linear_model.predict(X_test)
+
+            r_squared_test = r2_score(y_true=abs(y_test), y_pred=y_predict,
+                                      multioutput="uniform_average")
+
+        return r_squared_test
 
 
 if __name__ == '__main__':
