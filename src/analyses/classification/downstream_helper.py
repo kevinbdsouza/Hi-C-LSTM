@@ -363,23 +363,19 @@ class DownstreamHelper:
         self.num_subc = len(sc_data["target"].unique())
 
         if mode == "ends":
-            functional_data = self.get_pos_data(window_labels, chr)
-        else:
-            functional_data = window_labels
+            window_labels = self.get_pos_data(window_labels, chr)
 
         sc_functional_data = self.get_pos_data(sc_data, chr)
         sc_functional_data = sc_functional_data.rename(columns={"target": "sc"})
         sc_functional_data = sc_functional_data.dropna()
-        sc_merged_data = pd.merge(sc_functional_data, functional_data, on=['pos'])
+        sc_functional_data = pd.merge(sc_functional_data, window_labels, on=['pos'])
 
-        temp = np.zeros((sc_merged_data.shape[0], self.num_subc + 1))
-        temp[np.arange(sc_merged_data.shape[0]), sc_merged_data["sc"].astype(int)] = 1
+        subc_baseline = np.zeros((sc_functional_data.shape[0], self.num_subc + 1))
+        subc_baseline[np.arange(sc_functional_data.shape[0]), sc_functional_data["sc"].astype(int)] = 1
+        subc_baseline = pd.DataFrame(subc_baseline)
+        subc_baseline["target"] = sc_functional_data["target"]
 
-        temp = temp[:, 1:]
-        temp_df = pd.DataFrame(temp)
-        temp_df["target"] = sc_merged_data["target"]
-
-        return temp_df
+        return subc_baseline
 
     def get_zero_pos(self, window_labels, col_list, chr):
         """
