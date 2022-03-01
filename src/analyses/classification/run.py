@@ -262,32 +262,24 @@ class DownstreamTasks:
         map, accuracy, f_score, auroc = self.run_xgboost(embed_rows, loop_chr, chr, zero_target=True, mode="ends")
         return map, accuracy, f_score, auroc
 
-    def run_sub_compartments(self, cfg):
-        logging.info("subcompartment start")
+    def run_sub_compartments(self, chr, embed_rows):
+        """
+        run_sub_compartments(chr, embed_rows) -> float, float, float, float
+        Gets subcompartment data for given cell type and chromosome.
+        Runs xgboost using representations from chosen method and celltype. Or runs baseline.
+        Returns classification metrics.
+        Args:
+            chr (int): chromosome to run classification on.
+            embed_rows (DataFrame): Dataframe with representations and positions.
+        """
 
-        for cell in self.sbc_cell_names:
-            sc_ob = Subcompartments(cfg, cell, chr, mode="Rao")
-            sc_data = sc_ob.get_sc_data()
+        sc_ob = Subcompartments(cfg, chr)
+        sc_chr = sc_ob.get_sc_data()
 
-            sc_data = sc_data.filter(['start', 'end', 'target'], axis=1)
-            sc_data = sc_data.drop_duplicates(keep='first').reset_index(drop=True)
-
-            sc_data = self.downstream_helper_ob.add_cum_pos(sc_data, mode="ends")
-
-            if self.exp == "baseline":
-                feature_matrix = self.downstream_helper_ob.subc_baseline(Subcompartments, sc_data, mode="ends")
-            else:
-                feature_matrix = self.downstream_helper_ob.get_feature_matrix(sc_data)
-
-            logging.info("chr : {} - cell : {}".format(str(self.chr), cell))
-
-            if feature_matrix.empty:
-                continue
-
-            if self.calculate_map:
-                mean_map = self.downstream_helper_ob.calculate_map(feature_matrix, mode="multi", exp=self.exp)
-
-        return mean_map
+        "runs xgboost"
+        self.cfg.class_mode = "multi"
+        map, accuracy, f_score, auroc = self.run_xgboost(embed_rows, sc_chr, chr, zero_target=False, mode="ends")
+        return map, accuracy, f_score, auroc
 
     def run_experiment(self, model):
         """

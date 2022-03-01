@@ -108,7 +108,7 @@ class Config:
                                         "Loop Domains", "TADBs", "subTADBs", "Subcompartments"]
             self.metric_frame_columns = self.class_elements_list.append("chr")
         self.class_compute_representation = False
-        self.class_element = "TADs"
+        self.class_element = "Subcompartments"
         self.class_method = "hiclstm"
         self.class_run_elements = True
         self.class_run_all_elements = False
