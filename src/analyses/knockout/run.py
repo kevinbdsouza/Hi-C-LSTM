@@ -174,7 +174,7 @@ class Knockout():
                     continue
 
                 if j == 0:
-                    subset_ko = pred_data.loc[pred_data["i"] == ind]
+                    subset_ko = ko_pred_df.loc[pred_data["i"] == ind]
                 else:
                     subset_ko = ko_pred_df.loc[
                         ((ko_pred_df["i"] <= ind + j * win) & (ko_pred_df["i"] > ind + (j - 1) * win))
