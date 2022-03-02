@@ -89,42 +89,6 @@ class SeqLSTM(nn.Module):
         output = self.sigm(output)
         return output, embeddings
 
-    def lstm_decoder(self, embeddings):
-        """
-        lstm_decoder(self, embeddings) -> tensor
-        Forward method to be used when using LSTM as the decoder with representations.
-        Args:
-            embeddings (Tensor): The embeddings for positions.
-        """
-        hidden, state = self._initHidden(embeddings.shape[0])
-        output, _ = self.decoder_lstm(embeddings, (hidden, state))
-        output = self.decoder_lstm_fc(output.reshape(embeddings.shape[0], -1))
-        output = self.sigm(output)
-        return output
-
-    def cnn_decoder(self, embeddings):
-        """
-        cnn_decoder(self, embeddings) -> tensor
-        Forward method to be used when using CNN as the decoder with representations.
-        Args:
-            embeddings (Tensor): The embeddings for positions.
-        """
-        output, _ = self.decoder_cnn(embeddings)
-        output = self.decoder_cnn_fc(output.reshape(embeddings.shape[0], -1))
-        output = self.sigm(output)
-        return output
-
-    def fc_decoder(self, embeddings):
-        """
-        fc_decoder(self, embeddings) -> tensor
-        Forward method to be used when using FC as the decoder with representations.
-        Args:
-            embeddings (Tensor): The embeddings for positions.
-        """
-        output = self.decoder_fc(embeddings)
-        output = self.sigm(output)
-        return output
-
     def _initHidden(self, batch_size):
         """
         _initHidden(self, batch_size) -> tensor, tensor

@@ -76,7 +76,7 @@ def simple_plot(hic_win):
     ax = sns.heatmap(hic_win, cmap="Reds", vmin=0, vmax=1)
     ax.set_yticks([])
     ax.set_xticks([])
-    plt.savefig("/home/kevindsouza/Downloads/ctcfko_zero_shuffle.png")
+    plt.savefig("/home/kevindsouza/Downloads/ctcfko_zero_short.png")
     #plt.show()
 
     '''

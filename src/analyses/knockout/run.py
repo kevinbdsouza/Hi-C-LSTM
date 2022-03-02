@@ -423,7 +423,7 @@ if __name__ == '__main__':
             pred_data = pred_data.rename(columns={"ko_pred": "v"})
 
             hic_mat, st = get_heatmaps(pred_data, no_pred=False)
-            simple_plot(hic_mat)
+            simple_plot(hic_mat[1200:2200, 1200:2200])
             print("done")
 
         # tal_data, lmo2_data = ko_ob.tal_lmo2_preprocess()
