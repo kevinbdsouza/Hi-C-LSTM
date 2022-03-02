@@ -233,12 +233,11 @@ class SeqLSTM(nn.Module):
             pred_df (DataFrame): Dataframe to put the columns in
             prev_error_list (Array): Error list from the previous batch for averaging
             error_compute (bool): Boolean for computing error
-            zero_embed (bool): Boolean to get zero pred
+            zero_embed (bool): Boolean to get zero embed
         """
         seq = cfg.sequence_length
         num_seq = int(np.ceil(len(ind) / seq))
         error_list = None
-        zero_embed = None
 
         "compute error"
         if error_compute:
