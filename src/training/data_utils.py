@@ -240,9 +240,9 @@ def get_data(cfg, chr):
     return input_idx, values
 
 
-def get_data_loader_chr(cfg, chr):
+def get_data_loader_chr(cfg, chr, shuffle=True):
     """
-    get_data(cfg, chr) -> DataLoader
+    get_data(cfg, chr, shuffle) -> DataLoader
     Uses saved processed input indices and Hi-C values to load single chromosome.
     Creates DataLoader.
     Supports only those chromosomes for which processed data exists.
@@ -250,6 +250,7 @@ def get_data_loader_chr(cfg, chr):
     Args:
         cfg (Config): the configuration to use for the experiment.
         chr (int): the chromosome to load Hi-C data for.
+        shuffle (bool): To shuffle examples or not
     Raises:
         Error: Processed data does not exist for chromosome.
         """
@@ -260,7 +261,7 @@ def get_data_loader_chr(cfg, chr):
 
         "create dataloader"
         dataset = torch.utils.data.TensorDataset(input_idx.float(), values.float())
-        data_loader = torch.utils.data.DataLoader(dataset=dataset, batch_size=cfg.batch_size, shuffle=True)
+        data_loader = torch.utils.data.DataLoader(dataset=dataset, batch_size=cfg.batch_size, shuffle=shuffle)
         return data_loader
     except Exception as e:
         print("Processed data does not exist for chromosome")

@@ -169,7 +169,7 @@ class HiC_R2():
         optimizer, criterion = decoder_ob.compile_optimizer()
 
         "get data"
-        data_loader = get_data_loader_chr(self.cfg, self.chr)
+        data_loader = get_data_loader_chr(self.cfg, self.chr, shuffle=False)
 
         "train decoder"
         decoder_ob.train_decoder(data_loader, representations, start, criterion, optimizer, writer, decoder=decoder)
@@ -191,7 +191,7 @@ class HiC_R2():
         decoder_ob.load_weights()
 
         "get data"
-        data_loader = get_data_loader_chr(self.cfg, self.chr)
+        data_loader = get_data_loader_chr(self.cfg, self.chr, shuffle=False)
 
         "train decoder"
         predictions, pred_df = decoder_ob.test_decoder(data_loader, representations, start, decoder=decoder)

@@ -217,7 +217,7 @@ class Knockout():
             indices = [222863]
 
         "load data"
-        data_loader = get_data_loader_chr(self.cfg, self.chr)
+        data_loader = get_data_loader_chr(self.cfg, self.chr, shuffle=False)
 
         "get representations"
         representations, start, stop, pred_data = self.get_trained_representations(method="hiclstm")
@@ -249,7 +249,7 @@ class Knockout():
         """
 
         "load data"
-        data_loader = get_data_loader_chr(self.cfg, self.chr)
+        data_loader = get_data_loader_chr(self.cfg, self.chr, shuffle=False)
 
         "get representations"
         representations, start, stop, pred_data = self.get_trained_representations(method="hiclstm")

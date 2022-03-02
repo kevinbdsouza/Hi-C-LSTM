@@ -55,7 +55,7 @@ def test_model(model, cfg, chr):
 
     if cfg.full_test:
         "get data"
-        data_loader = get_data_loader_chr(cfg, chr)
+        data_loader = get_data_loader_chr(cfg, chr, shuffle=False)
 
         "test model"
         predictions, test_error, values, pred_df, error_list = model.test(data_loader)
@@ -69,7 +69,7 @@ def test_model(model, cfg, chr):
                        sep="\t")
     elif cfg.get_zero_pred:
         "zero pred"
-        data_loader = get_data_loader_chr(cfg, chr)
+        data_loader = get_data_loader_chr(cfg, chr, shuffle=False)
         zero_embed = model.zero_embed(data_loader)
         return zero_embed
 

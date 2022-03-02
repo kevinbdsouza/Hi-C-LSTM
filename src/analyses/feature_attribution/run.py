@@ -31,7 +31,7 @@ def run_captum(cfg, model, chr):
     np.random.seed(123)
 
     "get DataLoader"
-    data_loader = get_data_loader_chr(cfg, chr)
+    data_loader = get_data_loader_chr(cfg, chr, shuffle=False)
 
     "run IG"
     ig_df = model.get_captum_ig(data_loader)
