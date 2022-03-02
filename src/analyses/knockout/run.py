@@ -167,7 +167,7 @@ class Knockout():
                     continue
                 subset_ko = ko_pred_df.loc[(ko_pred_df["i"] <= ind + k) & (ko_pred_df["i"] >= ind - k)]
                 merged_df = pd.merge(subset_og, subset_ko, on=["i", "j"])
-                mean_diff = np.mean(np.array(subset_ko["ko_pred"]) - np.array(subset_og["pred"]))
+                mean_diff = np.mean(np.array(merged_df["ko_pred"]) - np.array(merged_df["pred"]))
                 diff_list[i, int(k / 10)] = mean_diff
 
         mean_diff = np.mean(diff_list, axis=0)
