@@ -265,7 +265,7 @@ class SeqLSTM(nn.Module):
         "return zero embed"
         if zero_embed:
             idx = np.array(np.where(np.sum(ind, axis=1) == 0))[0]
-            zero_embed = embed[idx]
+            zero_embed = embed[idx[0]]
         else:
             "remove padded indices"
             idx = np.array(np.where(np.sum(ind, axis=1) == 0))[0]
