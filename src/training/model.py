@@ -554,14 +554,15 @@ class SeqLSTM(nn.Module):
 
         return pred_df
 
-    def perform_ko(self, data_loader, embed_rows, start, mode):
+    def perform_ko(self, data_loader, embed_rows, start, zero_embed, mode):
         """
-        perform_ko(data_loader, embed_rows, start, mode) -> tensor, DataFrame
+        perform_ko(data_loader, embed_rows, start, zero_embed, mode) -> tensor, DataFrame
         Performs knockout.
         Args:
             data_loader (DataLoader): DataLoader containing dataset
             embed_rows (Array): embeddings
             start (int):  shift value
+            zero_embed (Array): representation for padding
             mode (string): Can specify whether running duplication or not. If not running
                             duplication, performs simple post processing
         """
@@ -582,8 +583,8 @@ class SeqLSTM(nn.Module):
                 for n in range(ind.shape[0]):
                     "replaces padding with mean"
                     if ind[n, 0] == 0 and ind[n, 1] == 0:
-                        embed_ij[n, 0:cfg.pos_embed_size] = np.mean(embed_rows, axis=0)
-                        embed_ij[n, cfg.pos_embed_size:2 * cfg.pos_embed_size] = np.mean(embed_rows, axis=0)
+                        embed_ij[n, 0:cfg.pos_embed_size] = zero_embed
+                        embed_ij[n, cfg.pos_embed_size:2 * cfg.pos_embed_size] = zero_embed
                     else:
                         embed_ij[n, 0:cfg.pos_embed_size] = embed_rows[int(ind[n, 0]) - start]
                         embed_ij[n, cfg.pos_embed_size:2 * cfg.pos_embed_size] = embed_rows[int(ind[n, 1]) - start]

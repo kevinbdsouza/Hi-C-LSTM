@@ -11,6 +11,7 @@ from training.config import Config
 from training.test_model import test_model
 from analyses.feature_attribution.tf import TFChip
 from analyses.plot.plot_utils import get_heatmaps, simple_plot
+from training.test_model import test_model
 
 device = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
 
@@ -31,6 +32,24 @@ class Knockout():
         self.hek_file = cfg.hic_path + cfg.cell + "/HEK239T-WT.matrix"
         self.tal1ko_file = cfg.hic_path + cfg.cell + "/Tal1KO.matrix"
         self.lmo2ko_file = cfg.hic_path + cfg.cell + "/Lmo2KO.matrix"
+
+    def get_trained_representations(self, method="hiclstm"):
+        """
+        get_trained_representations(method) -> Array, int
+        Gets fully trained representations for given method, cell type and chromosome.
+        obtain sniper and sca representations from respective methods.
+        Should contain SNIPER and SCA positions end internal representations.
+        Args:
+            method (string): one of hiclstm, sniper, sca
+        """
+
+        pred_data = pd.read_csv(
+            self.cfg.output_directory + "%s_%s_predictions_chr%s.csv" % (method, self.cell, str(self.chr)),
+            sep="\t")
+        pred_data = pred_data.drop(['Unnamed: 0'], axis=1)
+        pred_data = pred_data.filter(['i', 'j', 'v', 'pred'], axis=1)
+        representations, start, stop = self.convert_df_to_np(pred_data, method=method)
+        return representations, start, stop, pred_data
 
     def alter_index(self, embed_rows):
         """
@@ -60,24 +79,6 @@ class Knockout():
         cum_pos = get_cumpos(self.cfg, self.chr)
         data["start"] = data["start"] + cum_pos
         return data
-
-    def get_trained_representations(self, method="hiclstm"):
-        """
-        get_trained_representations(method) -> Array, int
-        Gets fully trained representations for given method, cell type and chromosome.
-        obtain sniper and sca representations from respective methods.
-        Should contain SNIPER and SCA positions end internal representations.
-        Args:
-            method (string): one of hiclstm, sniper, sca
-        """
-
-        pred_data = pd.read_csv(
-            self.cfg.output_directory + "%s_%s_predictions_chr%s.csv" % (method, self.cell, str(self.chr)),
-            sep="\t")
-        pred_data = pred_data.drop(['Unnamed: 0'], axis=1)
-        pred_data = pred_data.filter(['i', 'j', 'v', 'pred'], axis=1)
-        representations, start, stop = self.convert_df_to_np(pred_data, method=method)
-        return representations, start, stop, pred_data
 
     def convert_df_to_np(self, pred_data, method="hiclstm"):
         """
@@ -131,6 +132,20 @@ class Knockout():
                         embed_rows[j_new - start, :] = np.array(pred_data.loc[r, col])
 
         return embed_rows, start, stop
+
+    def normalize_embed(self, representations):
+        """
+
+        """
+
+        "normalize representations"
+        for n in range(len(representations)):
+            norm = np.linalg.norm(representations[n, :])
+            if norm == 0:
+                continue
+            else:
+                representations[n, :] = representations[n, :] / norm
+        return representations
 
     def ko_representations(self, representations, start, indices, mode="average"):
         """
@@ -210,31 +225,23 @@ class Knockout():
         "alter representations"
         representations = self.ko_representations(representations, start, indices, mode=cfg.ko_mode)
 
+        "get zero embed"
+        self.cfg.full_test = False
+        self.cfg.compute_pca = False
+        self.cfg.get_zero_pred = True
+        zero_embed = test_model(model, self.cfg, chr)
+
         if self.cfg.load_ko:
             ko_pred_df = pd.read_csv(cfg.output_directory + "hiclstm_%s_afko_chr%s.csv" % (cell, str(chr)), sep="\t")
         else:
             "run through model using altered representations, save ko predictions"
-            _, ko_pred_df = model.perform_ko(data_loader, representations, start, mode="ko")
+            _, ko_pred_df = model.perform_ko(data_loader, representations, start, zero_embed, mode="ko")
             ko_pred_df.to_csv(cfg.output_directory + "hiclstm_%s_afko_chr%s.csv" % (cell, str(chr)),
                               sep="\t")
 
         "compute difference between WT and KO predictions"
         mean_diff = self.compute_kodiff(pred_data, ko_pred_df, indices)
         return mean_diff
-
-    def normalize_embed(self, representations):
-        """
-
-        """
-
-        "normalize representations"
-        for n in range(len(representations)):
-            norm = np.linalg.norm(representations[n, :])
-            if norm == 0:
-                continue
-            else:
-                representations[n, :] = representations[n, :] / norm
-        return representations
 
     def normalize_embed_predict(self, model):
         """
@@ -250,8 +257,14 @@ class Knockout():
         "alter representations"
         representations = self.normalize_embed(representations)
 
+        "get zero embed"
+        self.cfg.full_test = False
+        self.cfg.compute_pca = False
+        self.cfg.get_zero_pred = True
+        zero_embed = test_model(model, self.cfg, chr)
+
         "run through model using altered representations, save ko predictions"
-        _, ko_pred_df = model.perform_ko(data_loader, representations, start, mode="ko")
+        _, ko_pred_df = model.perform_ko(data_loader, representations, start, zero_embed, mode="ko")
         ko_pred_df.to_csv(cfg.output_directory + "hiclstm_%s_norm_chr%s.csv" % (self.cfg.cell, str(self.chr)), sep="\t")
 
     def change_index(self, list_split):
