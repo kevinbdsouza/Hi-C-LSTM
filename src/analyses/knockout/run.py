@@ -63,6 +63,23 @@ class Knockout():
         data["start"] = data["start"] + cum_pos
         return data
 
+    def get_trained_representations(self, method="hiclstm"):
+        """
+        get_trained_representations(method) -> Array, int
+        Gets fully trained representations for given method, cell type and chromosome.
+        obtain sniper and sca representations from respective methods.
+        Should contain SNIPER and SCA positions end internal representations.
+        Args:
+            method (string): one of hiclstm, sniper, sca
+        """
+
+        pred_data = pd.read_csv(
+            self.cfg.output_directory + "%s_%s_predictions_chr%s.csv" % (method, self.cell, str(self.chr)),
+            sep="\t")
+        pred_data = pred_data.drop(['Unnamed: 0'], axis=1)
+        representations, start, stop = self.convert_df_to_np(pred_data, method=method)
+        return representations, start, stop, pred_data
+
     def convert_df_to_np(self, pred_data, method="hiclstm"):
         """
 
@@ -173,8 +190,7 @@ class Knockout():
         data_loader = get_data_loader_chr(self.cfg, self.chr)
 
         "get representations"
-        hic_r2_ob = HiC_R2(cfg, chr)
-        representations, start, stop, pred_data = hic_r2_ob.get_trained_representations(method="hiclstm")
+        representations, start, stop, pred_data = self.get_trained_representations(method="hiclstm")
 
         "alter representations"
         representations = self.ko_representations(representations, start, indices, mode=cfg.ko_mode)
@@ -210,8 +226,7 @@ class Knockout():
         data_loader = get_data_loader_chr(self.cfg, self.chr)
 
         "get representations"
-        hic_r2_ob = HiC_R2(cfg, chr)
-        representations, start, stop, pred_data = hic_r2_ob.get_trained_representations(method="hiclstm")
+        representations, start, stop, pred_data = self.get_trained_representations(method="hiclstm")
 
         "alter representations"
         representations = self.normalize_embed(representations)
