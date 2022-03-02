@@ -132,6 +132,6 @@ class Config:
         self.ko_increment = 10
         self.ko_mode = "shift"
         self.perform_ko = True
-        self.load_ko = False
+        self.load_ko = True
         self.normalize_embed = False
         self.compare_ko = True
