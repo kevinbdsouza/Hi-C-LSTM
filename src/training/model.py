@@ -222,7 +222,7 @@ class SeqLSTM(nn.Module):
 
     def post_processing(self, cfg, ind, val, pred, embed, pred_df, prev_error_list, error_compute, zero_embed):
         """
-        post_processing(self, cfg, ind, val, pred, embed, pred_df, prev_error_list, error_compute, zero_pred) -> DataFrame, Array
+        post_processing(self, cfg, ind, val, pred, embed, pred_df, prev_error_list, error_compute, zero_embed) -> DataFrame, Array
         Post processing method. Compute error and remove padded indices.
         Args:
             cfg (Config): DataLoader containing dataset.
@@ -233,7 +233,7 @@ class SeqLSTM(nn.Module):
             pred_df (DataFrame): Dataframe to put the columns in
             prev_error_list (Array): Error list from the previous batch for averaging
             error_compute (bool): Boolean for computing error
-            zero_pred (bool): Boolean to get zero pred
+            zero_embed (bool): Boolean to get zero pred
         """
         seq = cfg.sequence_length
         num_seq = int(np.ceil(len(ind) / seq))
@@ -267,21 +267,21 @@ class SeqLSTM(nn.Module):
         if zero_embed:
             idx = np.array(np.where(np.sum(ind, axis=1) == 0))[0]
             zero_embed = embed[idx]
+        else:
+            "remove padded indices"
+            idx = np.array(np.where(np.sum(ind, axis=1) == 0))[0]
+            ind = np.delete(ind, idx, axis=0)
+            val = np.delete(val, idx, axis=0)
+            pred = np.delete(pred, idx, axis=0)
+            embed = np.delete(embed, idx, axis=0)
 
-        "remove padded indices"
-        idx = np.array(np.where(np.sum(ind, axis=1) == 0))[0]
-        ind = np.delete(ind, idx, axis=0)
-        val = np.delete(val, idx, axis=0)
-        pred = np.delete(pred, idx, axis=0)
-        embed = np.delete(embed, idx, axis=0)
-
-        "make dataframe of indices, values, preds, and embeddings"
-        pred_df["i"] = ind[:, 0]
-        pred_df["j"] = ind[:, 1]
-        pred_df["v"] = val
-        pred_df["pred"] = pred
-        for n in range(2 * cfg.pos_embed_size):
-            pred_df[n] = embed[:, n]
+            "make dataframe of indices, values, preds, and embeddings"
+            pred_df["i"] = ind[:, 0]
+            pred_df["j"] = ind[:, 1]
+            pred_df["v"] = val
+            pred_df["pred"] = pred
+            for n in range(2 * cfg.pos_embed_size):
+                pred_df[n] = embed[:, n]
 
         return pred_df, error_list, zero_embed
 
@@ -350,6 +350,8 @@ class SeqLSTM(nn.Module):
 
         device = self.device
         cfg = self.cfg
+        pred_df = None
+        error_list = None
 
         with torch.no_grad():
             self.eval()
