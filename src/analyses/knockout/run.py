@@ -152,10 +152,11 @@ class Knockout():
 
         """
         window = self.cfg.ko_window
+        size = len(representations)
 
         for ind in indices:
             if mode == "average":
-                if ind - start - window < 0 or ind - start + window > len(representations):
+                if ind - start - window < 0 or ind - start + window > size:
                     window = int(window // 2)
 
                 window_left_arr = representations[ind - start - window: ind - start, :].copy()
@@ -165,6 +166,10 @@ class Knockout():
                 representations[ind - start, :] = window_arr_avg
             elif mode == "zero":
                 representations[ind - start, :] = np.zeros((1, self.cfg.pos_embed_size))
+            elif mode == "shift":
+                representations[ind - start:size - 1, :] = representations[
+                                                                           ind - start + 1:size, :]
+                representations[size, :] = np.zeros((1, self.cfg.pos_embed_size))
         return representations
 
     def compute_kodiff(self, pred_data, ko_pred_df, indices):
@@ -423,7 +428,7 @@ if __name__ == '__main__':
             pred_data = pred_data.rename(columns={"ko_pred": "v"})
 
             hic_mat, st = get_heatmaps(pred_data, no_pred=False)
-            simple_plot(hic_mat[1200:2200, 1200:2200])
+            simple_plot(hic_mat)
             print("done")
 
         # tal_data, lmo2_data = ko_ob.tal_lmo2_preprocess()
