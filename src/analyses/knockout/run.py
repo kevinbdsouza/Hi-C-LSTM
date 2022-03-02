@@ -76,6 +76,7 @@ class Knockout():
             self.cfg.output_directory + "%s_%s_predictions_chr%s.csv" % (method, self.cell, str(self.chr)),
             sep="\t")
         pred_data = pred_data.drop(['Unnamed: 0'], axis=1)
+        pred_data = pred_data.filter(['i', 'j', 'v', 'pred'], axis=1)
         representations, start, stop = self.convert_df_to_np(pred_data, method=method)
         return representations, start, stop, pred_data
 
@@ -152,21 +153,21 @@ class Knockout():
                 representations[ind - start, :] = np.zeros((1, self.cfg.pos_embed_size))
         return representations
 
-    def compute_kodiff(self, pred_data, ko_pred_df, indices, stop):
+    def compute_kodiff(self, pred_data, ko_pred_df, indices, start, stop):
         """
 
         """
 
-        indices = np.array(indices[:5])
+        indices = np.array(indices)
         diff_list = np.zeros((len(indices), 11))
         for i, ind in enumerate(indices):
             for k in np.arange(0, 101, 10):
-                subset_og = pred_data.loc[pred_data["i"] == ind + k]
-                if subset_og.empty or (ind + k) > stop:
+                subset_og = pred_data.loc[(pred_data["i"] >= ind + k) and (pred_data["i"] <= ind - k)]
+                if subset_og.empty:
                     continue
-                subset_ko = ko_pred_df.loc[ko_pred_df["i"] == ind + k]
+                subset_ko = ko_pred_df.loc[(ko_pred_df["i"] >= ind + k) and (ko_pred_df["i"] <= ind - k)]
                 mean_diff = np.mean(np.array(subset_ko["ko_pred"]) - np.array(subset_og["pred"]))
-                diff_list[i, int(k/10)] = mean_diff
+                diff_list[i, int(k / 10)] = mean_diff
 
         mean_diff = np.mean(diff_list, axis=0)
         return mean_diff
@@ -194,12 +195,16 @@ class Knockout():
         "alter representations"
         representations = self.ko_representations(representations, start, indices, mode=cfg.ko_mode)
 
-        "run through model using altered representations, save ko predictions"
-        _, ko_pred_df = model.perform_ko(data_loader, representations, start, mode="ko")
-        ko_pred_df.to_csv(cfg.output_directory + "hiclstm_%s_afko_chr%s.csv" % (self.cfg.cell, str(self.chr)), sep="\t")
+        if self.cfg.load_ko:
+            ko_pred_df = pd.read_csv(cfg.output_directory + "hiclstm_%s_afko_chr%s.csv" % (cell, str(chr)), sep="\t")
+        else:
+            "run through model using altered representations, save ko predictions"
+            _, ko_pred_df = model.perform_ko(data_loader, representations, start, mode="ko")
+            ko_pred_df.to_csv(cfg.output_directory + "hiclstm_%s_afko_chr%s.csv" % (self.cfg.cell, str(self.chr)),
+                              sep="\t")
 
         "compute difference between WT and KO predictions"
-        mean_diff = self.compute_kodiff(pred_data, ko_pred_df, indices, stop)
+        mean_diff = self.compute_kodiff(pred_data, ko_pred_df, indices, start, stop)
         return mean_diff
 
     def normalize_embed(self, representations):
@@ -380,8 +385,6 @@ if __name__ == '__main__':
         if cfg.perform_ko:
             "perform ko"
             mean_diff = ko_ob.perform_ko(model)
-        elif cfg.load_ko:
-            ko_pred_df = pd.read_csv(cfg.output_directory + "hiclstm_%s_afko_chr%s.csv" % (cell, str(chr)), sep="\t")
         elif cfg.normalize_embed:
             ko_ob.normalize_embed_predict(model)
 
