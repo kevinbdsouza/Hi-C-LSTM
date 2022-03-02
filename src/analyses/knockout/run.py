@@ -1,10 +1,8 @@
 import torch
 import numpy as np
-import os
 import pandas as pd
 from training.model import SeqLSTM
 from training.data_utils import get_data_loader_chr
-import matplotlib.pyplot as plt
 from training.data_utils import get_samples_sparse, get_cumpos
 import time
 from torch.utils.tensorboard import SummaryWriter
@@ -12,6 +10,7 @@ import torch.nn.functional as F
 from training.config import Config
 from training.test_model import test_model
 from analyses.feature_attribution.tf import TFChip
+from analyses.plot.plot_utils import get_heatmaps, simple_plot
 
 device = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
 
@@ -403,6 +402,15 @@ if __name__ == '__main__':
             mean_diff = ko_ob.perform_ko(model)
         elif cfg.normalize_embed:
             ko_ob.normalize_embed_predict(model)
+        elif cfg.compare_ko:
+            _, _, _, pred_data = ko_ob.get_trained_representations(method="hiclstm")
+            ko_pred_df = pd.read_csv(cfg.output_directory + "hiclstm_%s_afko_chr%s.csv" % (cell, str(chr)), sep="\t")
+            pred_data = pd.merge(pred_data, ko_pred_df, on=["i", "j"])
+            pred_data = pred_data.rename(columns={"v": "ko_pred"})
+
+            hic_mat, st = get_heatmaps(pred_data, no_pred=False)
+            simple_plot(hic_mat)
+            print("done")
 
         # tal_data, lmo2_data = ko_ob.tal_lmo2_preprocess()
         # ko_ob.train_tal1_lmo2(model, cfg, model_name)
