@@ -11,7 +11,6 @@ from torch.utils.tensorboard import SummaryWriter
 import torch.nn.functional as F
 from training.config import Config
 from training.test_model import test_model
-from analyses.reconstruction.hic_r2 import HiC_R2
 from analyses.feature_attribution.tf import TFChip
 
 device = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
