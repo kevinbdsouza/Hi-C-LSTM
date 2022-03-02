@@ -162,10 +162,10 @@ class Knockout():
         diff_list = np.zeros((len(indices), 11))
         for i, ind in enumerate(indices):
             for k in np.arange(0, 101, 10):
-                subset_og = pred_data.loc[(pred_data["i"] >= ind + k) and (pred_data["i"] <= ind - k)]
+                subset_og = pred_data.loc[(pred_data["i"] >= ind + k) & (pred_data["i"] <= ind - k)]
                 if subset_og.empty:
                     continue
-                subset_ko = ko_pred_df.loc[(ko_pred_df["i"] >= ind + k) and (ko_pred_df["i"] <= ind - k)]
+                subset_ko = ko_pred_df.loc[(ko_pred_df["i"] >= ind + k) & (ko_pred_df["i"] <= ind - k)]
                 mean_diff = np.mean(np.array(subset_ko["ko_pred"]) - np.array(subset_og["pred"]))
                 diff_list[i, int(k / 10)] = mean_diff
 
