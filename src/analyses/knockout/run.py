@@ -160,7 +160,7 @@ class Knockout():
         indices = np.array(indices[:5])
         diff_list = np.zeros((len(indices), 11))
         for i, ind in enumerate(indices):
-            for k in range(np.arange(0, 101, 10)):
+            for k in np.arange(0, 101, 10):
                 subset_og = pred_data.loc[pred_data["i"] == ind[0] + k]
                 if subset_og.empty or (ind[0] + k) > stop:
                     continue
