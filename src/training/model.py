@@ -583,11 +583,11 @@ class SeqLSTM(nn.Module):
                 for n in range(ind.shape[0]):
                     "replaces padding with mean"
                     if ind[n, 0] == 0 and ind[n, 1] == 0:
-                        embed_ij[n, 0:cfg.pos_embed_size] = zero_embed
-                        embed_ij[n, cfg.pos_embed_size:2 * cfg.pos_embed_size] = zero_embed
+                        embed_ij[n, 0:cfg.pos_embed_size] = zero_embed[0:cfg.pos_embed_size]
+                        embed_ij[n, cfg.pos_embed_size:] = zero_embed[cfg.pos_embed_size:]
                     else:
                         embed_ij[n, 0:cfg.pos_embed_size] = embed_rows[int(ind[n, 0]) - start]
-                        embed_ij[n, cfg.pos_embed_size:2 * cfg.pos_embed_size] = embed_rows[int(ind[n, 1]) - start]
+                        embed_ij[n, cfg.pos_embed_size:] = embed_rows[int(ind[n, 1]) - start]
 
                 embeddings = torch.from_numpy(embed_ij)
                 embeddings = embeddings.view((-1, self.cfg.sequence_length, 2 * cfg.pos_embed_size)).float().to(device)
