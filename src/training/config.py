@@ -131,7 +131,7 @@ class Config:
         self.ko_window = 10
         self.ko_increment = 10
         self.ko_mode = "zero"
-        self.perform_ko = True
-        self.load_ko = False
+        self.perform_ko = False
+        self.load_ko = True
         self.normalize_embed = False
         self.compare_ko = True
