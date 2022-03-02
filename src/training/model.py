@@ -369,7 +369,7 @@ class SeqLSTM(nn.Module):
                 pred_df, error_list, zero_embed = self.post_processing(cfg, ind, val, pred, embed, pred_df,
                                                                        error_list, error_compute=False, zero_embed=True)
 
-                if zero_embed:
+                if zero_embed is not None:
                     return zero_embed
 
     def simple_post(self, indices, ig, pred_df):
