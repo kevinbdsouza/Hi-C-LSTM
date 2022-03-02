@@ -166,7 +166,7 @@ class Knockout():
                     continue
                 subset_ko = ko_pred_df.loc[ko_pred_df["i"] == ind + k]
                 mean_diff = np.mean(np.array(subset_ko["ko_pred"]) - np.array(subset_og["pred"]))
-                diff_list[i, k] = mean_diff
+                diff_list[i, int(k/10)] = mean_diff
 
         mean_diff = np.mean(diff_list, axis=0)
         return mean_diff
