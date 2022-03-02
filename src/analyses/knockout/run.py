@@ -164,12 +164,22 @@ class Knockout():
         diff = np.arange(0, 101, 10)
         for i, ind in enumerate(indices):
             for j, d in enumerate(diff):
-                subset_og = pred_data.loc[((pred_data["i"] <= ind + j * win) & (pred_data["i"] > ind + (j - 1) * win))
-                                          | ((pred_data["i"] >= ind - j * win) & (pred_data["i"] < ind - (j - 1) * win))]
+                if j == 0:
+                    subset_og = pred_data.loc[pred_data["i"] == ind]
+                else:
+                    subset_og = pred_data.loc[
+                        ((pred_data["i"] <= ind + j * win) & (pred_data["i"] > ind + (j - 1) * win))
+                        | ((pred_data["i"] >= ind - j * win) & (pred_data["i"] < ind - (j - 1) * win))]
                 if subset_og.empty:
                     continue
-                subset_ko = ko_pred_df.loc[((ko_pred_df["i"] <= ind + j * win) & (ko_pred_df["i"] > ind + (j - 1) * win))
-                                          | ((ko_pred_df["i"] >= ind - j * win) & (ko_pred_df["i"] < ind - (j - 1) * win))]
+
+                if j == 0:
+                    subset_ko = pred_data.loc[pred_data["i"] == ind]
+                else:
+                    subset_ko = ko_pred_df.loc[
+                        ((ko_pred_df["i"] <= ind + j * win) & (ko_pred_df["i"] > ind + (j - 1) * win))
+                        | ((ko_pred_df["i"] >= ind - j * win) & (ko_pred_df["i"] < ind - (j - 1) * win))]
+
                 merged_df = pd.merge(subset_og, subset_ko, on=["i", "j"])
                 merged_df = merged_df.filter(['i', 'j', 'pred', 'ko_pred'], axis=1)
                 mean_diff = np.mean(np.array(merged_df["ko_pred"]) - np.array(merged_df["pred"]))
