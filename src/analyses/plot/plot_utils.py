@@ -76,7 +76,8 @@ def simple_plot(hic_win):
     ax = sns.heatmap(hic_win, cmap="Reds", vmin=0, vmax=1)
     ax.set_yticks([])
     ax.set_xticks([])
-    plt.show()
+    plt.savefig("/home/kevindsouza/Downloads/ctcf_ko_22_zero.png")
+    #plt.show()
 
     '''
     sns.set_theme()
