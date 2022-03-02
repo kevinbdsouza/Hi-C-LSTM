@@ -169,7 +169,7 @@ class Knockout():
             elif mode == "shift":
                 representations[ind - start:size - 1, :] = representations[
                                                                            ind - start + 1:size, :]
-                representations[size, :] = np.zeros((1, self.cfg.pos_embed_size))
+                representations[size - 1, :] = np.zeros((1, self.cfg.pos_embed_size))
         return representations
 
     def compute_kodiff(self, pred_data, ko_pred_df, indices):
