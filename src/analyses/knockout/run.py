@@ -153,22 +153,28 @@ class Knockout():
                 representations[ind - start, :] = np.zeros((1, self.cfg.pos_embed_size))
         return representations
 
-    def compute_kodiff(self, pred_data, ko_pred_df, indices, start, stop):
+    def compute_kodiff(self, pred_data, ko_pred_df, indices):
         """
 
         """
 
         indices = np.array(indices)
         diff_list = np.zeros((len(indices), 11))
+        win = self.cfg.ko_increment
+        diff = np.arange(0, 101, 10)
         for i, ind in enumerate(indices):
-            for k in np.arange(0, 101, 10):
-                subset_og = pred_data.loc[(pred_data["i"] <= ind + k) & (pred_data["i"] >= ind - k)]
+            for j, d in enumerate(diff):
+                subset_og = pred_data.loc[(pred_data["i"] <= ind + j * win) & (pred_data["i"] >= ind - j * win) &
+                                          (pred_data["i"] > ind + (j - 1) * win) & (
+                                                      pred_data["i"] < ind - (j - 1) * win)]
                 if subset_og.empty:
                     continue
-                subset_ko = ko_pred_df.loc[(ko_pred_df["i"] <= ind + k) & (ko_pred_df["i"] >= ind - k)]
+                subset_ko = ko_pred_df.loc[(ko_pred_df["i"] <= ind + j * win) & (ko_pred_df["i"] >= ind - j * win) &
+                                           (ko_pred_df["i"] > ind + (j - 1) * win) & (
+                                                       ko_pred_df["i"] < ind - (j - 1) * win)]
                 merged_df = pd.merge(subset_og, subset_ko, on=["i", "j"])
                 mean_diff = np.mean(np.array(merged_df["ko_pred"]) - np.array(merged_df["pred"]))
-                diff_list[i, int(k / 10)] = mean_diff
+                diff_list[i, j] = mean_diff
 
         mean_diff = np.mean(diff_list, axis=0)
         return mean_diff
@@ -205,7 +211,7 @@ class Knockout():
                               sep="\t")
 
         "compute difference between WT and KO predictions"
-        mean_diff = self.compute_kodiff(pred_data, ko_pred_df, indices, start, stop)
+        mean_diff = self.compute_kodiff(pred_data, ko_pred_df, indices)
         return mean_diff
 
     def normalize_embed(self, representations):

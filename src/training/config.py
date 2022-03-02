@@ -127,6 +127,7 @@ class Config:
         self.ctcf_indices_21 = [279219, 279229]
         self.ctcf_indices_22 = [284706, 284743]
         self.ko_window = 10
+        self.ko_increment = 10
         self.ko_mode = "average"
         self.perform_ko = True
         self.load_ko = True
