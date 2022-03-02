@@ -10,6 +10,8 @@ class Domains:
     Class for getting TAD, subTAD, and boundary data.
     Apply relevant filters.
     Merge non loop domains.
+    Get domain data for GM12878 from Rao. Get TAD data from TADKB.
+    To get TADs and subTADs for H1hESC and HFFhTERT, run GMAP.
     """
 
     def __init__(self, cfg, chr, mode="ig"):
@@ -24,6 +26,7 @@ class Domains:
         self.mode = mode
         self.down_helper_ob = DownstreamHelper(cfg)
         self.tad_file = cfg.downstream_dir + "/FIREs/" + 'TAD_boundaries.xlsx'
+        self.subtad_file = cfg.downstream_dir + "/FIREs/" + self.cell + '_subtads.csv'
 
     def get_domain_data(self):
         """
@@ -65,15 +68,19 @@ class Domains:
         data = data.filter(['x1', 'x2', 'y1', 'y2', 'target'], axis=1)
         return data
 
-    def get_tad_data(self):
+    def get_tad_data(self, type="TADs"):
         """
-        get_tad_data() -> Dataframe
+        get_tad_data(type) -> Dataframe
         Gets TAD data. Converts to resolution. Filters chromosome and columns.
         Args:
-            NA
+            type (string): one of TADs or subTADs.
         """
 
-        tads = pd.read_excel(self.tad_file, sheet_name=self.cell, names=["chr", "start", "end"])
+        if type == "TADs":
+            tads = pd.read_excel(self.tad_file, sheet_name=self.cell, names=["chr", "start", "end"])
+        else:
+            tads = pd.read_csv(self.subtad_file, sep="\t", names=["chr", "start", "end"])
+
         tads = tads.sort_values(by=['start']).reset_index(drop=True)
 
         "convert to resolution"
@@ -87,16 +94,6 @@ class Domains:
             tad_data_chr['target'] = "TADs"
         return tad_data_chr
 
-    def get_subTAD_data(self):
-        """
-        get_subTAD_data() -> Dataframe
-        Gets subTAD data. Converts to resolution. Filters chromosome and columns.
-        Args:
-            NA
-        """
-
-        pass
-
     def get_subtad_boundaries(self):
         """
         get_subtad_boundaries() -> Dataframe
@@ -106,7 +103,7 @@ class Domains:
         """
 
         "converts subTAD start and ends to boundary positions."
-        tads = self.get_subTAD_data()
+        tads = self.get_tad_data(type="subTADs")
         df_start = tads[["start", "target"]].rename(columns={"start": "pos"})
         df_end = tads[["end", "target"]].rename(columns={"end": "pos"})
         tadbs = pd.concat([df_start, df_end])
@@ -144,7 +141,7 @@ class Domains:
 
         "get domain data"
         domain_data = self.get_domain_data()
-        tad_data = self.get_tad_data()
+        tad_data = self.get_tad_data(type="TADs")
 
         "merge domain data on positions"
         merged_data = pd.concat([domain_data, tad_data])
@@ -162,7 +159,7 @@ class Domains:
         """
 
         "converts TAD start and ends to boundary positions."
-        tads = self.get_tad_data()
+        tads = self.get_tad_data(type="TADs")
         df_start = tads[["start", "target"]].rename(columns={"start": "pos"})
         df_end = tads[["end", "target"]].rename(columns={"end": "pos"})
         tadbs = pd.concat([df_start, df_end])
@@ -180,6 +177,16 @@ class Domains:
             tadbs = pd.concat([tadbctcf, tadbs[~tadbs["pos"].isin(ctcf_data["end"])]])
 
         return tadbs
+
+    def run_gmap(self):
+        """
+        run_gmap() -> No return object
+        Currently GMAP is implemented only for R. You can find the R package on github.
+        GMAP: https://github.com/wbaopaul/rGMAP
+        Args:
+            NA
+        """
+        pass
 
 
 if __name__ == '__main__':

@@ -1,4 +1,3 @@
-import logging
 from analyses.classification.rna_seq import GeneExp
 from training.config import Config
 import pandas as pd

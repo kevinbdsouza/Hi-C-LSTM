@@ -7,6 +7,7 @@ class Rep_timing:
     """
     Class to get Replication Timing data from given cell type.
     Alter it and provide for classification.
+    Replication timing data only available for GM12878.
     """
 
     def __init__(self, cfg, chr):

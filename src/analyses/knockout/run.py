@@ -1,38 +1,43 @@
-from __future__ import division
 import torch
 import numpy as np
 import os
 import pandas as pd
-import training.config as config
 from training.model import SeqLSTM
 from training.data_utils import get_data_loader_chr
 import matplotlib.pyplot as plt
-from training.data_utils import get_samples_sparse
+from training.data_utils import get_samples_sparse, get_cumpos
 import time
 from torch.utils.tensorboard import SummaryWriter
 import torch.nn.functional as F
+from training.config import Config
+from training.test_model import test_model
+from analyses.reconstruction.hic_r2 import HiC_R2
+from analyses.feature_attribution.tf import TFChip
 
 device = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
 
-# device = 'cpu'
-mode = "test"
-
 
 class Knockout():
+    """
+    Class to perform knockout experiments.
+    Includes methods that help you do knockout.
+    """
 
-    def __init__(self, cfg, cell, chr):
+    def __init__(self, cfg, chr):
         self.cfg = cfg
         self.chr = chr
-        self.cell = cell
+        self.cell = cfg.cell
         self.res = cfg.resolution
         self.sizes_path = self.cfg.hic_path + self.cfg.sizes_file
         self.sizes = np.load(self.sizes_path, allow_pickle=True).item()
-        self.file_path = os.path.join(cfg.downstream_dir, "ctcf")
         self.hek_file = cfg.hic_path + cfg.cell + "/HEK239T-WT.matrix"
         self.tal1ko_file = cfg.hic_path + cfg.cell + "/Tal1KO.matrix"
         self.lmo2ko_file = cfg.hic_path + cfg.cell + "/Lmo2KO.matrix"
 
     def alter_index(self, embed_rows):
+        """
+
+        """
         if self.chr == 1:
             cum_pos = 0
         else:
@@ -47,24 +52,22 @@ class Knockout():
         return embed_rows
 
     def get_ctcf_indices(self):
-        data = pd.read_csv(os.path.join(self.file_path, "chr" + str(chr) + ".bed"), sep="\t", header=None)
-        column_list = ["chr", "start", "end", "dot", "score", "dot_2", "enrich", "pval", "qval", "peak"]
-        data.columns = column_list
+        """
+
+        """
+
+        ctcf_ob = TFChip(cfg, chr)
+        data = ctcf_ob.get_ctcf_data()
         data = data.filter(['start'], axis=1)
-        data["start"] = (data["start"]).astype(int) // self.res
-
-        if self.chr == 1:
-            cum_pos = 0
-        else:
-            key = "chr" + str(self.chr - 1)
-            cum_pos = int(self.sizes[key])
-
+        cum_pos = get_cumpos(self.cfg, self.chr)
         data["start"] = data["start"] + cum_pos
-        data = data.sort_values('start')
-
         return data
 
     def convert_df_to_np(self, pred_data, method="hiclstm"):
+        """
+
+        """
+
         i_start = int(pred_data['i'].min())
         i_stop = int(pred_data['i'].max())
         j_start = int(pred_data['j'].min())
@@ -113,26 +116,35 @@ class Knockout():
 
         return embed_rows, start, stop
 
-    def ko_indices(self, embed_rows, start, indices):
-        # chose from input ko indices or give your own
-        window = 10
+    def ko_representations(self, representations, start, indices, mode="average"):
+        """
+
+        """
+        window = self.cfg.ko_window
 
         for ind in indices:
-            if ind - start - window < 0 or ind - start + window > len(embed_rows):
-                window = int(window // 2)
+            if mode == "average":
+                if ind - start - window < 0 or ind - start + window > len(representations):
+                    window = int(window // 2)
 
-            window_left_arr = embed_rows[ind - start - window: ind - start, :].copy()
-            window_right_arr = embed_rows[ind - start + 1: ind - start + window + 1, :].copy()
+                window_left_arr = representations[ind - start - window: ind - start, :].copy()
+                window_right_arr = representations[ind - start + 1: ind - start + window + 1, :].copy()
 
-            window_arr_avg = np.stack((window_left_arr, window_right_arr)).mean(axis=0).mean(axis=0)
-            embed_rows[ind - start, :] = window_arr_avg
-        return embed_rows
+                window_arr_avg = np.stack((window_left_arr, window_right_arr)).mean(axis=0).mean(axis=0)
+                representations[ind - start, :] = window_arr_avg
+            elif mode == "zero":
+                representations[ind - start, :] = np.zeros((1, self.cfg.pos_embed_size))
+        return representations
 
     def compute_kodiff(self, pred_data, ko_pred_df, indices, stop):
+        """
+
+        """
+
         indices = np.array(indices[:5])
         diff_list = np.zeros((len(indices), 11))
         for i, ind in enumerate(indices):
-            for k in range(11):
+            for k in range(np.arange(0, 101, 10)):
                 subset_og = pred_data.loc[pred_data["i"] == ind[0] + k]
                 if subset_og.empty or (ind[0] + k) > stop:
                     continue
@@ -141,51 +153,77 @@ class Knockout():
                 diff_list[i, k] = mean_diff
 
         mean_diff = np.mean(diff_list, axis=0)
-
-        pos = np.linspace(0, 1, 11)
-        plt.figure(figsize=(10, 8))
-        plt.xticks(rotation=90, fontsize=20)
-        plt.yticks(fontsize=20)
-        plt.xlabel("Distance between positions in Mbp", fontsize=20)
-        plt.ylabel("Average Difference in Contact Strength \n (KO - No KO)", fontsize=20)
-        plt.plot(pos, mean_diff, marker='o', markersize=16, color="C0", linewidth=3, label="CTCF KO")
-        plt.legend(fontsize=18)
-        plt.show()
-
         return mean_diff
 
-    def perform_ko(self, model, pred_data, indices):
-        data_loader, samples = get_data_loader_chr(self.cfg, self.chr)
-        embed_rows, start, stop = self.convert_df_to_np(pred_data, method="hiclstm")
-        embed_rows = self.ko_indices(embed_rows, start, indices)
+    def perform_ko(self, model):
+        """
 
-        _, ko_pred_df = model.perform_ko(data_loader, embed_rows, start, mode="ko")
-        ko_pred_df.to_csv(cfg.output_directory + "shuffle_%s_afko_chr%s.csv" % (self.cfg.cell, str(self.chr)), sep="\t")
+        """
 
+        "get knockout indices depending on experiment"
+        if self.cfg.ko_experiment == "ctcf":
+            if self.cfg.ctcf_indices == "all":
+                indices = self.get_ctcf_indices()
+            else:
+                indices = self.cfg.ctcf_indices_22
+        elif self.cfg.ko_experiment == "foxg1":
+            indices = [222863]
+
+        "load data"
+        data_loader = get_data_loader_chr(self.cfg, self.chr)
+
+        "get representations"
+        hic_r2_ob = HiC_R2(cfg, chr)
+        representations, start, stop, pred_data = hic_r2_ob.get_trained_representations(method="hiclstm")
+
+        "alter representations"
+        representations = self.ko_representations(representations, start, indices, mode=cfg.ko_mode)
+
+        "run through model using altered representations, save ko predictions"
+        _, ko_pred_df = model.perform_ko(data_loader, representations, start, mode="ko")
+        ko_pred_df.to_csv(cfg.output_directory + "hiclstm_%s_afko_chr%s.csv" % (self.cfg.cell, str(self.chr)), sep="\t")
+
+        "compute difference between WT and KO predictions"
         mean_diff = self.compute_kodiff(pred_data, ko_pred_df, indices, stop)
+        return mean_diff
 
-        return ko_pred_df, mean_diff
+    def normalize_embed(self, representations):
+        """
 
-    def normalize_embed(self, embed_rows):
-        for n in range(len(embed_rows)):
-            norm = np.linalg.norm(embed_rows[n, :])
+        """
+
+        "normalize representations"
+        for n in range(len(representations)):
+            norm = np.linalg.norm(representations[n, :])
             if norm == 0:
                 continue
             else:
-                embed_rows[n, :] = embed_rows[n, :] / norm
-        return embed_rows
+                representations[n, :] = representations[n, :] / norm
+        return representations
 
-    def normalize_embed_predict(self, model, pred_data):
-        data_loader, samples = get_data_loader_chr(self.cfg, self.chr)
-        embed_rows, start, stop = self.convert_df_to_np(pred_data, method="hiclstm")
-        embed_rows = self.normalize_embed(embed_rows)
+    def normalize_embed_predict(self, model):
+        """
 
-        _, ko_pred_df = model.perform_ko(data_loader, embed_rows, start, mode="ko")
-        ko_pred_df.to_csv(cfg.output_directory + "shuffle_%s_norm_chr%s.csv" % (self.cfg.cell, str(self.chr)), sep="\t")
+        """
 
-        return ko_pred_df
+        "load data"
+        data_loader = get_data_loader_chr(self.cfg, self.chr)
+
+        "get representations"
+        hic_r2_ob = HiC_R2(cfg, chr)
+        representations, start, stop, pred_data = hic_r2_ob.get_trained_representations(method="hiclstm")
+
+        "alter representations"
+        representations = self.normalize_embed(representations)
+
+        "run through model using altered representations, save ko predictions"
+        _, ko_pred_df = model.perform_ko(data_loader, representations, start, mode="ko")
+        ko_pred_df.to_csv(cfg.output_directory + "hiclstm_%s_norm_chr%s.csv" % (self.cfg.cell, str(self.chr)), sep="\t")
 
     def change_index(self, list_split):
+        """
+
+        """
         temp = [k.split('|')[-1] for k in list_split]
         chr_list = []
         index_list = []
@@ -202,6 +240,9 @@ class Knockout():
         return loc_list, chr_list
 
     def tal_lmo2_preprocess(self):
+        """
+
+        """
         # hek_mat = pd.read_csv(self.hek_file, sep="\t")
         hek_mat = pd.read_csv(self.lmo2ko_file, sep="\t")
 
@@ -242,6 +283,9 @@ class Knockout():
         return tal_df, lmo2_df
 
     def prepare_tal1_lmo2(self, cfg):
+        """
+
+        """
         tal_df = pd.read_csv(cfg.hic_path + cfg.cell + "/tal_df.txt", sep="\t")
         lmo2_df = pd.read_csv(cfg.hic_path + cfg.cell + "/lmo2_df.txt", sep="\t")
 
@@ -276,6 +320,9 @@ class Knockout():
         return data_loader, sample_index_tensor
 
     def train_tal1_lmo2(self, model, cfg, model_name):
+        """
+
+        """
         timestr = time.strftime("%Y%m%d-%H%M%S")
         writer = SummaryWriter('./tensorboard_logs/' + model_name + timestr)
 
@@ -287,54 +334,43 @@ class Knockout():
         pass
 
     def test_tal1_lmo2(self, model, cfg):
+        """
+
+        """
         data_loader, samples = self.prepare_tal1_lmo2(cfg)
         predictions, test_error, values, pred_df, error_list = model.test(data_loader)
 
         pred_df.to_csv(cfg.output_directory + "%s_predictions_chr.csv" % (cfg.cell), sep="\t")
         pass
 
-    def tf_ko(self, model, pred_data):
-        ctcf_indices_21 = [279219, 279229]
-        ctcf_indices_22 = [284706, 284743]
-
-        znf143_chr = 11
-        znf143_indices = [182532]
-
-        foxg1_chr = 14
-        foxg1_indices = [222863]
-
-        self.perform_ko(model, pred_data, foxg1_indices)
-
-        pass
-
 
 if __name__ == '__main__':
-
-    cfg = config.Config()
+    cfg = Config()
     cell = cfg.cell
 
-    # load model
-    model_name = "shuffle_" + cell
-    model = SeqLSTM(cfg, device, model_name).to(device)
+    "load model"
+    model = SeqLSTM(cfg, device).to(device)
     model.load_weights()
 
-    # test_chr = list(range(21, 23))
-    test_chr = [1]
+    if cfg.ko_experiment == "foxg1":
+        cfg.chr_test_list = cfg.foxg1_chr
 
-    for chr in test_chr:
-        print('Testing Start Chromosome: {}'.format(chr))
-        # pred_data = pd.read_csv(cfg.output_directory + "shuffle_%s_predictions_chr%s.csv" % (cell, str(chr)), sep="\t")
-        # ko_pred_df = pd.read_csv(cfg.output_directory + "shuffle_%s_afko_chr%s.csv" % (cell, str(chr)), sep="\t")
-        ko_ob = Knockout(cfg, cell, chr)
+    for chr in cfg.chr_test_list:
+        print('Knockout Start Chromosome: {}'.format(chr))
+        ko_ob = Knockout(cfg, chr)
 
-        # indices = ko_ob.get_ctcf_indices()
-        # ko_pred_df, mean_diff = ko_ob.perform_ko(model, pred_data, indices)
-        # ko_pred_df = ko_ob.normalize_embed_predict(model, pred_data)
+        if cfg.ko_compute_test:
+            "run test if predictions not computed yet"
+            test_model(model, cfg, chr)
 
-        tal_data, lmo2_data = ko_ob.tal_lmo2_preprocess()
+        if cfg.perform_ko:
+            "perform ko"
+            mean_diff = ko_ob.perform_ko(model)
+        elif cfg.load_ko:
+            ko_pred_df = pd.read_csv(cfg.output_directory + "hiclstm_%s_afko_chr%s.csv" % (cell, str(chr)), sep="\t")
+        elif cfg.normalize_embed:
+            ko_ob.normalize_embed_predict(model)
+
+        # tal_data, lmo2_data = ko_ob.tal_lmo2_preprocess()
         # ko_ob.train_tal1_lmo2(model, cfg, model_name)
         # ko_ob.test_tal1_lmo2(model, cfg)
-
-        # ko_ob.tf_ko(model, pred_data)
-
-    print("done")

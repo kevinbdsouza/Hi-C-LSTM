@@ -137,13 +137,13 @@ class HiC_R2():
             method (string): one of hiclstm, sniper, sca
         """
 
-        ko_ob = Knockout(self.cfg, self.cell, self.chr)
+        ko_ob = Knockout(self.cfg, self.chr)
         pred_data = pd.read_csv(
             self.cfg.output_directory + "%s_%s_predictions_chr%s.csv" % (method, self.cell, str(self.chr)),
             sep="\t")
         pred_data = pred_data.drop(['Unnamed: 0'], axis=1)
         representations, start, stop = ko_ob.convert_df_to_np(pred_data, method=method)
-        return representations, start
+        return representations, start, stop, pred_data
 
     def run_decoders(self, representations, start, decoder="lstm"):
         """

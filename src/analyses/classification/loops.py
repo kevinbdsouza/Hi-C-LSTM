@@ -9,6 +9,8 @@ class Loops:
     """
     Class to get Loop Domain data.
     Apply Relevant filters.
+    Get loops for GM12878 from Rao.
+    For H1hESC and HFFhTERT, run hiccups on hic file to get loops.
     """
 
     def __init__(self, cfg, chr, mode="ig"):

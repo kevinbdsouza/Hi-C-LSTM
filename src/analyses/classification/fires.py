@@ -6,6 +6,7 @@ class Fires:
     """
     Class to get FIRE data.
     Filter according to chromsome and cell type.
+    FIREs available only for GM12878.
     """
 
     def __init__(self, cfg, chr, mode="ig"):

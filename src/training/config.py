@@ -13,7 +13,7 @@ class Config:
         self.num_chr = 23
         self.genome_len = 288091
         self.resolution = 10000
-        self.cell = "H1hESC"
+        self.cell = "GM12878"
         self.chr_train_list = list(range(1, 23))
         self.chr_test_list = list(range(22, 23))
 
@@ -118,3 +118,16 @@ class Config:
         self.compute_metrics = True
         self.n_folds = 3
         self.regression_mode = "mlp"
+
+        "knockout"
+        self.ko_compute_test = False
+        self.ko_experiment = "ctcf"
+        self.ctcf_indices = "22"
+        self.foxg1_chr = [14]
+        self.ctcf_indices_21 = [279219, 279229]
+        self.ctcf_indices_22 = [284706, 284743]
+        self.ko_window = 10
+        self.ko_mode = "average"
+        self.perform_ko = True
+        self.load_ko = False
+        self.normalize_embed = False

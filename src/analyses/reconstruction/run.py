@@ -58,7 +58,7 @@ if __name__ == '__main__':
             hic_r2_ob = HiC_R2(cfg, chr)
 
             "load representations"
-            representations, start = hic_r2_ob.get_trained_representations(method=cfg.method)
+            representations, start, _, _ = hic_r2_ob.get_trained_representations(method=cfg.method)
 
             "train decoder"
             hic_r2_ob.run_decoders(representations, start, decoder=cfg.decoder)
@@ -74,7 +74,7 @@ if __name__ == '__main__':
 
             if cfg.recon_get_predictions:
                 "load and save representations"
-                representations, start = hic_r2_ob.get_trained_representations(method=cfg.method)
+                representations, start, _, _ = hic_r2_ob.get_trained_representations(method=cfg.method)
                 if cfg.recon_save_representation:
                     np.save(cfg.output_directory + "%s_rep_%s_chr%s.npy" % (cfg.method, cfg.cell, str(chr)),
                             representations)

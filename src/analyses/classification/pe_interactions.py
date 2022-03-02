@@ -8,6 +8,9 @@ class PeInteractions:
     """
     Class to get Promoters, Enhancers, and interaction data from given cell type.
     Alter it and provide for classification.
+    Before using make sure that TSS and enhancer data is loaded for cell type.
+    And set to promoter and enhancer starts and ends. If window data is available (GM12878),
+    set to window start and end. Use link in manuscript to download data.
     """
 
     def __init__(self, cfg, chr):

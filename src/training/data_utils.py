@@ -56,6 +56,32 @@ def get_genomic_coord(chr, bin_idx, cfg):
     return (bin_idx - chr_start) * cfg.resolution
 
 
+def load_interchrom_hic(cfg, chrx, chry):
+    """
+    load_hic(cfg, chrx, chry) -> Dataframe
+    Loads data from Hi-C interchrom txt files, converts indices to specified resolution.
+    Supports only those values of resolution that Juicer can extract from Hi-C txt file.
+    Supports only those cell types for which Hi-C txt files exist.
+    To check how to create the Hi-C txt file, refer to the documentation.
+    Args:
+        cfg (Config): the configuration to use for the experiment.
+        chrx (int): the first chromosome to extract Hi-C from.
+        chry (int): the second chromosome to extract Hi-C from.
+    Raises:
+        Error: Hi-C txt file does not exist or error during Juicer extraction.
+        Skips: if error during extraction using Juicer Tools, prints out empty txt file
+    """
+    try:
+        data = pd.read_csv("%s%s/%s/hic_chr%s.txt" % (cfg.hic_path, cfg.cell, chrx, chry), sep="\t",
+                           names=['i', 'j', 'v'])
+        data = data.dropna()
+        data[['i', 'j']] = data[['i', 'j']] / cfg.resolution
+        data[['i', 'j']] = data[['i', 'j']].astype('int64')
+        return data
+    except Exception as e:
+        print("Hi-C txt file does not exist or error during Juicer extraction")
+
+
 def load_hic(cfg, chr):
     """
     load_hic(cfg, chr) -> Dataframe
@@ -71,7 +97,8 @@ def load_hic(cfg, chr):
         Skips: if error during extraction using Juicer Tools, prints out empty txt file
     """
     try:
-        data = pd.read_csv("%s%s/%s/hic_chr%s.txt" % (cfg.hic_path, cfg.cell, chr, chr), sep="\t", names=['i', 'j', 'v'])
+        data = pd.read_csv("%s%s/%s/hic_chr%s.txt" % (cfg.hic_path, cfg.cell, chr, chr), sep="\t",
+                           names=['i', 'j', 'v'])
         data = data.dropna()
         data[['i', 'j']] = data[['i', 'j']] / cfg.resolution
         data[['i', 'j']] = data[['i', 'j']].astype('int64')
