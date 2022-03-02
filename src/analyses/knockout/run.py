@@ -147,7 +147,7 @@ class Knockout():
                 representations[n, :] = representations[n, :] / norm
         return representations
 
-    def ko_representations(self, representations, start, indices, mode="average"):
+    def ko_representations(self, representations, start, indices, zero_embed, mode="average"):
         """
 
         """
@@ -165,11 +165,12 @@ class Knockout():
                 window_arr_avg = np.stack((window_left_arr, window_right_arr)).mean(axis=0).mean(axis=0)
                 representations[ind - start, :] = window_arr_avg
             elif mode == "zero":
-                representations[ind - start, :] = np.zeros((1, self.cfg.pos_embed_size))
+                representations[ind - start, :] = np.zeros((1, cfg.pos_embed_size))
             elif mode == "shift":
-                representations[ind - start:size - 1, :] = representations[
-                                                                           ind - start + 1:size, :]
-                representations[size - 1, :] = np.zeros((1, self.cfg.pos_embed_size))
+                representations[ind - start:size - 1, :] = representations[ind - start + 1:size, :]
+                representations[size - 1, :] = np.zeros((1, cfg.pos_embed_size))
+            elif mode == "padding":
+                representations[ind - start, :] = zero_embed[:cfg.pos_embed_size]
         return representations
 
     def compute_kodiff(self, pred_data, ko_pred_df, indices):
@@ -227,14 +228,14 @@ class Knockout():
         "get representations"
         representations, start, stop, pred_data = self.get_trained_representations(method="hiclstm")
 
-        "alter representations"
-        representations = self.ko_representations(representations, start, indices, mode=cfg.ko_mode)
-
         "get zero embed"
         self.cfg.full_test = False
         self.cfg.compute_pca = False
         self.cfg.get_zero_pred = True
         zero_embed = test_model(model, self.cfg, chr)
+
+        "alter representations"
+        representations = self.ko_representations(representations, start, indices, zero_embed, mode=cfg.ko_mode)
 
         if self.cfg.load_ko:
             ko_pred_df = pd.read_csv(cfg.output_directory + "hiclstm_%s_afko_chr%s.csv" % (cell, str(chr)), sep="\t")
@@ -428,7 +429,7 @@ if __name__ == '__main__':
             pred_data = pred_data.rename(columns={"ko_pred": "v"})
 
             hic_mat, st = get_heatmaps(pred_data, no_pred=False)
-            simple_plot(hic_mat[:500, :500])
+            simple_plot(hic_mat)
             print("done")
 
         # tal_data, lmo2_data = ko_ob.tal_lmo2_preprocess()
