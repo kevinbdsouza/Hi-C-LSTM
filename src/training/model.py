@@ -220,9 +220,9 @@ class SeqLSTM(nn.Module):
             print('Completed epoch %s' % str(epoch + 1))
             print('Average loss: %s' % (running_loss / len(data_loader)))
 
-    def post_processing(self, cfg, ind, val, pred, embed, pred_df, prev_error_list, error_compute):
+    def post_processing(self, cfg, ind, val, pred, embed, pred_df, prev_error_list, error_compute, zero_embed):
         """
-        post_processing(self, cfg, ind, val, pred, embed, pred_df, prev_error_list, error_compute) -> DataFrame, Array
+        post_processing(self, cfg, ind, val, pred, embed, pred_df, prev_error_list, error_compute, zero_pred) -> DataFrame, Array
         Post processing method. Compute error and remove padded indices.
         Args:
             cfg (Config): DataLoader containing dataset.
@@ -233,10 +233,12 @@ class SeqLSTM(nn.Module):
             pred_df (DataFrame): Dataframe to put the columns in
             prev_error_list (Array): Error list from the previous batch for averaging
             error_compute (bool): Boolean for computing error
+            zero_pred (bool): Boolean to get zero pred
         """
         seq = cfg.sequence_length
         num_seq = int(np.ceil(len(ind) / seq))
         error_list = None
+        zero_embed = None
 
         "compute error"
         if error_compute:
@@ -261,6 +263,11 @@ class SeqLSTM(nn.Module):
             else:
                 error_list = np.mean((error_list, prev_error_list), axis=0)
 
+        "return zero embed"
+        if zero_embed:
+            idx = np.array(np.where(np.sum(ind, axis=1) == 0))[0]
+            zero_embed = embed[idx]
+
         "remove padded indices"
         idx = np.array(np.where(np.sum(ind, axis=1) == 0))[0]
         ind = np.delete(ind, idx, axis=0)
@@ -276,7 +283,7 @@ class SeqLSTM(nn.Module):
         for n in range(2 * cfg.pos_embed_size):
             pred_df[n] = embed[:, n]
 
-        return pred_df, error_list
+        return pred_df, error_list, zero_embed
 
     def test(self, data_loader):
         """
@@ -322,8 +329,8 @@ class SeqLSTM(nn.Module):
                 embed = embeddings.cpu().detach().numpy().reshape(-1, 2 * cfg.pos_embed_size)
 
                 "compute error and get post processed data and embeddings"
-                pred_df, error_list = self.post_processing(cfg, ind, val, pred, embed, pred_df,
-                                                           error_list, error_compute=False)
+                pred_df, error_list, _ = self.post_processing(cfg, ind, val, pred, embed, pred_df,
+                                                              error_list, error_compute=False, zero_embed=False)
 
                 main_pred_df = pd.concat([main_pred_df, pred_df], axis=0)
 
@@ -332,6 +339,37 @@ class SeqLSTM(nn.Module):
         target_values = torch.reshape(target_values, (-1, 1)).cpu().detach().numpy()
 
         return predictions, test_error, target_values, main_pred_df, error_list
+
+    def zero_embed(self, data_loader):
+        """
+        zero_pred(self, data_loader) -> Array
+        Method to return the representation for padding
+        Args:
+            data_loader (DataLoader): DataLoader containing dataset.
+        """
+
+        device = self.device
+        cfg = self.cfg
+
+        with torch.no_grad():
+            self.eval()
+            for i, (indices, values) in enumerate(tqdm(data_loader)):
+                indices = indices.to(device)
+                val = values.to(device)
+
+                "forward pass"
+                pred, embeddings = self.forward(indices)
+
+                "detach everything for post"
+                ind = indices.cpu().detach().numpy().reshape(-1, 2)
+                embed = embeddings.cpu().detach().numpy().reshape(-1, 2 * cfg.pos_embed_size)
+
+                "compute error and get post processed data and embeddings"
+                pred_df, error_list, zero_embed = self.post_processing(cfg, ind, val, pred, embed, pred_df,
+                                                                       error_list, error_compute=False, zero_embed=True)
+
+                if zero_embed:
+                    return zero_embed
 
     def simple_post(self, indices, ig, pred_df):
         """

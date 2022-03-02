@@ -47,7 +47,9 @@ class Config:
         "decoder parameters"
         self.decoder_name = "hiclstm_fc"
         self.decoder = "fc"
-        self.compute_pca = True
+        self.compute_pca = False
+        self.get_zero_pred = True
+        self.full_test = False
         self.recon_compute_representation = False
         self.recon_save_representation = False
         self.train_decoders = False

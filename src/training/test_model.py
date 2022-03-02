@@ -53,7 +53,7 @@ def test_model(model, cfg, chr):
         chr (int): The chromosome to test.
     """
 
-    if not cfg.compute_pca:
+    if cfg.full_test:
         "get data"
         data_loader = get_data_loader_chr(cfg, chr)
 
@@ -62,11 +62,16 @@ def test_model(model, cfg, chr):
 
         "save predictions"
         pred_df.to_csv(cfg.output_directory + "hiclstm_%s_predictions_chr%s.csv" % (cfg.cell, str(chr)), sep="\t")
-    else:
+    elif cfg.compute_pca:
         pred_df = compute_pca(cfg, chr)
         "save predictions"
         pred_df.to_csv(cfg.output_directory + "pca_%s_predictions_chr%s.csv" % (cfg.cell, str(chr)),
                        sep="\t")
+    elif cfg.get_zero_pred:
+        "zero pred"
+        data_loader = get_data_loader_chr(cfg, chr)
+        zero_embed = model.zero_embed(data_loader)
+        return zero_embed
 
 
 if __name__ == '__main__':

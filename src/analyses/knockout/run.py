@@ -215,7 +215,7 @@ class Knockout():
         else:
             "run through model using altered representations, save ko predictions"
             _, ko_pred_df = model.perform_ko(data_loader, representations, start, mode="ko")
-            ko_pred_df.to_csv(cfg.output_directory + "hiclstm_%s_afko_chr%s.csv" % (self.cfg.cell, str(self.chr)),
+            ko_pred_df.to_csv(cfg.output_directory + "hiclstm_%s_afko_chr%s.csv" % (cell, str(chr)),
                               sep="\t")
 
         "compute difference between WT and KO predictions"
