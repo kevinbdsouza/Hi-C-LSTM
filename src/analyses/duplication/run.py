@@ -102,6 +102,9 @@ if __name__ == '__main__':
 
         if cfg.dupl_compute_test:
             "run test if predictions not computed yet"
+            cfg.compute_pca = False
+            cfg.get_zero_pred = False
+            cfg.full_test = True
             test_model(model, cfg, chr)
 
         if cfg.melo_insert:
