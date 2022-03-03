@@ -78,20 +78,8 @@ class Knockout():
         """
 
         "assign start and stop"
-        i_start = int(pred_data['i'].min())
-        i_stop = int(pred_data['i'].max())
-        j_start = int(pred_data['j'].min())
-        j_stop = int(pred_data['j'].max())
-
-        if i_start < j_start:
-            start = i_start
-        else:
-            start = j_start
-
-        if i_stop > j_stop:
-            stop = i_stop
-        else:
-            stop = j_stop
+        start = int(pred_data['i'].min())
+        stop = int(pred_data['i'].max())
 
         try:
             "try loading representations"
@@ -103,7 +91,6 @@ class Knockout():
             embed_rows = np.zeros((nrows + 1, self.cfg.pos_embed_size))
 
             i_old = 0
-            j_old = 0
             for r in range(len(pred_data)):
                 i_new = int(pred_data.loc[r, "i"])
 
@@ -118,18 +105,8 @@ class Knockout():
                         col = [str(x) for x in col]
                         embed_rows[i_new - start, :] = np.array(pred_data.loc[r, col])
 
-                "repeat for j"
-                j_new = int(pred_data.loc[r, "j"])
-
-                if j_new == j_old:
-                    continue
-                else:
-                    j_old = j_new
-                    if np.all((embed_rows[j_new - start, :] == 0)):
-                        col = list(np.arange(self.cfg.pos_embed_size, 2 * self.cfg.pos_embed_size))
-                        col = [str(x) for x in col]
-                        embed_rows[j_new - start, :] = np.array(pred_data.loc[r, col])
-
+                np.save(self.cfg.output_directory + "%s_rep_%s_chr%s.npy" % (method, self.cfg.cell, str(self.chr)),
+                        embed_rows)
         return embed_rows, start, stop
 
     def normalize_embed(self, representations, zero_embed):
