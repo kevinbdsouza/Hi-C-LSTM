@@ -91,7 +91,6 @@ class Knockout():
             embed_rows = np.zeros((nrows + 1, self.cfg.pos_embed_size))
 
             i_old = 0
-            j_old = 0
             for r in range(len(pred_data)):
                 i_new = int(pred_data.loc[r, "i"])
 
@@ -106,8 +105,7 @@ class Knockout():
                         col = [str(x) for x in col]
                         embed_rows[i_new - start, :] = np.array(pred_data.loc[r, col])
 
-                np.save(self.cfg.output_directory + "%s_rep_%s_chr%s.npy" % (method, self.cfg.cell, str(self.chr)),
-                        embed_rows)
+            np.save(self.cfg.output_directory + "%s_rep_%s_chr%s.npy" % (method, self.cfg.cell, str(self.chr)), embed_rows)
         return embed_rows, start, stop
 
     def normalize_embed(self, representations, zero_embed):
