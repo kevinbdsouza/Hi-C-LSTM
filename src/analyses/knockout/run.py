@@ -191,7 +191,7 @@ class Knockout():
 
         if mode == "reverse":
             representations = np.fliplr(representations)
-            zero_embed = np.flip(zero_embed, axis=1)
+            zero_embed = np.flip(zero_embed)
 
         return representations, zero_embed
 
