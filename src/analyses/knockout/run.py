@@ -96,11 +96,11 @@ class Knockout():
         try:
             "try loading representations"
             embed_rows = np.load(
-                self.cfg.output_directory + "%s_rep_%s_chr%s.npy" % (method, cfg.cell, str(chr)))
+                self.cfg.output_directory + "%s_rep_%s_chr%s.npy" % (method, self.cell, str(self.chr)))
         except:
             "initialize"
             nrows = int(stop - start)
-            embed_rows = np.zeros((nrows + 1, cfg.pos_embed_size))
+            embed_rows = np.zeros((nrows + 1, self.cfg.pos_embed_size))
 
             i_old = 0
             j_old = 0
@@ -114,7 +114,7 @@ class Knockout():
                     "assign representations"
                     i_old = i_new
                     if np.all((embed_rows[i_new - start, :] == 0)):
-                        col = list(np.arange(cfg.pos_embed_size))
+                        col = list(np.arange(self.cfg.pos_embed_size))
                         col = [str(x) for x in col]
                         embed_rows[i_new - start, :] = np.array(pred_data.loc[r, col])
 
@@ -126,11 +126,11 @@ class Knockout():
                     "assign representations"
                     j_old = j_new
                     if np.all((embed_rows[j_new - start, :] == 0)):
-                        col = list(np.arange(cfg.pos_embed_size, 2 * cfg.pos_embed_size))
+                        col = list(np.arange(self.cfg.pos_embed_size, 2 * self.cfg.pos_embed_size))
                         col = [str(x) for x in col]
                         embed_rows[j_new - start, :] = np.array(pred_data.loc[r, col])
 
-            np.save(self.cfg.output_directory + "%s_rep_%s_chr%s.npy" % (method, cfg.cell, str(chr)), embed_rows)
+            np.save(self.cfg.output_directory + "%s_rep_%s_chr%s.npy" % (method, self.cell, str(self.chr)), embed_rows)
         return embed_rows, start, stop
 
     def normalize_embed(self, representations, zero_embed):
