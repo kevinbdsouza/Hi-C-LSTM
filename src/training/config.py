@@ -84,6 +84,9 @@ class Config:
         self.dupl_start = 257018
         self.dupl_end = 257232
         self.shift = 215
+        self.dupl_chrs = [7]
+        self.dupl_load_data = False
+        self.dupl_compute_test = False
 
         "ctcf dots"
         self.ctcf_dots_threshold = 41
@@ -131,7 +134,7 @@ class Config:
         self.ctcf_indices_22 = [284706, 284743]
         self.ko_window = 10
         self.ko_increment = 10
-        self.ko_mode = "padding"
+        self.ko_mode = "reverse"
         self.perform_ko = True
         self.load_ko = False
         self.normalize_embed = False
