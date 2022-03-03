@@ -46,8 +46,8 @@ class Knockout():
             self.cfg.output_directory + "%s_%s_predictions_chr%s.csv" % (method, self.cell, str(self.chr)),
             sep="\t")
         pred_data = pred_data.drop(['Unnamed: 0'], axis=1)
-        pred_data = pred_data.filter(['i', 'j', 'v', 'pred'], axis=1)
         representations, start, stop = self.convert_df_to_np(pred_data, method=method)
+        pred_data = pred_data.filter(['i', 'j', 'v', 'pred'], axis=1)
         return representations, start, stop, pred_data
 
     def get_ctcf_indices(self):
