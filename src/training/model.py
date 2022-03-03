@@ -550,8 +550,13 @@ class SeqLSTM(nn.Module):
                         embed_ij[n, 0:cfg.pos_embed_size] = zero_embed[0:cfg.pos_embed_size]
                         embed_ij[n, cfg.pos_embed_size:] = zero_embed[cfg.pos_embed_size:]
                     else:
-                        embed_ij[n, 0:cfg.pos_embed_size] = embed_rows[int(ind[n, 0]) - start]
-                        embed_ij[n, cfg.pos_embed_size:] = embed_rows[int(ind[n, 1]) - start]
+                        try:
+                            embed_ij[n, 0:cfg.pos_embed_size] = embed_rows[int(ind[n, 0]) - start]
+                            embed_ij[n, cfg.pos_embed_size:] = embed_rows[int(ind[n, 1]) - start]
+                        except Exception:
+                            print("row representation doesn't exist")
+                            embed_ij[n, 0:cfg.pos_embed_size] = zero_embed[0:cfg.pos_embed_size]
+                            embed_ij[n, cfg.pos_embed_size:] = zero_embed[cfg.pos_embed_size:]
 
                 embeddings = torch.from_numpy(embed_ij)
                 embeddings = embeddings.view((-1, self.cfg.sequence_length, 2 * cfg.pos_embed_size)).float().to(device)

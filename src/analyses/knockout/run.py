@@ -91,6 +91,7 @@ class Knockout():
             embed_rows = np.zeros((nrows + 1, self.cfg.pos_embed_size))
 
             i_old = 0
+            j_old = 0
             for r in range(len(pred_data)):
                 i_new = int(pred_data.loc[r, "i"])
 
