@@ -448,10 +448,9 @@ if __name__ == '__main__':
         if cfg.perform_ko:
             "perform ko"
             mean_diff = ko_ob.perform_ko(model)
-        elif cfg.normalize_embed:
-            ko_ob.normalize_embed_predict(model)
 
         if cfg.compare_ko:
+            "plot comparison"
             _, _, _, pred_data = ko_ob.get_trained_representations(method="hiclstm")
             ko_pred_df = pd.read_csv(cfg.output_directory + "hiclstm_%s_afko_chr%s.csv" % (cell, str(chr)), sep="\t")
             pred_data = pd.merge(pred_data, ko_pred_df, on=["i", "j"])

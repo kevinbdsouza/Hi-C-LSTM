@@ -78,16 +78,6 @@ class Config:
             else:
                 print("Directory %s exists" % file_path)
 
-        "melo parameters"
-        self.chunk_start = 256803
-        self.chunk_end = 257017
-        self.dupl_start = 257018
-        self.dupl_end = 257232
-        self.shift = 215
-        self.dupl_chrs = [7]
-        self.dupl_load_data = False
-        self.dupl_compute_test = False
-
         "ctcf dots"
         self.ctcf_dots_threshold = 41
 
@@ -137,5 +127,22 @@ class Config:
         self.ko_mode = "normalize"
         self.perform_ko = True
         self.load_ko = False
-        self.normalize_embed = False
         self.compare_ko = True
+
+        "duplication"
+        self.melo_insert = True
+        self.compare_dup = True
+        self.dupl_load_data = False
+        self.dupl_compute_test = True
+        self.chunk_start = 256803
+        self.chunk_end = 257017
+        self.chunk_start_rep = 6794
+        self.chunk_end_rep = 7008
+        self.dupl_start = 257018
+        self.dupl_start_rep = 7009
+        self.dupl_end = 257232
+        self.dupl_end_rep = 7223
+        self.melo_shift = 215
+        self.plt_start = 6700
+        self.plt_end = 7440
+        self.dupl_chrs = [7]

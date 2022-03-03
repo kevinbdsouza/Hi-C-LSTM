@@ -490,7 +490,7 @@ class SeqLSTM(nn.Module):
             chunk_end = self.cfg.chunk_end
             dupl_start = self.cfg.dupl_start
             dupl_end = self.cfg.dupl_end
-            shift = self.cfg.shift
+            shift = self.cfg.melo_shift
 
             for r in range(start, stop + 1):
                 if r < chunk_start:

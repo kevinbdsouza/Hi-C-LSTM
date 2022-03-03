@@ -6,6 +6,7 @@ from training.model import SeqLSTM
 from training.data_utils import get_data_loader_chr
 from analyses.knockout.run import Knockout
 from training.test_model import test_model
+from analyses.plot.plot_utils import get_heatmaps, simple_plot
 
 device = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
 
@@ -25,48 +26,61 @@ class Duplicate():
         self.sizes = np.load(self.sizes_path, allow_pickle=True).item()
         self.ko_ob = Knockout(cfg, chr)
 
-    def duplicate(self, embed_rows):
+    def duplicate(self, representations):
         """
-        test_tal1_lmo2(model, cfg) -> No return object
+        duplicate(representations) -> Array
+        Representations to duplicate in the specified region.
         Args:
-            model (SeqLSTM):
-            cfg (Config):
+            representations (Array): Representations to duplicate.
         """
 
-        plt_start = 6700
-        chunk_start = 6794
-        chunk_end = 7008
-        dupl_start = 7009
-        dupl_end = 7223
-        plt_end = 7440
-
-        shift = 215
-
-        lstrow = len(embed_rows) - 1
+        "positions"
+        lstrow = len(representations) - 1
+        dupl_start = cfg.dupl_start_rep
+        plt_end = cfg.plt_end
+        shift = cfg.melo_shift
         startrow = lstrow - plt_end
         endrow = lstrow - dupl_start
 
+        "shift representations"
         for n in range(startrow, endrow + 1):
-            embed_rows[lstrow - n, :] = embed_rows[lstrow - n - shift, :]
+            representations[lstrow - n, :] = representations[lstrow - n - shift, :]
 
-        return embed_rows
+        return representations
 
-    def melo_insert(self, model, pred_data):
+    def melo_insert(self, model):
         """
-        test_tal1_lmo2(model, cfg) -> No return object
+        melo_insert(model, pred_data) -> No return object
+        Perform melo insertion. Saves resulting predictions.
         Args:
-            model (SeqLSTM):
-            cfg (Config):
+            model (SeqLSTM): Model to be used for duplication.
+            pred_data (DataFrame): Frame containing predictions.
         """
 
-        data_loader, samples = get_data_loader_chr(self.cfg, self.chr)
-        embed_rows, start, stop = self.ko_ob.convert_df_to_np(pred_data)
-        embed_rows = self.duplicate(embed_rows)
-        # embed_rows = self.reverse_embeddings(embed_rows)
+        "load data for chromosome"
+        data_loader = get_data_loader_chr(cfg, chr, shuffle=False)
 
-        _, melo_pred_df = model.perform_ko(data_loader, embed_rows, start, mode="dup")
-        melo_pred_df.to_csv(
-            cfg.output_directory + "shuffle_%s_meloafkofusion_chr%s.csv" % (self.cfg.cell, str(self.chr)), sep="\t")
+        "get representations"
+        representations, start, stop, pred_data = self.ko_ob.get_trained_representations(method="hiclstm")
+
+        "get zero embed"
+        self.cfg.full_test = False
+        self.cfg.compute_pca = False
+        self.cfg.get_zero_pred = True
+        zero_embed = test_model(model, self.cfg, chr)
+
+        "duplicate"
+        representations = self.duplicate(representations)
+
+        "load duplicated"
+        if self.cfg.dupl_load_data:
+            melo_pred_df = pd.read_csv(cfg.output_directory + "hiclstm_%s_meloafko_chr%s.csv" % (cell, str(chr)),
+                                       sep="\t")
+        else:
+            "perform duplication"
+            _, melo_pred_df = model.perform_ko(data_loader, representations, start, zero_embed, mode="ko")
+            melo_pred_df.to_csv(
+                cfg.output_directory + "hiclstm_%s_meloafko_chr%s.csv" % (cell, str(chr)), sep="\t")
 
         return melo_pred_df
 
@@ -80,6 +94,7 @@ if __name__ == '__main__':
     model = SeqLSTM(cfg, device).to(device)
     model.load_weights()
 
+    melo_pred_df = None
     for chr in cfg.dupl_chrs:
         print('Duplication Start Chromosome: {}'.format(chr))
 
@@ -89,8 +104,20 @@ if __name__ == '__main__':
             "run test if predictions not computed yet"
             test_model(model, cfg, chr)
 
-        pred_data = pd.read_csv(cfg.output_directory + "shuffle_%s_predictions_chr%s.csv" % (cell, str(chr)),
-                                sep="\t")
+        if cfg.melo_insert:
+            "melo insertion"
+            melo_pred_df = dup_ob.melo_insert(model)
 
-        "melo insertion"
-        melo_pred_df = dup_ob.melo_insert(model, pred_data)
+        if cfg.compare_dup:
+            "plot comparison"
+            _, _, _, pred_data = dup_ob.ko_ob.get_trained_representations(method="hiclstm")
+
+            if melo_pred_df is None:
+                melo_pred_df = pd.read_csv(cfg.output_directory + "hiclstm_%s_meloafko_chr%s.csv" % (cell, str(chr)),
+                                           sep="\t")
+            pred_data = pd.merge(pred_data, melo_pred_df, on=["i", "j"])
+            pred_data = pred_data.rename(columns={"ko_pred": "v"})
+
+            hic_mat, st = get_heatmaps(pred_data, no_pred=False)
+            simple_plot(hic_mat)
+            print("done")
