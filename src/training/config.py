@@ -14,7 +14,7 @@ class Config:
         self.genome_len = 288091
         self.resolution = 10000
         self.cell = "GM12878"
-        self.chr_train_list = list(range(22, 23))
+        self.chr_train_list = list(range(20, 23))
         self.chr_test_list = list(range(22, 23))
 
         "Model Paramters"
@@ -67,6 +67,7 @@ class Config:
         self.output_directory = self.downstream_dir + "/predictions/"
         self.plot_dir = self.output_directory + 'data_plots/'
         self.processed_data_dir = self.output_directory + 'processed_data/' + self.cell + "/"
+        self.new_data_dir = self.output_directory + 'new_data/' + self.cell + "/"
 
         "create directories if they don't exist"
         for file_path in [self.model_dir, self.output_directory, self.plot_dir, self.processed_data_dir]:
@@ -130,8 +131,8 @@ class Config:
         self.ctcf_indices_22 = [284706, 284743]
         self.ko_window = 10
         self.ko_increment = 10
-        self.ko_mode = "padding"
+        self.ko_mode = "average"
         self.perform_ko = True
-        self.load_ko = True
+        self.load_ko = False
         self.normalize_embed = False
         self.compare_ko = True
