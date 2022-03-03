@@ -244,7 +244,7 @@ class SeqLSTM(nn.Module):
             pred_df["v"] = val
             pred_df["pred"] = pred
             for n in range(cfg.pos_embed_size):
-                pred_df[n] = embed[:cfg.pos_embed_size, n]
+                pred_df[n] = embed[:, n]
 
         return pred_df, error_list, zero_embed
 
