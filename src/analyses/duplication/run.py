@@ -78,9 +78,9 @@ class Duplicate():
                                        sep="\t")
         else:
             "perform duplication"
-            _, melo_pred_df = model.perform_ko(data_loader, representations, start, zero_embed, mode="ko")
+            _, melo_pred_df = model.perform_ko(data_loader, representations, start, zero_embed, mode="dup")
             melo_pred_df.to_csv(
-                cfg.output_directory + "hiclstm_%s_meloafko_chr%s.csv" % (cell, str(chr)), sep="\t")
+                cfg.output_directory + "hiclstm_%s_meloafkofusion_chr%s.csv" % (cell, str(chr)), sep="\t")
 
         return melo_pred_df
 
@@ -116,7 +116,7 @@ if __name__ == '__main__':
             _, _, _, pred_data = dup_ob.ko_ob.get_trained_representations(method="hiclstm")
 
             if melo_pred_df is None:
-                melo_pred_df = pd.read_csv(cfg.output_directory + "hiclstm_%s_meloafko_chr%s.csv" % (cell, str(chr)),
+                melo_pred_df = pd.read_csv(cfg.output_directory + "hiclstm_%s_meloafkofusion_chr%s.csv" % (cell, str(chr)),
                                            sep="\t")
             pred_data = pd.merge(pred_data, melo_pred_df, on=["i", "j"])
             pred_data = pred_data.rename(columns={"ko_pred": "v"})

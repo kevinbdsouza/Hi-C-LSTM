@@ -130,7 +130,7 @@ class Config:
         self.compare_ko = True
 
         "duplication"
-        self.melo_insert = False
+        self.melo_insert = True
         self.compare_dup = True
         self.dupl_load_data = False
         self.dupl_compute_test = False
