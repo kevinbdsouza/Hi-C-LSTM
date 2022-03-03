@@ -151,7 +151,7 @@ class Knockout():
 
         "normalize padding"
         norm = np.linalg.norm(zero_embed)
-        zero_embed = representations/norm
+        zero_embed = representations / norm
         return representations, zero_embed
 
     def ko_representations(self, representations, start, indices, zero_embed, mode="average"):
@@ -163,7 +163,7 @@ class Knockout():
             start (ind): start indice in chromosome.
             indices (list): indices to knockout
             zero_embed (Array): Padding representation
-            mode (string): one of average, zero, padding, shift, or reverse
+            mode (string): one of average, zero, padding, shift, normalize, or reverse
         """
 
         window = self.cfg.ko_window
@@ -192,6 +192,8 @@ class Knockout():
         if mode == "reverse":
             representations = np.fliplr(representations)
             zero_embed = np.flip(zero_embed)
+        elif mode == "normalize":
+            representations, zero_embed = self.normalize_embed(representations, zero_embed)
 
         return representations, zero_embed
 
@@ -274,7 +276,8 @@ class Knockout():
         zero_embed = test_model(model, self.cfg, chr)
 
         "alter representations"
-        representations, zero_embed = self.ko_representations(representations, start, indices, zero_embed, mode=cfg.ko_mode)
+        representations, zero_embed = self.ko_representations(representations, start, indices, zero_embed,
+                                                              mode=cfg.ko_mode)
 
         if self.cfg.load_ko:
             ko_pred_df = pd.read_csv(cfg.output_directory + "hiclstm_%s_afko_chr%s.csv" % (cell, str(chr)), sep="\t")
@@ -287,34 +290,6 @@ class Knockout():
         "compute difference between WT and KO predictions"
         mean_diff = self.compute_kodiff(pred_data, ko_pred_df, indices)
         return mean_diff
-
-    def normalize_embed_predict(self, model):
-        """
-        normalize_embed_predict(model) -> No return object
-        Loads data for chromosome. Loads representations. normalizes representations.
-        Gets padding representation. Runs through decoder. Saves predictions.
-        Args:
-            model (SeqLSTM): model to use after normalization.
-        """
-
-        "load data"
-        data_loader = get_data_loader_chr(self.cfg, self.chr, shuffle=False)
-
-        "get representations"
-        representations, start, stop, pred_data = self.get_trained_representations(method="hiclstm")
-
-        "get zero embed"
-        self.cfg.full_test = False
-        self.cfg.compute_pca = False
-        self.cfg.get_zero_pred = True
-        zero_embed = test_model(model, self.cfg, chr)
-
-        "alter representations"
-        representations, zero_embed = self.normalize_embed(representations, zero_embed)
-
-        "run through model using altered representations, save ko predictions"
-        _, ko_pred_df = model.perform_ko(data_loader, representations, start, zero_embed, mode="ko")
-        ko_pred_df.to_csv(cfg.output_directory + "hiclstm_%s_norm_chr%s.csv" % (self.cfg.cell, str(self.chr)), sep="\t")
 
     def change_index(self, list_split):
         """
