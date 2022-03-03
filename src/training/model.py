@@ -243,8 +243,8 @@ class SeqLSTM(nn.Module):
             pred_df["j"] = ind[:, 1]
             pred_df["v"] = val
             pred_df["pred"] = pred
-            for n in range(2 * cfg.pos_embed_size):
-                pred_df[n] = embed[:, n]
+            for n in range(cfg.pos_embed_size):
+                pred_df[n] = embed[:cfg.pos_embed_size, n]
 
         return pred_df, error_list, zero_embed
 
@@ -265,7 +265,7 @@ class SeqLSTM(nn.Module):
         predictions = torch.empty(0, seq).to(device)
         test_error = torch.empty(0).to(device)
         target_values = torch.empty(0, seq).to(device)
-        df_columns = ["i", "j", "v", "pred"] + list(np.arange(2 * cfg.pos_embed_size))
+        df_columns = ["i", "j", "v", "pred"] + list(np.arange(cfg.pos_embed_size))
         main_pred_df = pd.DataFrame(columns=df_columns)
 
         with torch.no_grad():
