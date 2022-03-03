@@ -133,7 +133,7 @@ class Config:
         self.melo_insert = True
         self.compare_dup = True
         self.dupl_load_data = False
-        self.dupl_compute_test = False
+        self.dupl_compute_test = True
         self.chunk_start = 256803
         self.chunk_end = 257017
         self.chunk_start_rep = 6794
