@@ -151,7 +151,7 @@ class Knockout():
 
         "normalize padding"
         norm = np.linalg.norm(zero_embed)
-        zero_embed = representations / norm
+        zero_embed = zero_embed / norm
         return representations, zero_embed
 
     def ko_representations(self, representations, start, indices, zero_embed, mode="average"):
