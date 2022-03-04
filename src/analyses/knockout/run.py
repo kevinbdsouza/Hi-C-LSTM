@@ -368,8 +368,12 @@ class Knockout():
                 lmo2_df = lmo2_df.append({"i": i, "j": j, "v": lmo2_mat.loc[i][j]}, ignore_index=True)
 
         "save data"
-        tal_df.to_csv(cfg.hic_path + cfg.cell + "/tal_df.txt", sep="\t")
-        lmo2_df.to_csv(cfg.hic_path + cfg.cell + "/lmo2_df.txt", sep="\t")
+        if self.cfg.tal_mode == "wt":
+            tal_df.to_csv(cfg.hic_path + cfg.cell + "/tal_df.txt", sep="\t")
+            lmo2_df.to_csv(cfg.hic_path + cfg.cell + "/lmo2_df.txt", sep="\t")
+        else:
+            tal_df.to_csv(cfg.output_directory + "tal1_ko.txt", sep="\t")
+            lmo2_df.to_csv(cfg.output_directory + "lmo2_ko.txt", sep="\t")
 
     def prepare_tal1_lmo2(self):
         """
@@ -466,12 +470,19 @@ class Knockout():
                 pred_df = pd.read_csv(cfg.output_directory + "%s_predictions.csv" % (cfg.cell), sep="\t")
 
             tal1_data = pred_df.loc[pred_df["i"] < 7000]
-            tal1_mat, st = get_heatmaps(tal1_data, no_pred=False)
-            simple_plot(tal1_mat)
-
+            tal1_mat, _ = get_heatmaps(tal1_data, no_pred=False)
             lmo2_data = pred_df.loc[pred_df["i"] > 7000]
-            lmo2_mat, st = get_heatmaps(lmo2_data, no_pred=False)
-            simple_plot(lmo2_mat)
+            lmo2_mat, _ = get_heatmaps(lmo2_data, no_pred=False)
+
+            if cfg.tal_plot:
+                simple_plot(tal1_mat)
+                simple_plot(lmo2_mat)
+
+        if cfg.check_ko:
+            self.cfg.tal_mode = "tal1_ko"
+            self.convert_to_hic_format()
+            tal1_ko = pd.read_csv(cfg.output_directory + "tal1_ko.txt", sep="\t")
+            lmo2_ko = pd.read_csv(cfg.output_directory + "lmo2_ko.txt", sep="\t")
             print("done")
 
 

@@ -131,9 +131,11 @@ class Config:
         self.run_tal = True
         self.tal_pre = False
         self.tal_train = False
-        self.tal_test = True
-        self.tal_mode = "wt"
+        self.tal_test = False
+        self.tal_mode = "tal1_ko"
         self.compare_tal = True
+        self.check_ko = True
+        self.tal_plot = False
         self.lmo2_chr = 11
 
         "duplication"
