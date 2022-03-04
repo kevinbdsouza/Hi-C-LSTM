@@ -459,17 +459,59 @@ class SeqLSTM(nn.Module):
         inv_exp_val = np.nan_to_num(1 / coeffs) - delta
         return inv_exp_val
 
-    def ko_post(self, ind, val, pred, pred_df, mode):
+    def ko_fusion(self, main_pred_df):
         """
-        ko_post(ind, val, pred, pred_df, mode) -> DataFrame
+        ko_fusion(main_pred_df) -> DataFrame
+        postprocess duplication with fusion to account for confusion in the reads when doing duplication.
+        Args:
+            main_pred_df (DataFrame): Dataframe to postprocess fusion
+        """
+
+        "intialize"
+        start = int(main_pred_df['i'].min())
+        stop = int(main_pred_df['i'].max())
+        chunk_start = self.cfg.chunk_start
+        chunk_end = self.cfg.chunk_end
+        dupl_start = self.cfg.dupl_start
+        dupl_end = self.cfg.dupl_end
+        shift = self.cfg.melo_shift
+
+        for r in range(start, stop + 1):
+            if r < chunk_start:
+                continue
+            elif r >= chunk_start and r <= chunk_end:
+                og_pred = main_pred_df.loc[main_pred_df['i'] == r]["ko_pred"]
+                dupl_pred = main_pred_df.loc[main_pred_df['i'] == r + shift]["ko_pred"]
+
+                if len(dupl_pred) == 0:
+                    continue
+
+                "compute inverse exponentials"
+                og_inv = self.inverse_exp(og_pred)
+                dupl_inv = self.inverse_exp(dupl_pred)
+
+                "squish after adding again"
+                exp_pred = self.contactProb(og_inv + dupl_inv)
+                main_pred_df.loc[main_pred_df['i'] == r, 'ko_pred'] = exp_pred
+
+            elif r >= dupl_start and r <= dupl_end:
+                main_pred_df.loc[main_pred_df['i'] == r, 'ko_pred'] = main_pred_df.loc[main_pred_df['i'] == r + shift][
+                    "ko_pred"]
+
+            elif r > dupl_end:
+                break
+
+        return main_pred_df
+
+    def ko_simple_post(self, ind, val, pred, pred_df):
+        """
+        ko_simple_post(ind, val, pred, pred_df, mode) -> DataFrame
         Removes padded indices and accounts for confusion during duplication.
         Args:
             ind (Array): Concatenated indices
             val (Array): The Hi-C observed values
             pred (Array): The Hi-C predicted values
             pred_df (DataFrame): Dataframe to add knockout values with indices
-            mode (string): Can specify whether running duplication with fusion or not. If not running
-                            duplication with fusion, performs simple post processing
         """
 
         "remove padded indices"
@@ -481,41 +523,6 @@ class SeqLSTM(nn.Module):
         pred_df["j"] = ind[:, 1]
         pred_df["v"] = val
         pred_df["ko_pred"] = pred
-
-        "account for confusion in the reads when doing duplication"
-        if mode == "fusion":
-            start = int(pred_df['i'].min())
-            stop = int(pred_df['i'].max())
-            chunk_start = self.cfg.chunk_start
-            chunk_end = self.cfg.chunk_end
-            dupl_start = self.cfg.dupl_start
-            dupl_end = self.cfg.dupl_end
-            shift = self.cfg.melo_shift
-
-            for r in range(start, stop + 1):
-                if r < chunk_start:
-                    continue
-                elif r >= chunk_start and r <= chunk_end:
-                    og_pred = pred_df.loc[pred_df['i'] == r]["ko_pred"]
-                    dupl_pred = pred_df.loc[pred_df['i'] == r + shift]["ko_pred"]
-
-                    if len(dupl_pred) == 0:
-                        continue
-
-                    "compute inverse exponentials"
-                    og_inv = self.inverse_exp(og_pred)
-                    dupl_inv = self.inverse_exp(dupl_pred)
-
-                    "squish after adding again"
-                    exp_pred = self.contactProb(og_inv + dupl_inv)
-                    pred_df.loc[pred_df['i'] == r, 'ko_pred'] = exp_pred
-
-                elif r >= dupl_start and r <= dupl_end:
-                    pred_df.loc[pred_df['i'] == r, 'ko_pred'] = pred_df.loc[pred_df['i'] == r + shift]["ko_pred"]
-
-                elif r > dupl_end:
-                    break
-
         return pred_df
 
     def perform_ko(self, data_loader, embed_rows, start, zero_embed, mode):
@@ -527,8 +534,8 @@ class SeqLSTM(nn.Module):
             embed_rows (Array): embeddings
             start (int):  shift value
             zero_embed (Array): representation for padding
-            mode (string): Can specify whether running duplication or not. If not running
-                            duplication, performs simple post processing
+            mode (string): Can specify whether running fusion or not. If not running
+                            fusion, performs simple post processing
         """
         device = self.device
         cfg = self.cfg
@@ -567,10 +574,12 @@ class SeqLSTM(nn.Module):
 
                 "run postprocessing"
                 pred = lstm_output.cpu().detach().numpy().reshape(-1, 1)
-                pred_df = self.ko_post(ind, val, pred, pred_df, mode=mode)
+                pred_df = self.ko_simple_post(ind, val, pred, pred_df)
 
                 main_pred_df = pd.concat([main_pred_df, pred_df], axis=0)
 
+        if mode == "fusion":
+            main_pred_df = self.ko_fusion(main_pred_df)
         ko_predictions = torch.reshape(ko_predictions, (-1, 1)).cpu().detach().numpy()
 
         return ko_predictions, main_pred_df
