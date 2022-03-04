@@ -29,7 +29,7 @@ class Config:
         self.method = "hiclstm"
 
         "Hyperparameters"
-        self.learning_rate = 0.01
+        self.learning_rate = 0.001
         self.num_epochs = 40
         self.batch_size = 210
         self.max_norm = 10
@@ -130,10 +130,10 @@ class Config:
         self.compare_ko = False
         self.run_tal = True
         self.tal_pre = False
-        self.tal_train = False
-        self.tal_test = True
+        self.tal_train = True
+        self.tal_test = False
         self.tal_mode = "wt"
-        self.compare_tal = True
+        self.compare_tal = False
         self.lmo2_chr = 11
 
         "duplication"
