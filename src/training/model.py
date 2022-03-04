@@ -468,8 +468,8 @@ class SeqLSTM(nn.Module):
             val (Array): The Hi-C observed values
             pred (Array): The Hi-C predicted values
             pred_df (DataFrame): Dataframe to add knockout values with indices
-            mode (string): Can specify whether running duplication or not. If not running
-                            duplication, performs simple post processing
+            mode (string): Can specify whether running duplication with fusion or not. If not running
+                            duplication with fusion, performs simple post processing
         """
 
         "remove padded indices"
@@ -483,7 +483,7 @@ class SeqLSTM(nn.Module):
         pred_df["ko_pred"] = pred
 
         "account for confusion in the reads when doing duplication"
-        if mode == "dup":
+        if mode == "fusion":
             start = int(pred_df['i'].min())
             stop = int(pred_df['i'].max())
             chunk_start = self.cfg.chunk_start

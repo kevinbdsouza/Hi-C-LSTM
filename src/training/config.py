@@ -146,3 +146,4 @@ class Config:
         self.plt_start = 6700
         self.plt_end = 7440
         self.dupl_chrs = [17]
+        self.dupl_mode = "fusion"
