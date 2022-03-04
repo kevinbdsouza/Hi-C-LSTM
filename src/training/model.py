@@ -491,7 +491,15 @@ class SeqLSTM(nn.Module):
                 dupl_inv = self.inverse_exp(dupl_pred)
 
                 "squish after adding again"
-                exp_pred = self.contactProb(og_inv + dupl_inv)
+                og_len = len(og_inv)
+                dupl_len = len(dupl_inv)
+                if og_len < dupl_len:
+                    exp_pred = self.contactProb(og_inv + dupl_inv[:og_len])
+                else:
+                    dupl_inv_extended = np.zeros((og_len,))
+                    dupl_inv_extended[:dupl_len] = dupl_inv
+                    exp_pred = self.contactProb(og_inv + dupl_inv_extended)
+
                 main_pred_df.loc[main_pred_df['i'] == r, 'ko_pred'] = exp_pred
 
             elif r >= dupl_start and r <= dupl_end:
