@@ -128,6 +128,7 @@ class Config:
         self.perform_ko = False
         self.load_ko = False
         self.compare_ko = False
+        self.run_tal = True
         self.tal_pre = False
         self.tal_train = True
         self.tal_test = False

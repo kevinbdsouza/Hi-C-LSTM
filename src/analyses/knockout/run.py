@@ -319,7 +319,8 @@ class Knockout():
 
     def convert_to_hic_format(self):
         """
-        convert_to_hic_format() -> DataFrame, DataFrame
+        convert_to_hic_format() -> No return object.
+        Assigns positions and chr. Convert 5C to Hi-C like format.
         Args:
             NA.
         """
@@ -369,7 +370,6 @@ class Knockout():
         "save data"
         tal_df.to_csv(cfg.hic_path + cfg.cell + "/tal_df.txt", sep="\t")
         lmo2_df.to_csv(cfg.hic_path + cfg.cell + "/lmo2_df.txt", sep="\t")
-        return tal_df, lmo2_df
 
     def prepare_tal1_lmo2(self):
         """
@@ -447,10 +447,27 @@ class Knockout():
         pred_df.to_csv(cfg.output_directory + "%s_predictions.csv" % (cfg.cell), sep="\t")
         return pred_df
 
+    def run_tal_experiment(self):
+        pred_df = None
+        if cfg.tal_pre:
+            "prepare tal1 and lmo2 data"
+            tal_data, lmo2_data = ko_ob.convert_to_hic_format()
+
+        if cfg.tal_train:
+            "train 5C data"
+            ko_ob.train_tal1_lmo2(model)
+
+        if cfg.tal_test:
+            "test tal1 and lmo2 regions"
+            pred_df = ko_ob.test_tal1_lmo2(model)
+
+        if cfg.compare_tal:
+            if pred_df is not None:
+                pred_df = pd.read_csv(cfg.output_directory + "%s_predictions.csv" % (cfg.cell), sep="\t")
+
 
 if __name__ == '__main__':
     cfg = Config()
-    cfg.cell = "HEK239T"
 
     "load model"
     model = SeqLSTM(cfg, device).to(device)
@@ -483,20 +500,8 @@ if __name__ == '__main__':
             simple_plot(hic_mat)
 
     "TAL1 and LMO2"
-    ko_ob = Knockout(cfg, cfg.lmo2_chr)
-    pred_df = None
-    if cfg.tal_pre:
-        "prepare tal1 and lmo2 data"
-        tal_data, lmo2_data = ko_ob.convert_to_hic_format()
-
-    if cfg.tal_train:
-        "train 5C data"
-        ko_ob.train_tal1_lmo2(model)
-
-    if cfg.tal_test:
-        "test tal1 and lmo2 regions"
-        pred_df = ko_ob.test_tal1_lmo2(model)
-
-    if cfg.compare_tal:
-        if pred_df is not None:
-            pred_df = pd.read_csv(cfg.output_directory + "%s_predictions.csv" % (cfg.cell), sep="\t")
+    if cfg.run_tal:
+        cfg.cell = "HEK239T"
+        cfg.model_name = "shuffle_" + cfg.cell
+        ko_ob = Knockout(cfg, cfg.lmo2_chr)
+        ko_ob.run_tal_experiment()
