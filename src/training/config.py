@@ -29,7 +29,7 @@ class Config:
         self.method = "hiclstm"
 
         "Hyperparameters"
-        self.learning_rate = 0.0001
+        self.learning_rate = 0.00001
         self.num_epochs = 40
         self.batch_size = 210
         self.max_norm = 10
