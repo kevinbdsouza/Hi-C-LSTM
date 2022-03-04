@@ -290,7 +290,7 @@ class Knockout():
 
         "compute difference between WT and KO predictions"
         mean_diff = self.compute_kodiff(pred_data, ko_pred_df, indices)
-        return mean_diff
+        return mean_diff, ko_pred_df
 
     def change_index(self, list_split):
         """
@@ -509,6 +509,7 @@ if __name__ == '__main__':
     if cfg.ko_experiment == "foxg1":
         cfg.chr_test_list = cfg.foxg1_chr
 
+    ko_pred_df = None
     for chr in cfg.chr_test_list:
         print('Knockout Start Chromosome: {}'.format(chr))
         ko_ob = Knockout(cfg, chr)
@@ -519,13 +520,14 @@ if __name__ == '__main__':
 
         if cfg.perform_ko:
             "perform ko"
-            mean_diff = ko_ob.perform_ko(model)
+            mean_diff, ko_pred_df = ko_ob.perform_ko(model)
 
         if cfg.compare_ko:
             "plot comparison"
             _, _, _, pred_data = ko_ob.get_trained_representations(method="hiclstm")
-            ko_pred_df = pd.read_csv(cfg.output_directory + "hiclstm_%s_afko_chr%s.csv" % (cfg.cell, str(chr)),
-                                     sep="\t")
+            if ko_pred_df is None:
+                ko_pred_df = pd.read_csv(cfg.output_directory + "hiclstm_%s_afko_chr%s.csv" % (cfg.cell, str(chr)),
+                                         sep="\t")
             pred_data = pd.merge(pred_data, ko_pred_df, on=["i", "j"])
             pred_data = pred_data.rename(columns={"ko_pred": "v"})
 
