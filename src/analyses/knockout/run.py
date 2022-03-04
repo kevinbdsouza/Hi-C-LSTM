@@ -466,7 +466,7 @@ class Knockout():
             pred_df = ko_ob.test_tal1_lmo2(model)
 
         if cfg.compare_tal:
-            if pred_df is not None:
+            if pred_df is None:
                 pred_df = pd.read_csv(cfg.output_directory + "%s_predictions.csv" % (cfg.cell), sep="\t")
 
             tal1_data = pred_df.loc[pred_df["i"] < 7000]
