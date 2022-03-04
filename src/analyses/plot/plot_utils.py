@@ -78,7 +78,7 @@ def simple_plot(hic_win):
     ax.set_yticks([])
     ax.set_xticks([])
     plt.savefig("/home/kevindsouza/Downloads/ctcf_ko.png")
-    #plt.show()
+    # plt.show()
 
     '''
     sns.set_theme()
@@ -90,6 +90,20 @@ def simple_plot(hic_win):
     '''
 
     pass
+
+
+def plot_diff(hic_win):
+    hic_up = np.triu(hic_win)
+    hic_lo = np.tril(hic_win).T
+    hic_diff = hic_up - hic_lo
+
+    plt.figure()
+    sns.set_theme()
+    rdgn = sns.diverging_palette(h_neg=220, h_pos=14, s=79, l=55, sep=3, as_cmap=True)
+    sns.heatmap(hic_diff, cmap=rdgn, center=0.00, cbar=True)
+    plt.yticks([])
+    plt.xticks([])
+    plt.savefig("/home/kevindsouza/Downloads/ctcf_ko.png")
 
 
 def plot_frame_error(error_list):

@@ -1147,7 +1147,7 @@ if __name__ == "__main__":
     cfg = config.Config()
     plot_ob = PlotFns(cfg)
 
-    # plot_ob.plot_combined(cell = "HFFhTERT")
+    plot_ob.plot_combined(cell="GM12878")
     # plot_ob.plot_combined_all(cell="GM12878")
     # plot_ob.plot_mAP_celltypes()
     # plot_ob.plot_mAP_resolutions()
@@ -1166,7 +1166,7 @@ if __name__ == "__main__":
 
     # plot_ob.plot_knockout_results()
     # plot_ob.plot_knockout_tfs()
-    plot_ob.pr_curves()
+    # plot_ob.pr_curves()
 
     # plot_ob.plot_feature_signal()
     # plot_ob.plot_pred_range()

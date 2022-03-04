@@ -281,7 +281,8 @@ class Knockout():
                                                               mode=cfg.ko_mode)
 
         if self.cfg.load_ko:
-            ko_pred_df = pd.read_csv(cfg.output_directory + "hiclstm_%s_afko_chr%s.csv" % (cfg.cell, str(chr)), sep="\t")
+            ko_pred_df = pd.read_csv(cfg.output_directory + "hiclstm_%s_afko_chr%s.csv" % (cfg.cell, str(chr)),
+                                     sep="\t")
         else:
             "run through model using altered representations, save ko predictions"
             _, ko_pred_df = model.perform_ko(data_loader, representations, start, zero_embed, mode="ko")
@@ -533,7 +534,6 @@ if __name__ == '__main__':
 
             hic_mat, st = get_heatmaps(pred_data, no_pred=False)
             simple_plot(hic_mat)
-            print("stop")
 
     "TAL1 and LMO2"
     if cfg.run_tal:
