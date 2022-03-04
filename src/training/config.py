@@ -133,6 +133,7 @@ class Config:
         self.tal_test = False
         self.tal_mode = "wt"
         self.compare_tal = False
+        self.lmo2_chr = 11
 
         "duplication"
         self.melo_insert = True

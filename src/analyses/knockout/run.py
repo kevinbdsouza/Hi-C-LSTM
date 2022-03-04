@@ -482,19 +482,21 @@ if __name__ == '__main__':
             hic_mat, st = get_heatmaps(pred_data, no_pred=False)
             simple_plot(hic_mat)
 
-        pred_df = None
-        if cfg.tal_pre:
-            "prepare tal1 and lmo2 data"
-            tal_data, lmo2_data = ko_ob.convert_to_hic_format()
+    "TAL1 and LMO2"
+    ko_ob = Knockout(cfg, cfg.lmo2_chr)
+    pred_df = None
+    if cfg.tal_pre:
+        "prepare tal1 and lmo2 data"
+        tal_data, lmo2_data = ko_ob.convert_to_hic_format()
 
-        if cfg.tal_train:
-            "train 5C data"
-            ko_ob.train_tal1_lmo2(model)
+    if cfg.tal_train:
+        "train 5C data"
+        ko_ob.train_tal1_lmo2(model)
 
-        if cfg.tal_test:
-            "test tal1 and lmo2 regions"
-            pred_df = ko_ob.test_tal1_lmo2(model)
+    if cfg.tal_test:
+        "test tal1 and lmo2 regions"
+        pred_df = ko_ob.test_tal1_lmo2(model)
 
-        if cfg.compare_tal:
-            if pred_df is not None:
-                pred_df = pd.read_csv(cfg.output_directory + "%s_predictions.csv" % (cfg.cell), sep="\t")
+    if cfg.compare_tal:
+        if pred_df is not None:
+            pred_df = pd.read_csv(cfg.output_directory + "%s_predictions.csv" % (cfg.cell), sep="\t")
