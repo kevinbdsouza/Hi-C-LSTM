@@ -334,7 +334,7 @@ def barplot_tal_lm():
 
 
 if __name__ == '__main__':
-    plot_chr = list(range(14, 15))
+    plot_chr = list(range(22, 23))
     cfg = config.Config()
     cell = cfg.cell
     comb_r2_df = pd.DataFrame(columns=["diff", "r2"])
@@ -347,8 +347,10 @@ if __name__ == '__main__':
         plot_r2(comb_r2_df)
         '''
 
-        # pred_data = pd.read_csv(cfg.output_directory + "shuffle_%s_predictions_chr%s.csv" % (cell, str(chr)), sep="\t")
-        # plot_foxg1(pred_data)
+        pred_data = pd.read_csv(cfg.output_directory + "hiclstm_%s_predictions_chr%s.csv" % (cell, str(chr)), sep="\t")
+        hic_mat, st = get_heatmaps(pred_data, no_pred=False)
+        simple_plot(hic_mat)
+
         '''
         foxg1_data = pd.read_csv(cfg.output_directory + "shuffle_%s_afko_chr%s.csv" % (cell, str(chr)), sep="\t")
         plot_foxg1(foxg1_data)
@@ -360,7 +362,7 @@ if __name__ == '__main__':
         # tal1_diff = np.load(cfg.output_directory + "tal1_diff.npy")
         # simple_plot(tal1_diff)
         # scatter_tal_lm(tal1_diff)
-        barplot_tal_lm()
+        # barplot_tal_lm()
 
         # pred_data = pd.read_csv(cfg.output_directory + "%s_predictions_chr.csv" % (cell), sep="\t")
         # plot_tal1_lmo2(pred_data)
