@@ -334,7 +334,7 @@ def barplot_tal_lm():
 
 
 if __name__ == '__main__':
-    plot_chr = list(range(22, 23))
+    plot_chr = list(range(21, 22))
     cfg = config.Config()
     cell = cfg.cell
     comb_r2_df = pd.DataFrame(columns=["diff", "r2"])
