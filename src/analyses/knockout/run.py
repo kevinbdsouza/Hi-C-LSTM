@@ -484,7 +484,7 @@ class Knockout():
         if cfg.check_ko:
             "compare ko and observed 5C"
             if cfg.tal_pre_ko:
-                self.cfg.tal_mode = "tal1_ko"
+                self.cfg.tal_mode = "lmo2_ko"
                 self.convert_to_hic_format()
             tal1_ko = pd.read_csv(cfg.output_directory + "tal1_ko.txt", sep="\t")
             lmo2_ko = pd.read_csv(cfg.output_directory + "lmo2_ko.txt", sep="\t")
