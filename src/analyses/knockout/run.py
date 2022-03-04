@@ -465,8 +465,13 @@ class Knockout():
             if pred_df is not None:
                 pred_df = pd.read_csv(cfg.output_directory + "%s_predictions.csv" % (cfg.cell), sep="\t")
 
-            hic_mat, st = get_heatmaps(pred_data, no_pred=False)
-            simple_plot(hic_mat)
+            tal1_data = pred_df.loc[pred_df["i"] < 7000]
+            tal1_mat, st = get_heatmaps(tal1_data, no_pred=False)
+            simple_plot(tal1_mat)
+
+            lmo2_data = pred_df.loc[pred_df["i"] > 7000]
+            lmo2_mat, st = get_heatmaps(lmo2_data, no_pred=False)
+            simple_plot(lmo2_mat)
 
 
 if __name__ == '__main__':
