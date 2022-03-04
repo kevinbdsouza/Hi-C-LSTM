@@ -503,8 +503,17 @@ class SeqLSTM(nn.Module):
                 main_pred_df.loc[main_pred_df['i'] == r, 'ko_pred'] = exp_pred
 
             elif r >= dupl_start and r <= dupl_end:
-                main_pred_df.loc[main_pred_df['i'] == r, 'ko_pred'] = main_pred_df.loc[main_pred_df['i'] == r + shift][
-                    "ko_pred"]
+                dupl = np.array(main_pred_df.loc[main_pred_df['i'] == r, 'ko_pred'])
+                shifted = np.array(main_pred_df.loc[main_pred_df['i'] == r + shift, "ko_pred"])
+
+                dupl_len = len(dupl)
+                shifted_len = len(shifted)
+                if dupl_len < shifted_len:
+                    main_pred_df.loc[main_pred_df['i'] == r, 'ko_pred'] = shifted[:dupl_len]
+                else:
+                    shifted_extended = np.zeros((dupl_len,))
+                    shifted_extended[:shifted_len] = shifted
+                    main_pred_df.loc[main_pred_df['i'] == r, 'ko_pred'] = shifted_extended
 
             elif r > dupl_end:
                 break
