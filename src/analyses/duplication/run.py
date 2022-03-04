@@ -50,11 +50,10 @@ class Duplicate():
 
     def melo_insert(self, model):
         """
-        melo_insert(model, pred_data) -> No return object
-        Perform melo insertion. Saves resulting predictions.
+        melo_insert(modelx`) -> No return object
+        Perform melo insertion. Saves resulting predictions. Specify fusion if duplicating with fusion.
         Args:
             model (SeqLSTM): Model to be used for duplication.
-            pred_data (DataFrame): Frame containing predictions.
         """
 
         "load data for chromosome"
@@ -134,5 +133,4 @@ if __name__ == '__main__':
             pred_data = pred_data.rename(columns={"ko_pred": "v"})
 
             hic_mat, st = get_heatmaps(pred_data, no_pred=False)
-            simple_plot(hic_mat[6700:7440, 6700:7440])
-            print("done")
+            simple_plot(hic_mat[cfg.plt_start:cfg.plt_end, cfg.plt_start:cfg.plt_end])

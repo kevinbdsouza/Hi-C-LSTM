@@ -125,9 +125,14 @@ class Config:
         self.ko_window = 10
         self.ko_increment = 10
         self.ko_mode = "normalize"
-        self.perform_ko = True
+        self.perform_ko = False
         self.load_ko = False
-        self.compare_ko = True
+        self.compare_ko = False
+        self.tal_pre = False
+        self.tal_train = True
+        self.tal_test = False
+        self.tal_mode = "wt"
+        self.compare_tal = False
 
         "duplication"
         self.melo_insert = True

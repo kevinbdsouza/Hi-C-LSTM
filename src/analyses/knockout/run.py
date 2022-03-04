@@ -295,10 +295,12 @@ class Knockout():
     def change_index(self, list_split):
         """
         change_index(list_split) -> list, list
+        get locations from index.
         Args:
             list_split (list): list
         """
 
+        "format index"
         temp = [k.split('|')[-1] for k in list_split]
         chr_list = []
         index_list = []
@@ -307,6 +309,7 @@ class Knockout():
             chr_list.append(index[0])
             index_list.append(index[1].split('-'))
 
+        "prepare locations list"
         loc_list = []
         for ind in index_list:
             loc = int(((int(ind[0]) + int(ind[1])) / 2) // 10000)
@@ -314,23 +317,30 @@ class Knockout():
 
         return loc_list, chr_list
 
-    def tal_lmo2_preprocess(self):
+    def convert_to_hic_format(self):
         """
-        tal_lmo2_preprocess() -> DataFrame, DataFrame
+        convert_to_hic_format() -> DataFrame, DataFrame
         Args:
             NA.
         """
 
-        # hek_mat = pd.read_csv(self.hek_file, sep="\t")
-        hek_mat = pd.read_csv(self.lmo2ko_file, sep="\t")
+        if self.cfg.tal_mode == "wt":
+            hek_mat = pd.read_csv(self.hek_file, sep="\t")
+        elif self.cfg.tal_mode == "tal1_ko":
+            hek_mat = pd.read_csv(self.tal1ko_file, sep="\t")
+        elif self.cfg.tal_mode == "lmo2_ko":
+            hek_mat = pd.read_csv(self.lmo2ko_file, sep="\t")
 
+        "get positions"
         index, chr_list = self.change_index(list(hek_mat.index))
         columns, _ = self.change_index(hek_mat.columns)
 
+        "assign rows, columns and chr"
         hek_mat.index = index
         hek_mat.columns = columns
         hek_mat["chr"] = chr_list
 
+        "get matrices for TAL1 and LMO2"
         tal1_mat = hek_mat.loc[hek_mat["chr"] == "chr1"]
         tal1_mat = tal1_mat.iloc[:, 0:285]
         lmo2_mat = hek_mat.loc[hek_mat["chr"] == "chr11"]
@@ -340,6 +350,7 @@ class Knockout():
         lmo2_mat = lmo2_mat.groupby(level=0, axis=1).sum()
         lmo2_mat = lmo2_mat.groupby(level=0, axis=0).sum()
 
+        "prepare data in the form of Hi-C"
         tal_i = list(tal1_mat.index)
         tal_j = tal1_mat.columns
         lmo2_i = list(lmo2_mat.index)
@@ -355,81 +366,91 @@ class Knockout():
             for j in lmo2_j:
                 lmo2_df = lmo2_df.append({"i": i, "j": j, "v": lmo2_mat.loc[i][j]}, ignore_index=True)
 
+        "save data"
         tal_df.to_csv(cfg.hic_path + cfg.cell + "/tal_df.txt", sep="\t")
         lmo2_df.to_csv(cfg.hic_path + cfg.cell + "/lmo2_df.txt", sep="\t")
-
         return tal_df, lmo2_df
 
-    def prepare_tal1_lmo2(self, cfg):
+    def prepare_tal1_lmo2(self):
         """
         prepare_tal1_lmo2(cfg) -> DataLoader
+        prepare dataloader to train.
         Args:
-            cfg (Config):
+            cfg (Config): config to be used to run the experiment.
         """
 
+        "load Hi-C like data"
         tal_df = pd.read_csv(cfg.hic_path + cfg.cell + "/tal_df.txt", sep="\t")
         lmo2_df = pd.read_csv(cfg.hic_path + cfg.cell + "/lmo2_df.txt", sep="\t")
 
+        "preprocess"
         tal_df = tal_df.drop(['Unnamed: 0'], axis=1)
         lmo2_df = lmo2_df.drop(['Unnamed: 0'], axis=1)
-
         tal_df[['i', 'j']] = tal_df[['i', 'j']].astype('int64')
         lmo2_df[['i', 'j']] = lmo2_df[['i', 'j']].astype('int64')
 
+        "prepare indices and values for TAL1 in chromosome 1"
         values = torch.empty(0, cfg.sequence_length)
         input_idx = torch.empty(0, cfg.sequence_length, 2)
-
-        input_idx_tal1, values_tal1, sample_index_tal1 = get_samples_sparse(tal_df, 1, cfg)
+        input_idx_tal1, values_tal1 = get_samples_sparse(tal_df, 1, cfg)
         values_tal1 = F.pad(input=values_tal1, pad=(0, 4, 0, 0), mode='constant', value=0)
         input_idx_tal1 = F.pad(input=input_idx_tal1, pad=(0, 0, 0, 4, 0, 0), mode='constant', value=0)
-
         values = torch.cat((values, values_tal1.float()), 0)
         input_idx = torch.cat((input_idx, input_idx_tal1), 0)
 
-        input_idx_lmo2, values_lmo2, sample_index_lmo2 = get_samples_sparse(lmo2_df, 11, cfg)
+        "prepare indices and values for LMO2 in chromosome 11"
+        input_idx_lmo2, values_lmo2 = get_samples_sparse(lmo2_df, 11, cfg)
         values = torch.cat((values, values_lmo2.float()), 0)
         input_idx = torch.cat((input_idx, input_idx_lmo2), 0)
 
-        # create dataset, dataloader
+        "create dataloader"
         dataset = torch.utils.data.TensorDataset(input_idx, values)
         data_loader = torch.utils.data.DataLoader(dataset=dataset, batch_size=cfg.batch_size, shuffle=True)
 
         return data_loader
 
-    def train_tal1_lmo2(self, model, cfg):
+    def train_tal1_lmo2(self, model):
         """
         train_tal1_lmo2(model, cfg) -> No return object
+        Train model on 5C data from TAL1 and LMO2 regions.
         Args:
-            model (SeqLSTM):
-            cfg (Config):
+            model (SeqLSTM): Model to be used to train on 5C data
         """
 
+        "summary writer"
         timestr = time.strftime("%Y%m%d-%H%M%S")
         writer = SummaryWriter('./tensorboard_logs/' + cfg.model_name + timestr)
 
+        "initialize optimizer and prepare dataloader"
         optimizer, criterion = model.compile_optimizer()
-        data_loader, samples = self.prepare_tal1_lmo2(cfg)
+        data_loader = self.prepare_tal1_lmo2()
 
+        "train and save the model"
         model.train_model(data_loader, criterion, optimizer, writer)
         torch.save(model.state_dict(), cfg.model_dir + cfg.model_name + '.pth')
 
-    def test_tal1_lmo2(self, model, cfg):
+    def test_tal1_lmo2(self, model):
         """
-        test_tal1_lmo2(model, cfg) -> No return object
+        test_tal1_lmo2(model) -> No return object
+        Test model on 5C data from TAL1 and LMO2 regions.
         Args:
-            model (SeqLSTM):
-            cfg (Config):
+            model (SeqLSTM):  Model to be used to test on 5C data
         """
 
-        data_loader, samples = self.prepare_tal1_lmo2(cfg)
-        predictions, test_error, values, pred_df, error_list = model.test(data_loader)
+        "prepare dataloader"
+        data_loader = self.prepare_tal1_lmo2()
 
-        pred_df.to_csv(cfg.output_directory + "%s_predictions_chr.csv" % (cfg.cell), sep="\t")
+        "test model"
+        _, _, _, pred_df, _ = model.test(data_loader)
+
+        "save predictions"
+        pred_df.to_csv(cfg.output_directory + "%s_predictions.csv" % (cfg.cell), sep="\t")
+        return pred_df
 
 
 if __name__ == '__main__':
     cfg = Config()
-    cell = cfg.cell
+    cfg.cell = "HEK239T"
 
     "load model"
     model = SeqLSTM(cfg, device).to(device)
@@ -453,13 +474,27 @@ if __name__ == '__main__':
         if cfg.compare_ko:
             "plot comparison"
             _, _, _, pred_data = ko_ob.get_trained_representations(method="hiclstm")
-            ko_pred_df = pd.read_csv(cfg.output_directory + "hiclstm_%s_afko_chr%s.csv" % (cell, str(chr)), sep="\t")
+            ko_pred_df = pd.read_csv(cfg.output_directory + "hiclstm_%s_afko_chr%s.csv" % (cfg.cell, str(chr)),
+                                     sep="\t")
             pred_data = pd.merge(pred_data, ko_pred_df, on=["i", "j"])
             pred_data = pred_data.rename(columns={"ko_pred": "v"})
 
             hic_mat, st = get_heatmaps(pred_data, no_pred=False)
             simple_plot(hic_mat)
 
-        # tal_data, lmo2_data = ko_ob.tal_lmo2_preprocess()
-        # ko_ob.train_tal1_lmo2(model, cfg)
-        # ko_ob.test_tal1_lmo2(model, cfg)
+        pred_df = None
+        if cfg.tal_pre:
+            "prepare tal1 and lmo2 data"
+            tal_data, lmo2_data = ko_ob.convert_to_hic_format()
+
+        if cfg.tal_train:
+            "train 5C data"
+            ko_ob.train_tal1_lmo2(model)
+
+        if cfg.tal_test:
+            "test tal1 and lmo2 regions"
+            pred_df = ko_ob.test_tal1_lmo2(model)
+
+        if cfg.compare_tal:
+            if pred_df is not None:
+                pred_df = pd.read_csv(cfg.output_directory + "%s_predictions.csv" % (cfg.cell), sep="\t")
