@@ -472,6 +472,7 @@ class Knockout():
             lmo2_data = pred_df.loc[pred_df["i"] > 7000]
             lmo2_mat, st = get_heatmaps(lmo2_data, no_pred=False)
             simple_plot(lmo2_mat)
+            print("done")
 
 
 if __name__ == '__main__':
