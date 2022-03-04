@@ -116,7 +116,7 @@ class Config:
         self.regression_mode = "mlp"
 
         "knockout"
-        self.ko_compute_test = True
+        self.ko_compute_test = False
         self.ko_experiment = "ctcf"
         self.ctcf_indices = "22"
         self.foxg1_chr = [14]
@@ -124,7 +124,7 @@ class Config:
         self.ctcf_indices_22 = [284706, 284743]
         self.ko_window = 10
         self.ko_increment = 10
-        self.ko_mode = "zero"
+        self.ko_mode = "none"
         self.perform_ko = True
         self.load_ko = False
         self.compare_ko = True
