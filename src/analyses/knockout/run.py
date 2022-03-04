@@ -453,6 +453,8 @@ class Knockout():
 
     def run_tal_experiment(self):
         pred_df = None
+        tal1_data = None
+        lmo2_data = None
         if cfg.tal_pre:
             "prepare tal1 and lmo2 data"
             self.convert_to_hic_format()
@@ -466,23 +468,35 @@ class Knockout():
             pred_df = ko_ob.test_tal1_lmo2(model)
 
         if cfg.compare_tal:
+            "compare predictions and observed 5C"
             if pred_df is None:
                 pred_df = pd.read_csv(cfg.output_directory + "%s_predictions.csv" % (cfg.cell), sep="\t")
 
             tal1_data = pred_df.loc[pred_df["i"] < 7000]
-            tal1_mat, _ = get_heatmaps(tal1_data, no_pred=False)
             lmo2_data = pred_df.loc[pred_df["i"] > 7000]
+            tal1_mat, _ = get_heatmaps(tal1_data, no_pred=False)
             lmo2_mat, _ = get_heatmaps(lmo2_data, no_pred=False)
 
-            if cfg.tal_plot:
+            if cfg.tal_plot_wt:
                 simple_plot(tal1_mat)
                 simple_plot(lmo2_mat)
 
         if cfg.check_ko:
-            self.cfg.tal_mode = "tal1_ko"
-            self.convert_to_hic_format()
+            "compare ko and observed 5C"
+            if cfg.tal_pre_ko:
+                self.cfg.tal_mode = "tal1_ko"
+                self.convert_to_hic_format()
             tal1_ko = pd.read_csv(cfg.output_directory + "tal1_ko.txt", sep="\t")
             lmo2_ko = pd.read_csv(cfg.output_directory + "lmo2_ko.txt", sep="\t")
+
+            tal1_data["pred"] = tal1_ko["v"]
+            lmo2_data["pred"] = lmo2_ko["v"]
+            tal1_mat, _ = get_heatmaps(tal1_data, no_pred=False)
+            lmo2_mat, _ = get_heatmaps(lmo2_data, no_pred=False)
+
+            if cfg.tal_plot_ko:
+                simple_plot(tal1_mat)
+                simple_plot(lmo2_mat)
             print("done")
 
 

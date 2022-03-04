@@ -135,7 +135,9 @@ class Config:
         self.tal_mode = "tal1_ko"
         self.compare_tal = True
         self.check_ko = True
-        self.tal_plot = False
+        self.tal_pre_ko = False
+        self.tal_plot_wt = False
+        self.tal_plot_ko = True
         self.lmo2_chr = 11
 
         "duplication"
