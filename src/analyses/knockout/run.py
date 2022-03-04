@@ -451,7 +451,7 @@ class Knockout():
         pred_df = None
         if cfg.tal_pre:
             "prepare tal1 and lmo2 data"
-            tal_data, lmo2_data = ko_ob.convert_to_hic_format()
+            self.convert_to_hic_format()
 
         if cfg.tal_train:
             "train 5C data"
@@ -464,6 +464,9 @@ class Knockout():
         if cfg.compare_tal:
             if pred_df is not None:
                 pred_df = pd.read_csv(cfg.output_directory + "%s_predictions.csv" % (cfg.cell), sep="\t")
+
+            hic_mat, st = get_heatmaps(pred_data, no_pred=False)
+            simple_plot(hic_mat)
 
 
 if __name__ == '__main__':
