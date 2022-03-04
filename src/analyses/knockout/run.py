@@ -497,7 +497,6 @@ class Knockout():
             if cfg.tal_plot_ko:
                 simple_plot(tal1_mat)
                 simple_plot(lmo2_mat)
-            print("done")
 
 
 if __name__ == '__main__':
@@ -531,7 +530,8 @@ if __name__ == '__main__':
             pred_data = pred_data.rename(columns={"ko_pred": "v"})
 
             hic_mat, st = get_heatmaps(pred_data, no_pred=False)
-            simple_plot(hic_mat)
+            simple_plot(hic_mat[:200, :200])
+            print("stop")
 
     "TAL1 and LMO2"
     if cfg.run_tal:

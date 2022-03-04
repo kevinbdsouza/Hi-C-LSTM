@@ -124,11 +124,11 @@ class Config:
         self.ctcf_indices_22 = [284706, 284743]
         self.ko_window = 10
         self.ko_increment = 10
-        self.ko_mode = "normalize"
-        self.perform_ko = False
+        self.ko_mode = "padding"
+        self.perform_ko = True
         self.load_ko = False
-        self.compare_ko = False
-        self.run_tal = True
+        self.compare_ko = True
+        self.run_tal = False
         self.tal_pre = False
         self.tal_train = False
         self.tal_test = False
