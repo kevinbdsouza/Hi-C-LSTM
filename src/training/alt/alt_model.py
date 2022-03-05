@@ -20,7 +20,6 @@ class SeqLSTM(nn.Module):
         super(SeqLSTM, self).__init__()
         self.device = device
         self.cfg = cfg
-        self.hidden_size_lstm = cfg.hidden_size_lstm
         self.gpu_id = 0
         self.model_name = cfg.model_name
 
