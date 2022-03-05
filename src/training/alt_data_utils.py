@@ -104,7 +104,7 @@ def get_samples_sparse(data, chr, cfg):
             split_cols = list(torch.split(j, cfg.sequence_length, dim=0))
             i = data[data['i'] == row]['i_binidx'].values[0]
 
-            row_idx = row_idx.append(i)
+            row_idx.append(i)
             column_idx = column_idx + split_cols
             values = values + split_vals
 
