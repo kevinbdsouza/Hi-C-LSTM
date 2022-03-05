@@ -64,7 +64,7 @@ def load_hic(cfg, chr):
         print("Hi-C txt file does not exist or error during Juicer extraction")
 
 
-def get_hicmat(data, cfg):
+def get_hicmat(data, chr, cfg):
     data = data.apply(pd.to_numeric)
     nrows = max(data['i'].max(), data['j'].max()) + 1
     seq_diff = cfg.sequence_length_pos - (nrows % cfg.sequence_length_pos)
@@ -100,7 +100,7 @@ def get_samples_sparse(data, chr, cfg):
         cfg (Config): the configuration to use for the experiment.
     """
 
-    hic_mat, indices, nrows, nrows_full = get_hicmat(data, cfg)
+    hic_mat, indices, nrows, nrows_full = get_hicmat(data, chr, cfg)
 
     values = torch.from_numpy(hic_mat)
     indices = torch.from_numpy(indices)
