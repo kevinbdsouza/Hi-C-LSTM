@@ -78,20 +78,8 @@ class Knockout():
         """
 
         "assign start and stop"
-        i_start = int(pred_data['i'].min())
-        i_stop = int(pred_data['i'].max())
-        j_start = int(pred_data['j'].min())
-        j_stop = int(pred_data['j'].max())
-
-        if i_start < j_start:
-            start = i_start
-        else:
-            start = j_start
-
-        if i_stop > j_stop:
-            stop = i_stop
-        else:
-            stop = j_stop
+        start = min(int(pred_data['i'].min()), int(pred_data['j'].min()))
+        stop = max(int(pred_data['i'].max()), int(pred_data['j'].max()))
 
         try:
             "try loading representations"
@@ -99,8 +87,8 @@ class Knockout():
                 self.cfg.output_directory + "%s_rep_%s_chr%s.npy" % (method, self.cell, str(self.chr)))
         except:
             "initialize"
-            nrows = int(stop - start)
-            embed_rows = np.zeros((nrows + 1, self.cfg.pos_embed_size))
+            nrows = int(stop - start) + 1
+            embed_rows = np.zeros((nrows, self.cfg.pos_embed_size))
 
             i_old = 0
             j_old = 0

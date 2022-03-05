@@ -82,7 +82,8 @@ def get_samples_sparse(data, chr, cfg):
     data['j_binidx'] = get_bin_idx(np.full(data.shape[0], chr), data['j'], cfg)
 
     values = []
-    input_idx = []
+    column_idx = []
+    row_idx = []
     nvals_list = []
     for row in range(nrows):
         vals = data[data['i'] == row]['v'].values
@@ -99,31 +100,24 @@ def get_samples_sparse(data, chr, cfg):
             split_vals = list(vals.split(cfg.sequence_length, dim=0))
 
             "get indices"
-            j = torch.Tensor(data[data['i'] == row]['j_binidx'].values)
-            i = torch.Tensor(data[data['i'] == row]['i_binidx'].values)
+            j = torch.Tensor(data[data['i'] == row]['j_binidx'].values).unsqueeze(-1)
+            split_cols = list(torch.split(j, cfg.sequence_length, dim=0))
+            i = data[data['i'] == row]['i_binidx'].values[0]
 
-            "conactenate indices"
-            ind = torch.cat((i.unsqueeze(-1), j.unsqueeze(-1)), 1)
-            split_ind = list(torch.split(ind, cfg.sequence_length, dim=0))
-
-            if cfg.window_model:
-                dist = cfg.distance_cut_off_mb
-                for i in range(len(split_ind) - 1):
-                    win_ind = torch.cat((split_ind[i][-dist:, :], split_ind[i + 1][-dist:, :]),
-                                        0)
-                    win_vals = torch.cat((split_vals[i][-dist:], split_vals[i + 1][-dist:]),
-                                         0)
-                    split_ind.append(win_ind)
-                    split_vals.append(win_vals)
-
-            input_idx = input_idx + split_ind
+            row_idx = row_idx.append(i)
+            column_idx = column_idx + split_cols
             values = values + split_vals
+
+    "split rows"
+    row_idx = torch.Tensor(row_idx).unsqueeze(-1)
+    row_idx = list(torch.split(row_idx, cfg.sequence_length, dim=0))
 
     "pad sequences if shorter than sequence_length"
     values = pad_sequence(values, batch_first=True)
-    input_idx = pad_sequence(input_idx, batch_first=True)
+    column_idx = pad_sequence(column_idx, batch_first=True)
+    row_idx = pad_sequence(row_idx, batch_first=True)
 
-    return input_idx, values
+    return column_idx, values, row_idx
 
 
 def contactProbabilities(values, smoothing=8, delta=1e-10):
@@ -157,9 +151,9 @@ def get_data(cfg, chr):
         Skips: if error during extraction using Juicer Tools, prints out empty txt file
     """
     data = load_hic(cfg, chr)
-    input_idx, values = get_samples_sparse(data, chr, cfg)
+    column_idx, values, row_idx = get_samples_sparse(data, chr, cfg)
 
-    return input_idx, values
+    return column_idx, values, row_idx
 
 
 def get_data_loader_chr(cfg, chr, shuffle=True):
@@ -243,9 +237,10 @@ def save_processed_data(cfg):
     for chr in cfg.chr_train_list:
         print("Saving input data for Chr", str(chr), "in the specified processed directory")
 
-        idx, val = get_data(cfg, chr)
-        torch.save(idx, cfg.processed_data_dir + 'input_idx_chr' + str(chr) + '.pth')
+        column_idx, val, row_idx = get_data(cfg, chr)
+        torch.save(column_idx, cfg.processed_data_dir + 'column_idx_chr' + str(chr) + '.pth')
         torch.save(val, cfg.processed_data_dir + 'values_chr' + str(chr) + '.pth')
+        torch.save(row_idx, cfg.processed_data_dir + 'row_idx_idx_chr' + str(chr) + '.pth')
 
 
 if __name__ == "__main__":
