@@ -2,8 +2,7 @@ import numpy as np
 import pandas as pd
 import torch
 import torch.utils.data
-from torch.nn.utils.rnn import pad_sequence
-import training.config as config
+from training.alt.alt_config import Config
 
 
 def get_cumpos(cfg, chr_num):
@@ -65,22 +64,27 @@ def load_hic(cfg, chr):
         print("Hi-C txt file does not exist or error during Juicer extraction")
 
 
-def get_hicmat(data):
+def get_hicmat(data, cfg):
     data = data.apply(pd.to_numeric)
     nrows = max(data['i'].max(), data['j'].max()) + 1
-    data['v'] = data['v'].fillna(0)
+    seq_diff = cfg.sequence_length_pos - (nrows % cfg.sequence_length_pos)
+    nrows_full = nrows + seq_diff
 
+    data['v'] = data['v'].fillna(0)
     rows = np.array(data["i"]).astype(int)
     cols = np.array(data["j"]).astype(int)
 
-    hic_mat = np.zeros((nrows, nrows))
+    hic_mat = np.zeros((nrows_full, nrows_full))
     hic_mat[rows, cols] = np.array(data["v"])
     hic_upper = np.triu(hic_mat)
     hic_mat[cols, rows] = np.array(data["v"])
     hic_lower = np.tril(hic_mat)
     hic_mat = hic_upper + hic_lower
     hic_mat[np.diag_indices_from(hic_mat)] /= 2
-    return hic_mat, nrows
+
+    indices = np.zeros(nrows_full, )
+    indices[:nrows] = np.arange(0, nrows)
+    return hic_mat, indices, nrows, nrows_full
 
 
 def get_samples_sparse(data, chr, cfg):
@@ -94,14 +98,12 @@ def get_samples_sparse(data, chr, cfg):
         cfg (Config): the configuration to use for the experiment.
     """
 
-    hic_mat, nrows = get_hicmat(data)
+    hic_mat, indices, nrows, nrows_full = get_hicmat(data, cfg)
 
-    indices = np.arange(0, nrows)
     cum_idx = get_bin_idx(np.full(hic_mat.shape[0], chr), indices, cfg)
 
     values = torch.from_numpy(hic_mat)
     cum_idx = torch.from_numpy(cum_idx)
-
     return cum_idx, values
 
 
@@ -228,6 +230,6 @@ def save_processed_data(cfg):
 
 
 if __name__ == "__main__":
-    cfg = config.Config()
+    cfg = Config()
     cell = cfg.cell
     save_processed_data(cfg)

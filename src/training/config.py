@@ -23,8 +23,7 @@ class Config:
         self.input_size_lstm = 2 * self.pos_embed_size
         self.hidden_size_lstm = 8
         self.output_size_lstm = 1
-        #self.sequence_length = 150
-        self.sequence_length = 1000
+        self.sequence_length = 150
         self.distance_cut_off_mb = int(self.sequence_length / 2)
         self.lstm_nontrain = False
         self.window_model = False
@@ -44,8 +43,7 @@ class Config:
         self.schic_pairs_file = "/GSM2254215_ML1.validPairs.txt"
         self.start_end_file = 'starts.npy'
         self.downstream_dir = "/data2/hic_lstm/downstream"
-        #self.model_name = "shuffle_" + self.cell
-        self.model_name = "shuffle_test"
+        self.model_name = "shuffle_" + self.cell
 
         "decoder parameters"
         self.decoder_name = "hiclstm_fc"
@@ -69,8 +67,7 @@ class Config:
         self.model_dir = self.proj_dir + 'saved_models/'
         self.output_directory = self.downstream_dir + "/predictions/"
         self.plot_dir = self.output_directory + 'data_plots/'
-        #self.processed_data_dir = self.output_directory + 'processed_data/' + self.cell + "/"
-        self.processed_data_dir = self.output_directory + 'alt_processed_data/' + self.cell + "/"
+        self.processed_data_dir = self.output_directory + 'processed_data/' + self.cell + "/"
         self.new_data_dir = self.output_directory + 'new_data/' + self.cell + "/"
 
         "create directories if they don't exist"
