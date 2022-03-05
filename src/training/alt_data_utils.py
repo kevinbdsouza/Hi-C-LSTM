@@ -97,16 +97,13 @@ def get_samples_sparse(data, chr, cfg):
             nvals_list.append(nvals)
             vals = torch.from_numpy(vals)
 
-            split_vals = list(vals.split(cfg.sequence_length, dim=0))
-
             "get indices"
             j = torch.Tensor(data[data['i'] == row]['j_binidx'].values).unsqueeze(-1)
-            split_cols = list(torch.split(j, cfg.sequence_length, dim=0))
             i = data[data['i'] == row]['i_binidx'].values[0]
 
             row_idx.append(i)
-            column_idx = column_idx + split_cols
-            values = values + split_vals
+            column_idx.append(j)
+            values.append(vals)
 
     "split rows"
     row_idx = torch.Tensor(row_idx).unsqueeze(-1)
