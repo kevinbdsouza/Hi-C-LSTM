@@ -65,6 +65,24 @@ def load_hic(cfg, chr):
         print("Hi-C txt file does not exist or error during Juicer extraction")
 
 
+def get_hicmat(data):
+    data = data.apply(pd.to_numeric)
+    nrows = max(data['i'].max(), data['j'].max()) + 1
+    data['v'] = data['v'].fillna(0)
+
+    rows = np.array(data["i"]).astype(int)
+    cols = np.array(data["j"]).astype(int)
+
+    hic_mat = np.zeros((nrows, nrows))
+    hic_mat[rows, cols] = np.array(data["v"])
+    hic_upper = np.triu(hic_mat)
+    hic_mat[cols, rows] = np.array(data["v"])
+    hic_lower = np.tril(hic_mat)
+    hic_mat = hic_upper + hic_lower
+    hic_mat[np.diag_indices_from(hic_mat)] /= 2
+    return hic_mat, nrows
+
+
 def get_samples_sparse(data, chr, cfg):
     """
     get_samples_sparse(data, chr, cfg) -> List, List
@@ -75,42 +93,27 @@ def get_samples_sparse(data, chr, cfg):
         chr (int): the chromosome to extract Hi-C from.
         cfg (Config): the configuration to use for the experiment.
     """
-    data = data.apply(pd.to_numeric)
-    nrows = max(data['i'].max(), data['j'].max()) + 1
-    data['v'] = data['v'].fillna(0)
-    data['i_binidx'] = get_bin_idx(np.full(data.shape[0], chr), data['i'], cfg)
-    data['j_binidx'] = get_bin_idx(np.full(data.shape[0], chr), data['j'], cfg)
+
+    hic_mat, nrows = get_hicmat(data)
+
+    cum_idx = get_bin_idx(np.full(hic_mat.shape[0], chr), hic_mat.index, cfg)
 
     values = []
-    column_idx = []
-    row_idx = []
-    nvals_list = []
     for row in range(nrows):
-        vals = data[data['i'] == row]['v'].values
+        vals = hic_mat[row, :]
         nvals = vals.shape[0]
         if nvals == 0:
             continue
         else:
             vals = contactProbabilities(vals, smoothing=cfg.hic_smoothing)
 
-        if (nvals > 10):
-            nvals_list.append(nvals)
-            vals = torch.from_numpy(vals)
+        vals = torch.from_numpy(vals)
+        values.append(vals)
 
-            "get indices"
-            j = torch.Tensor(data[data['i'] == row]['j_binidx'].values).unsqueeze(-1)
-            i = torch.Tensor(data[data['i'] == row]['i_binidx'].values[0])
-
-            row_idx.append(i)
-            column_idx.append(j)
-            values.append(vals)
-
-    "pad sequences if shorter than sequence_length"
-    values = pad_sequence(values, batch_first=True)
-    column_idx = pad_sequence(column_idx, batch_first=True)
-    row_idx = pad_sequence(row_idx, batch_first=True)
-
-    return column_idx, values, row_idx
+    "convert to tensor"
+    values = torch.Tensor(values)
+    cum_idx = torch.Tensor(cum_idx)
+    return cum_idx, values
 
 
 def contactProbabilities(values, smoothing=8, delta=1e-10):
@@ -144,9 +147,9 @@ def get_data(cfg, chr):
         Skips: if error during extraction using Juicer Tools, prints out empty txt file
     """
     data = load_hic(cfg, chr)
-    column_idx, values, row_idx = get_samples_sparse(data, chr, cfg)
+    cum_idx, values = get_samples_sparse(data, chr, cfg)
 
-    return column_idx, values, row_idx
+    return cum_idx, values
 
 
 def get_data_loader_chr(cfg, chr, shuffle=True):
@@ -230,10 +233,9 @@ def save_processed_data(cfg):
     for chr in cfg.chr_train_list:
         print("Saving input data for Chr", str(chr), "in the specified processed directory")
 
-        column_idx, val, row_idx = get_data(cfg, chr)
-        torch.save(column_idx, cfg.processed_data_dir + 'column_idx_chr' + str(chr) + '.pth')
+        cum_idx, val = get_data(cfg, chr)
+        torch.save(cum_idx, cfg.processed_data_dir + 'cum_idx_chr' + str(chr) + '.pth')
         torch.save(val, cfg.processed_data_dir + 'values_chr' + str(chr) + '.pth')
-        torch.save(row_idx, cfg.processed_data_dir + 'row_idx_idx_chr' + str(chr) + '.pth')
 
 
 if __name__ == "__main__":

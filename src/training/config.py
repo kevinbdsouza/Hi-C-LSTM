@@ -23,7 +23,8 @@ class Config:
         self.input_size_lstm = 2 * self.pos_embed_size
         self.hidden_size_lstm = 8
         self.output_size_lstm = 1
-        self.sequence_length = 150
+        #self.sequence_length = 150
+        self.sequence_length = 1000
         self.distance_cut_off_mb = int(self.sequence_length / 2)
         self.lstm_nontrain = False
         self.window_model = False
