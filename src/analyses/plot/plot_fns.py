@@ -147,7 +147,6 @@ class PlotFns:
         plt.legend(fontsize=18)
         plt.subplots_adjust(bottom=0.35)
         plt.savefig("/home/kevindsouza/Downloads/map_res.png")
-        pass
 
     def plot_auroc_celltypes(self):
         tasks = ["Gene Expression", "Replication Timing", "Enhancers", "TSS", "PE-Interactions", "FIREs",
@@ -863,8 +862,8 @@ if __name__ == "__main__":
     plot_ob = PlotFns(cfg)
 
     # plot_ob.plot_combined(cell="HFFhTERT")
-    plot_ob.plot_mAP_celltypes()
-    # plot_ob.plot_mAP_resolutions()
+    # plot_ob.plot_mAP_celltypes()
+    plot_ob.plot_mAP_resolutions()
     # plot_ob.plot_auroc_celltypes()
     # plot_ob.plot_auroc()
 
