@@ -35,7 +35,7 @@ def train_model(cfg, writer):
     model.train_model(data_loader, criterion, optimizer, writer)
 
     "Save model"
-    torch.save(model.state_dict(), cfg.model_dir + model_name + '.pth')
+    torch.save(model.state_dict(), cfg.model_dir + cfg.model_name + '.pth')
 
 
 if __name__ == '__main__':
@@ -47,8 +47,9 @@ if __name__ == '__main__':
     timestr = time.strftime("%Y%m%d-%H%M%S")
     writer = SummaryWriter('./tensorboard_logs/' + model_name + timestr)
 
-    "Process input data and save the input IDs and Hi-C Values"
-    save_processed_data(cfg, cell)
+    if cfg.save_processed_data:
+        "Process input data and save the input IDs and Hi-C Values"
+        save_processed_data(cfg)
 
     "Train the model and save the .pth file"
     train_model(cfg, writer)
