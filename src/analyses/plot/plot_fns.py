@@ -100,7 +100,7 @@ class PlotFns:
         plt.xticks(rotation=90, fontsize=20)
         plt.yticks(fontsize=20)
         plt.xlabel("Prediction Target", fontsize=20)
-        plt.ylabel("Cumulative Prediction Score", fontsize=20)
+        plt.ylabel("mAP", fontsize=20)
         plt.plot('Tasks', 'GM12878_Rao', data=df_main, marker='o', markersize=16, color="C0", linewidth=3,
                  label="GM12878 (Rao 2014, 3B)")
         plt.plot('Tasks', 'H1hESC_Dekker', data=df_main, marker='D', markersize=16, color="C1", linewidth=3,
