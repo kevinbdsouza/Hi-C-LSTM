@@ -97,7 +97,7 @@ def get_samples_sparse(data, chr, cfg):
     hic_mat, nrows = get_hicmat(data)
     indices = np.arange(0, nrows)
 
-    cum_idx = get_bin_idx(np.full(hic_mat.shape[0], chr), hic_mat.index, cfg)
+    cum_idx = get_bin_idx(np.full(hic_mat.shape[0], chr), indices, cfg)
 
     values = []
     for row in range(nrows):
