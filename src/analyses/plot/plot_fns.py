@@ -110,72 +110,7 @@ class PlotFns:
 
     def plot_combined_all(self, cell):
         methods = ["Hi-C-LSTM", "SNIPER-INTRA", "SNIPER-INTER", "SCI", "PCA", "SBCID"]
-
-        if cell == "GM12878":
-            tasks = ["Gene Expression", "Replication Timing", "Enhancers", "TSS", "PE-Interactions", "FIREs",
-                     "TADs", "subTADs", "Loop Domains", "TAD Boundaries", "subTAD Boundaries", "Subcompartments"]
-            colors = ['C3', 'C0', 'C1', 'C2', 'C4', 'C5', 'C6', 'C7', 'C8', 'C9', 'C10', 'C11']
-
-            lstm_values_all_tasks = np.load(self.path + "lstm_values_all_tasks.npy")
-            sniper_intra_values_all_tasks = np.load(self.path + "sniper_intra_values_all_tasks.npy")
-            sniper_inter_values_all_tasks = np.load(self.path + "sniper_inter_values_all_tasks.npy")
-            graph_values_all_tasks = np.load(self.path + "graph_values_all_tasks.npy")
-            pca_values_all_tasks = np.load(self.path + "pca_values_all_tasks.npy")
-            sbcid_values_all_tasks = np.load(self.path + "sbcid_values_all_tasks.npy")
-
-            lstm_auroc_all_tasks = np.load(self.path + "gm_auroc_all_tasks.npy")
-            sniper_intra_auroc_all_tasks = np.load(self.path + "sniper_intra_auroc_all_tasks.npy")
-            sniper_inter_auroc_all_tasks = np.load(self.path + "sniper_inter_auroc_all_tasks.npy")
-            graph_auroc_all_tasks = np.load(self.path + "graph_auroc_all_tasks.npy")
-            pca_auroc_all_tasks = np.load(self.path + "pca_auroc_all_tasks.npy")
-            sbcid_auroc_all_tasks = np.load(self.path + "sbcid_auroc_all_tasks.npy")
-
-            lstm_accuracy_all_tasks = np.load(self.path + "gm_accuracy_all_tasks.npy")
-            sniper_intra_accuracy_all_tasks = np.load(self.path + "gm_sniper_intra_accuracy_all_tasks.npy")
-            sniper_inter_accuracy_all_tasks = np.load(self.path + "gm_sniper_inter_accuracy_all_tasks.npy")
-            graph_accuracy_all_tasks = np.load(self.path + "gm_graph_accuracy_all_tasks.npy")
-            pca_accuracy_all_tasks = np.load(self.path + "gm_pca_accuracy_all_tasks.npy")
-            sbcid_accuracy_all_tasks = np.load(self.path + "gm_sbcid_accuracy_all_tasks.npy")
-
-            lstm_fscore_all_tasks = np.load(self.path + "gm_fscore_all_tasks.npy")
-            sniper_intra_fscore_all_tasks = np.load(self.path + "gm_sniper_intra_fscore_all_tasks.npy")
-            sniper_inter_fscore_all_tasks = np.load(self.path + "gm_sniper_inter_fscore_all_tasks.npy")
-            graph_fscore_all_tasks = np.load(self.path + "gm_graph_fscore_all_tasks.npy")
-            pca_fscore_all_tasks = np.load(self.path + "gm_pca_fscore_all_tasks.npy")
-            sbcid_fscore_all_tasks = np.load(self.path + "gm_sbcid_fscore_all_tasks.npy")
-        elif cell == "H1hESC":
-            tasks = ["Gene Expression", "Enhancers", "TSS", "TADs", "subTADs", "Loop Domains", "TAD Boundaries",
-                     "subTAD Boundaries", "Subcompartments"]
-            colors = ['C3', 'C1', 'C2', 'C6', 'C7', 'C8', 'C9', 'C10', 'C11']
-
-            lstm_values_all_tasks = np.load(self.path + "h1_values_all_tasks.npy")
-            sniper_intra_values_all_tasks = np.load(self.path + "sniper_intra_h1_all_tasks.npy")
-            sniper_inter_values_all_tasks = np.load(self.path + "sniper_inter_h1_all_tasks.npy")
-            graph_values_all_tasks = np.load(self.path + "graph_h1_all_tasks.npy")
-            pca_values_all_tasks = np.load(self.path + "pca_h1_all_tasks.npy")
-            sbcid_values_all_tasks = np.load(self.path + "sbcid_h1_all_tasks.npy")
-
-            lstm_auroc_all_tasks = np.load(self.path + "h1_auroc_all_tasks.npy")
-            sniper_intra_auroc_all_tasks = np.load(self.path + "sniper_intra_auroc_h1_all_tasks.npy")
-            sniper_inter_auroc_all_tasks = np.load(self.path + "sniper_inter_auroc_h1_all_tasks.npy")
-            graph_auroc_all_tasks = np.load(self.path + "graph_auroc_h1_all_tasks.npy")
-            pca_auroc_all_tasks = np.load(self.path + "pca_auroc_h1_all_tasks.npy")
-            sbcid_auroc_all_tasks = np.load(self.path + "sbcid_auroc_h1_all_tasks.npy")
-
-            lstm_accuracy_all_tasks = np.load(self.path + "h1_accuracy_all_tasks.npy")
-            sniper_intra_accuracy_all_tasks = np.load(self.path + "sniper_intra_accuracy_h1_all_tasks.npy")
-            sniper_inter_accuracy_all_tasks = np.load(self.path + "sniper_inter_accuracy_h1_all_tasks.npy")
-            graph_accuracy_all_tasks = np.load(self.path + "graph_accuracy_h1_all_tasks.npy")
-            pca_accuracy_all_tasks = np.load(self.path + "pca_accuracy_h1_all_tasks.npy")
-            sbcid_accuracy_all_tasks = np.load(self.path + "sbcid_accuracy_h1_all_tasks.npy")
-
-            lstm_fscore_all_tasks = np.load(self.path + "lstm_fscore_h1_all_tasks.npy")
-            sniper_intra_fscore_all_tasks = np.load(self.path + "sniper_intra_fscore_h1_all_tasks.npy")
-            sniper_inter_fscore_all_tasks = np.load(self.path + "sniper_inter_fscore_h1_all_tasks.npy")
-            graph_fscore_all_tasks = np.load(self.path + "graph_fscore_h1_all_tasks.npy")
-            pca_fscore_all_tasks = np.load(self.path + "pca_fscore_h1_all_tasks.npy")
-            sbcid_fscore_all_tasks = np.load(self.path + "sbcid_fscore_h1_all_tasks.npy")
-        elif cell == "HFFhTERT":
+        if cell == "HFFhTERT":
             tasks = ["Gene Expression", "Enhancers", "TSS", "TADs", "subTADs", "Loop Domains", "TAD Boundaries",
                      "subTAD Boundaries", "Subcompartments"]
             colors = ['C3', 'C1', 'C2', 'C6', 'C7', 'C8', 'C9', 'C10', 'C11']
@@ -307,7 +242,7 @@ class PlotFns:
         df_main["PCA"] = pca_values_all_tasks
         df_main["SBCID"] = sbcid_values_all_tasks
 
-        df_main = pd.read_csv(self.path + "%s_accuracy_df.csv" % (cell), sep="\t")
+        df_main = pd.read_csv(self.path + "%s_map_df.csv" % (cell), sep="\t")
         df_main = df_main.drop(['Unnamed: 0'], axis=1)
 
         plt.figure(figsize=(12, 10))
@@ -315,7 +250,7 @@ class PlotFns:
         plt.xticks(rotation=90, fontsize=20)
         plt.yticks(fontsize=20)
         plt.xlabel("Prediction Target", fontsize=20)
-        plt.ylabel("Accuracy", fontsize=20)
+        plt.ylabel("mAP", fontsize=20)
         plt.plot('Tasks', 'Hi-C-LSTM', data=df_main, marker='o', markersize=16, color="C3", linewidth=3,
                  label="Hi-C-LSTM")
         plt.plot('Tasks', 'SNIPER-INTRA', data=df_main, marker='*', markersize=16, color="C0", linewidth=3,
@@ -1136,7 +1071,7 @@ if __name__ == "__main__":
     cfg = config.Config()
     plot_ob = PlotFns(cfg)
 
-    plot_ob.plot_combined(cell="H1hESC")
+    plot_ob.plot_combined(cell="HFFhTERT")
     # plot_ob.plot_combined_all(cell="GM12878")
     # plot_ob.plot_mAP_celltypes()
     # plot_ob.plot_mAP_resolutions()
