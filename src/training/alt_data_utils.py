@@ -99,15 +99,11 @@ def get_samples_sparse(data, chr, cfg):
 
             "get indices"
             j = torch.Tensor(data[data['i'] == row]['j_binidx'].values).unsqueeze(-1)
-            i = data[data['i'] == row]['i_binidx'].values[0]
+            i = torch.Tensor(data[data['i'] == row]['i_binidx'].values[0])
 
             row_idx.append(i)
             column_idx.append(j)
             values.append(vals)
-
-    "split rows"
-    row_idx = torch.Tensor(row_idx).unsqueeze(-1)
-    row_idx = list(torch.split(row_idx, cfg.sequence_length, dim=0))
 
     "pad sequences if shorter than sequence_length"
     values = pad_sequence(values, batch_first=True)
