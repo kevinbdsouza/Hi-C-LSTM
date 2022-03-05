@@ -318,7 +318,7 @@ class PlotFns:
         df_main["PCA"] = pca_values_all_tasks
         df_main["SBCID"] = sbcid_values_all_tasks
 
-        df_main = pd.read_csv(self.path + "%s_auroc_df.csv" % (cell), sep="\t")
+        df_main = pd.read_csv(self.path + "%s_fscore_df.csv" % (cell), sep="\t")
         df_main = df_main.drop(['Unnamed: 0'], axis=1)
 
         plt.figure(figsize=(12, 10))
