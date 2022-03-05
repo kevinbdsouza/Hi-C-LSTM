@@ -82,8 +82,10 @@ def get_hicmat(data, cfg):
     hic_mat = hic_upper + hic_lower
     hic_mat[np.diag_indices_from(hic_mat)] /= 2
 
+    indices = np.arange(0, nrows)
+    cum_idx = get_bin_idx(np.full(hic_mat.shape[0], chr), indices, cfg)
     indices = np.zeros(nrows_full, )
-    indices[:nrows] = np.arange(0, nrows)
+    indices[:nrows] = cum_idx
     return hic_mat, indices, nrows, nrows_full
 
 
@@ -100,11 +102,9 @@ def get_samples_sparse(data, chr, cfg):
 
     hic_mat, indices, nrows, nrows_full = get_hicmat(data, cfg)
 
-    cum_idx = get_bin_idx(np.full(hic_mat.shape[0], chr), indices, cfg)
-
     values = torch.from_numpy(hic_mat)
-    cum_idx = torch.from_numpy(cum_idx)
-    return cum_idx, values
+    indices = torch.from_numpy(indices)
+    return indices, values
 
 
 def contactProbabilities(values, smoothing=8, delta=1e-10):
