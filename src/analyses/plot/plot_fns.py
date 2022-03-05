@@ -1,18 +1,10 @@
 import logging
 import numpy as np
 import matplotlib as mpl
-
-# mpl.use('WebAgg')
-mpl.use('module://backend_interagg')
 import matplotlib.pyplot as plt
-import operator
 import pandas as pd
 import seaborn as sns
 import training.config as config
-from analyses.classification.domains import Domains
-from training.data_utils import get_cumpos
-
-logger = logging.getLogger(__name__)
 
 
 class PlotFns:
@@ -21,227 +13,46 @@ class PlotFns:
         self.path = cfg.output_directory
         self.cell_type = ["E116", "GM12878"]
 
-    def get_dict(self, path):
-        lstm_rna = np.load(path + "lstm/map_dict_rnaseq.npy").item()
-        sniper_rna = np.load(path + "sniper/map_dict_rnaseq.npy").item()
-        graph_rna = np.load(path + "graph/map_dict_rnaseq.npy").item()
-        pca_rna = np.load(path + "pca/map_dict_rnaseq.npy").item()
-        sbcid_rna = np.load(path + "sbcid/map_dict_rnaseq.npy").item()
+    def plot_stackedbar(self, df_main, tasks, colors):
+        # df_main = df_main.set_index("Tasks")
+        df_main = df_main.T
+        df_main.columns = df_main.iloc[0]
+        df_main = df_main.drop(["Tasks"], axis=0)
+        fields = df_main.columns.tolist()
 
-        lstm_pe = np.load(path + "lstm/map_dict_pe.npy").item()
-        sniper_pe = np.load(path + "sniper/map_dict_pe.npy").item()
-        graph_pe = np.load(path + "graph/map_dict_pe.npy").item()
-        pca_pe = np.load(path + "pca/map_dict_pe.npy").item()
-        sbcid_pe = np.load(path + "sbcid/map_dict_pe.npy").item()
+        # figure and axis
+        fig, ax = plt.subplots(1, figsize=(22, 12))
 
-        lstm_fire = np.load(path + "lstm/map_dict_fire.npy").item()
-        sniper_fire = np.load(path + "sniper/map_dict_fire.npy").item()
-        graph_fire = np.load(path + "graph/map_dict_fire.npy").item()
-        pca_fire = np.load(path + "pca/map_dict_fire.npy").item()
-        sbcid_fire = np.load(path + "sbcid/map_dict_fire.npy").item()
+        # plot bars
+        left = len(df_main) * [0]
+        for idx, name in enumerate(fields):
+            plt.barh(df_main.index, df_main[name], left=left, color=colors[idx])
+            left = left + df_main[name]
 
-        lstm_rep = np.load(path + "lstm/map_dict_rep.npy").item()
-        sniper_rep = np.load(path + "sniper/map_dict_rep.npy").item()
-        graph_rep = np.load(path + "graph/map_dict_rep.npy").item()
-        pca_rep = np.load(path + "pca/map_dict_rep.npy").item()
-        sbcid_rep = np.load(path + "sbcid/map_dict_rep.npy").item()
+        # legend
+        plt.rcParams.update({'font.size': 22})
+        plt.legend(tasks, bbox_to_anchor=([0.02, 1, 0, 0]), ncol=6, frameon=False, fontsize=14)
 
-        lstm_promoter = np.load(path + "lstm/map_dict_promoter.npy").item()
-        sniper_promoter = np.load(path + "sniper/map_dict_promoter.npy").item()
-        graph_promoter = np.load(path + "graph/map_dict_promoter.npy").item()
-        pca_promoter = np.load(path + "pca/map_dict_promoter.npy").item()
-        sbcid_promoter = np.load(path + "sbcid/map_dict_promoter.npy").item()
+        # remove spines
+        ax.spines['right'].set_visible(False)
+        ax.spines['left'].set_visible(False)
+        ax.spines['top'].set_visible(False)
+        ax.spines['bottom'].set_visible(False)
 
-        lstm_enhancer = np.load(path + "lstm/map_dict_enhancer.npy").item()
-        sniper_enhancer = np.load(path + "sniper/map_dict_enhancer.npy").item()
-        graph_enhancer = np.load(path + "graph/map_dict_enhancer.npy").item()
-        pca_enhancer = np.load(path + "pca/map_dict_enhancer.npy").item()
-        sbcid_enhancer = np.load(path + "sbcid/map_dict_enhancer.npy").item()
+        # format x ticks
+        xticks = np.arange(0, 36.1, 4)
+        xlabels = ['{}'.format(i) for i in np.arange(0, 36.1, 4)]
+        plt.xticks(xticks, xlabels, fontsize=20)
 
-        lstm_domain = np.load(path + "lstm/map_dict_domain.npy").item()
-        sniper_domain = np.load(path + "sniper/map_dict_domain.npy").item()
-        graph_domain = np.load(path + "graph/map_dict_domain.npy").item()
-        pca_domain = np.load(path + "pca/map_dict_domain.npy").item()
-        sbcid_domain = np.load(path + "sbcid/map_dict_domain.npy").item()
+        # adjust limits and draw grid lines
+        plt.ylim(-0.5, ax.get_yticks()[-1] + 0.5)
+        ax.xaxis.grid(color='gray', linestyle='dashed')
+        plt.xlabel("Prediction Target", fontsize=20)
+        plt.ylabel("Cumulative Prediction Score", fontsize=20)
 
-        lstm_loop = np.load(path + "lstm/map_dict_loop.npy").item()
-        sniper_loop = np.load(path + "sniper/map_dict_loop.npy").item()
-        graph_loop = np.load(path + "graph/map_dict_loop.npy").item()
-        pca_loop = np.load(path + "pca/map_dict_loop.npy").item()
-        sbcid_loop = np.load(path + "sbcid/map_dict_loop.npy").item()
-
-        lstm_tss = np.load(path + "lstm/map_dict_tss.npy").item()
-        sniper_tss = np.load(path + "sniper/map_dict_tss.npy").item()
-        graph_tss = np.load(path + "graph/map_dict_tss.npy").item()
-        pca_tss = np.load(path + "pca/map_dict_tss.npy").item()
-        sbcid_tss = np.load(path + "sbcid/map_dict_tss.npy").item()
-
-        lstm_sbc = np.load(path + "lstm/map_dict_sbc.npy").item()
-        sniper_sbc = np.load(path + "sniper/map_dict_sbc.npy").item()
-        graph_sbc = np.load(path + "graph/map_dict_sbc.npy").item()
-        pca_sbc = np.load(path + "pca/map_dict_sbc.npy").item()
-        sbcid_sbc = np.load(path + "sbcid/map_dict_sbc.npy").item()
-
-        return sniper_rna, sniper_pe, sniper_fire, sniper_rep, sniper_promoter, sniper_enhancer, \
-               sniper_domain, sniper_loop, sniper_tss, sniper_sbc, lstm_rna, lstm_pe, lstm_fire, \
-               lstm_rep, lstm_promoter, lstm_enhancer, lstm_domain, lstm_loop, lstm_tss, lstm_sbc, \
-               graph_rna, graph_pe, graph_fire, graph_rep, graph_promoter, graph_enhancer, graph_domain, \
-               graph_loop, graph_tss, graph_sbc, pca_rna, pca_pe, pca_fire, pca_rep, pca_promoter, pca_enhancer, \
-               pca_domain, pca_loop, pca_tss, pca_sbc, sbcid_rna, sbcid_pe, sbcid_fire, sbcid_rep, sbcid_promoter, \
-               sbcid_enhancer, sbcid_domain, sbcid_loop, sbcid_tss, sbcid_sbc
-
-    def get_lists(self, dict):
-        key_list = []
-        value_list = []
-
-        for key, value in sorted(dict.items(), key=operator.itemgetter(1), reverse=True):
-            key_list.append(key)
-            value_list.append(value)
-
-        return key_list, value_list
-
-    def reorder_lists(self, key_list_lstm, key_list_other, value_list_other):
-        key_list_other_sort = sorted(key_list_other, key=lambda i: key_list_lstm.index(i))
-        temp = {val: key for key, val in enumerate(key_list_other_sort)}
-        res = list(map(temp.get, key_list_lstm))
-        value_list_other = [value_list_other[i] for i in res]
-
-        return value_list_other
-
-    def plot_combined_all(self, cell):
-        methods = ["Hi-C-LSTM", "SNIPER-INTRA", "SNIPER-INTER", "SCI", "PCA", "SBCID"]
-        if cell == "HFFhTERT":
-            tasks = ["Gene Expression", "Enhancers", "TSS", "TADs", "subTADs", "Loop Domains", "TAD Boundaries",
-                     "subTAD Boundaries", "Subcompartments"]
-            colors = ['C3', 'C1', 'C2', 'C6', 'C7', 'C8', 'C9', 'C10', 'C11']
-
-            lstm_values_all_tasks = np.load(self.path + "hff_values_all_tasks.npy")
-            sniper_intra_values_all_tasks = np.load(self.path + "sniper_intra_hff_all_tasks.npy")
-            sniper_inter_values_all_tasks = np.load(self.path + "sniper_inter_hff_all_tasks.npy")
-            graph_values_all_tasks = np.load(self.path + "graph_hff_all_tasks.npy")
-            pca_values_all_tasks = np.load(self.path + "pca_hff_all_tasks.npy")
-            sbcid_values_all_tasks = np.load(self.path + "sbcid_hff_all_tasks.npy")
-
-            lstm_auroc_all_tasks = np.load(self.path + "hff_auroc_all_tasks.npy")
-            sniper_intra_auroc_all_tasks = np.load(self.path + "sniper_intra_auroc_hff_all_tasks.npy")
-            sniper_inter_auroc_all_tasks = np.load(self.path + "sniper_inter_auroc_hff_all_tasks.npy")
-            graph_auroc_all_tasks = np.load(self.path + "graph_auroc_hff_all_tasks.npy")
-            pca_auroc_all_tasks = np.load(self.path + "pca_auroc_hff_all_tasks.npy")
-            sbcid_auroc_all_tasks = np.load(self.path + "sbcid_auroc_hff_all_tasks.npy")
-
-            lstm_accuracy_all_tasks = np.load(self.path + "hff_accuracy_all_tasks.npy")
-            sniper_intra_accuracy_all_tasks = np.load(self.path + "sniper_intra_accuracy_hff_all_tasks.npy")
-            sniper_inter_accuracy_all_tasks = np.load(self.path + "sniper_inter_accuracy_hff_all_tasks.npy")
-            graph_accuracy_all_tasks = np.load(self.path + "graph_accuracy_hff_all_tasks.npy")
-            pca_accuracy_all_tasks = np.load(self.path + "pca_accuracy_hff_all_tasks.npy")
-            sbcid_accuracy_all_tasks = np.load(self.path + "sbcid_accuracy_hff_all_tasks.npy")
-
-            lstm_fscore_all_tasks = np.load(self.path + "lstm_fscore_hff_all_tasks.npy")
-            sniper_intra_fscore_all_tasks = np.load(self.path + "sniper_intra_fscore_hff_all_tasks.npy")
-            sniper_inter_fscore_all_tasks = np.load(self.path + "sniper_inter_fscore_hff_all_tasks.npy")
-            graph_fscore_all_tasks = np.load(self.path + "graph_fscore_hff_all_tasks.npy")
-            pca_fscore_all_tasks = np.load(self.path + "pca_fscore_hff_all_tasks.npy")
-            sbcid_fscore_all_tasks = np.load(self.path + "sbcid_fscore_hff_all_tasks.npy")
-
-        df_main = pd.DataFrame(
-            columns=["Tasks", "Hi-C-LSTM", "SNIPER-INTRA", "SNIPER-INTER", "SCI", "PCA",
-                     "SBCID"])
-        df_main["Tasks"] = tasks
-        df_main[
-            "Hi-C-LSTM"] = lstm_values_all_tasks + lstm_auroc_all_tasks + lstm_accuracy_all_tasks + lstm_fscore_all_tasks
-        df_main[
-            "SNIPER-INTRA"] = sniper_intra_values_all_tasks + sniper_intra_auroc_all_tasks + sniper_intra_accuracy_all_tasks + sniper_intra_fscore_all_tasks
-        df_main[
-            "SNIPER-INTER"] = sniper_inter_values_all_tasks + sniper_inter_auroc_all_tasks + sniper_inter_accuracy_all_tasks + sniper_inter_fscore_all_tasks
-        df_main[
-            "SCI"] = graph_values_all_tasks + graph_auroc_all_tasks + graph_accuracy_all_tasks + graph_fscore_all_tasks
-        df_main["PCA"] = pca_values_all_tasks + pca_auroc_all_tasks + pca_accuracy_all_tasks + pca_fscore_all_tasks
-        df_main[
-            "SBCID"] = sbcid_values_all_tasks + sbcid_auroc_all_tasks + sbcid_accuracy_all_tasks + sbcid_fscore_all_tasks
-
-        # df_main.to_csv(self.path + "%s_metrics_df.csv" % (cell), sep="\t")
-
-        df_main = pd.read_csv(self.path + "%s_metrics_df.csv" % (cell), sep="\t")
-        df_main = df_main.drop(['Unnamed: 0'], axis=1)
-
-        def plot_stackedbar(df_main, tasks, colors):
-            # df_main = df_main.set_index("Tasks")
-            df_main = df_main.T
-            df_main.columns = df_main.iloc[0]
-            df_main = df_main.drop(["Tasks"], axis=0)
-            fields = df_main.columns.tolist()
-
-            # figure and axis
-            fig, ax = plt.subplots(1, figsize=(22, 12))
-
-            # plot bars
-            left = len(df_main) * [0]
-            for idx, name in enumerate(fields):
-                plt.barh(df_main.index, df_main[name], left=left, color=colors[idx])
-                left = left + df_main[name]
-
-            # legend
-            plt.rcParams.update({'font.size': 22})
-            plt.legend(tasks, bbox_to_anchor=([0.02, 1, 0, 0]), ncol=6, frameon=False, fontsize=14)
-
-            # remove spines
-            ax.spines['right'].set_visible(False)
-            ax.spines['left'].set_visible(False)
-            ax.spines['top'].set_visible(False)
-            ax.spines['bottom'].set_visible(False)
-
-            # format x ticks
-            xticks = np.arange(0, 36.1, 4)
-            xlabels = ['{}'.format(i) for i in np.arange(0, 36.1, 4)]
-            plt.xticks(xticks, xlabels, fontsize=20)
-
-            # adjust limits and draw grid lines
-            plt.ylim(-0.5, ax.get_yticks()[-1] + 0.5)
-            ax.xaxis.grid(color='gray', linestyle='dashed')
-            plt.xlabel("Prediction Target", fontsize=20)
-            plt.ylabel("Cumulative Prediction Score", fontsize=20)
-
-            plt.savefig("/home/kevindsouza/Downloads/H1hESC_metrics.png")
-
-        plot_stackedbar(df_main, tasks, colors)
-
-        print("done")
-
-        pass
+        plt.savefig("/home/kevindsouza/Downloads/H1hESC_metrics.png")
 
     def plot_combined(self, cell):
-        if cell == "H1hESC":
-            tasks = ["Gene Expression", "Enhancers", "TSS", "TADs", "subTADs", "Loop Domains", "TAD Boundaries",
-                     "subTAD Boundaries", "Subcompartments"]
-            colors = ['C3', 'C1', 'C2', 'C6', 'C7', 'C8', 'C9', 'C10', 'C11']
-
-            lstm_values_all_tasks = np.load(self.path + "h1_values_all_tasks.npy")
-            sniper_intra_values_all_tasks = np.load(self.path + "sniper_intra_h1_all_tasks.npy")
-            sniper_inter_values_all_tasks = np.load(self.path + "sniper_inter_h1_all_tasks.npy")
-            graph_values_all_tasks = np.load(self.path + "graph_h1_all_tasks.npy")
-            pca_values_all_tasks = np.load(self.path + "pca_h1_all_tasks.npy")
-            sbcid_values_all_tasks = np.load(self.path + "sbcid_h1_all_tasks.npy")
-        elif cell == "HFFhTERT":
-            tasks = ["Gene Expression", "Enhancers", "TSS", "TADs", "subTADs", "Loop Domains", "TAD Boundaries",
-                     "subTAD Boundaries", "Subcompartments"]
-            colors = ['C3', 'C1', 'C2', 'C6', 'C7', 'C8', 'C9', 'C10', 'C11']
-
-            lstm_values_all_tasks = np.load(self.path + "hff_values_all_tasks.npy")
-            sniper_intra_values_all_tasks = np.load(self.path + "sniper_intra_hff_all_tasks.npy")
-            sniper_inter_values_all_tasks = np.load(self.path + "sniper_inter_hff_all_tasks.npy")
-            graph_values_all_tasks = np.load(self.path + "graph_hff_all_tasks.npy")
-            pca_values_all_tasks = np.load(self.path + "pca_hff_all_tasks.npy")
-            sbcid_values_all_tasks = np.load(self.path + "sbcid_hff_all_tasks.npy")
-
-        df_main = pd.DataFrame(columns=["Tasks", "Hi-C-LSTM", "SNIPER-INTRA", "SNIPER-INTER", "SCI", "PCA", "SBCID"])
-        df_main["Tasks"] = tasks
-        df_main["Hi-C-LSTM"] = lstm_values_all_tasks
-        df_main["SNIPER-INTRA"] = sniper_intra_values_all_tasks
-        df_main["SNIPER-INTER"] = sniper_inter_values_all_tasks
-        df_main["SCI"] = graph_values_all_tasks
-        df_main["PCA"] = pca_values_all_tasks
-        df_main["SBCID"] = sbcid_values_all_tasks
-
         df_main = pd.read_csv(self.path + "%s_accuracy_df.csv" % (cell), sep="\t")
         df_main = df_main.drop(['Unnamed: 0'], axis=1)
 
@@ -265,42 +76,25 @@ class PlotFns:
         plt.legend(fontsize=18)
         plt.subplots_adjust(bottom=0.35)
         plt.savefig("/home/kevindsouza/Downloads/map.png")
-        # plt.show()
-
-        pass
 
     def plot_mAP_celltypes(self):
         tasks = ["Gene Expression", "Enhancers", "TSS", "TADs", "subTADs", "Loop Domains",
                  "TAD Boundaries", "subTAD Boundaries", "Subcompartments"]
 
         gm_values_all_tasks = np.load(self.path + "gm_reduced_all_tasks.npy")
-        gm_auroc_reduced = np.load(self.path + "gm_auroc_reduced.npy")
-        gm_accuracy_reduced = np.load(self.path + "gm_accuracy_reduced.npy")
-        gm_fscore_all_tasks = np.load(self.path + "gm_fscore_reduced.npy")
-
         h1_values_all_tasks = np.load(self.path + "h1_values_all_tasks.npy")
-        h1_auroc_all_tasks = np.load(self.path + "h1_auroc_all_tasks.npy")
-        h1_accuracy_all_tasks = np.load(self.path + "h1_accuracy_all_tasks.npy")
-        h1_fscore_all_tasks = np.load(self.path + "lstm_fscore_h1_all_tasks.npy")
-
         hff_values_all_tasks = np.load(self.path + "hff_values_all_tasks.npy")
-        hff_auroc_all_tasks = np.load(self.path + "hff_auroc_all_tasks.npy")
-        hff_accuracy_all_tasks = np.load(self.path + "hff_accuracy_all_tasks.npy")
-        hff_fscore_all_tasks = np.load(self.path + "lstm_fscore_hff_all_tasks.npy")
-
         gmlow_values_all_tasks = np.load(self.path + "gmlow_metrics_all_tasks.npy")
         gmlow2_values_all_tasks = np.load(self.path + "gmlow2_metrics_all_tasks.npy")
 
         df_main = pd.DataFrame(columns=["Tasks", "GM12878_Rao", "H1hESC_Dekker",
                                         "GM12878_low", "HFFhTERT_Dekker", "GM12878_low2"])
         df_main["Tasks"] = tasks
-        df_main["GM12878_Rao"] = gm_values_all_tasks + gm_auroc_reduced + gm_accuracy_reduced + gm_fscore_all_tasks
-        df_main[
-            "H1hESC_Dekker"] = h1_values_all_tasks + h1_auroc_all_tasks + h1_accuracy_all_tasks + h1_fscore_all_tasks
+        df_main["GM12878_Rao"] = gm_values_all_tasks
+        df_main["H1hESC_Dekker"] = h1_values_all_tasks
         df_main["GM12878_low"] = gmlow_values_all_tasks
         df_main["GM12878_low2"] = gmlow2_values_all_tasks
-        df_main[
-            "HFFhTERT_Dekker"] = hff_values_all_tasks + hff_auroc_all_tasks + hff_accuracy_all_tasks + hff_fscore_all_tasks
+        df_main["HFFhTERT_Dekker"] = hff_values_all_tasks
 
         plt.figure(figsize=(12, 10))
         plt.xticks(rotation=90, fontsize=20)
@@ -320,9 +114,6 @@ class PlotFns:
         plt.legend(fontsize=18)
         plt.subplots_adjust(bottom=0.35)
         plt.savefig("/home/kevindsouza/Downloads/map_cells.png")
-        # plt.show()
-
-        pass
 
     def plot_mAP_resolutions(self):
         tasks = ["Gene Expression", "Enhancers", "TADs", "subTADs", "Subcompartments"]
@@ -1071,9 +862,8 @@ if __name__ == "__main__":
     cfg = config.Config()
     plot_ob = PlotFns(cfg)
 
-    plot_ob.plot_combined(cell="HFFhTERT")
-    # plot_ob.plot_combined_all(cell="GM12878")
-    # plot_ob.plot_mAP_celltypes()
+    # plot_ob.plot_combined(cell="HFFhTERT")
+    plot_ob.plot_mAP_celltypes()
     # plot_ob.plot_mAP_resolutions()
     # plot_ob.plot_auroc_celltypes()
     # plot_ob.plot_auroc()
