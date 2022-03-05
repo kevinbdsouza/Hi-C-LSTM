@@ -275,18 +275,7 @@ class PlotFns:
         pass
 
     def plot_combined(self, cell):
-        if cell == "GM12878":
-            tasks = ["Gene Expression", "Replication Timing", "Enhancers", "TSS", "PE-Interactions", "FIREs",
-                     "TADs", "subTADs", "Loop Domains", "TAD Boundaries", "subTAD Boundaries", "Subcompartments"]
-            colors = ['C3', 'C0', 'C1', 'C2', 'C4', 'C5', 'C6', 'C7', 'C8', 'C9', 'C10', 'C11']
-
-            lstm_values_all_tasks = np.load(self.path + "gm_accuracy_all_tasks.npy")
-            sniper_intra_values_all_tasks = np.load(self.path + "gm_sniper_intra_accuracy_all_tasks.npy")
-            sniper_inter_values_all_tasks = np.load(self.path + "gm_sniper_inter_accuracy_all_tasks.npy")
-            graph_values_all_tasks = np.load(self.path + "gm_graph_accuracy_all_tasks.npy")
-            pca_values_all_tasks = np.load(self.path + "gm_pca_accuracy_all_tasks.npy")
-            sbcid_values_all_tasks = np.load(self.path + "gm_sbcid_accuracy_all_tasks.npy")
-        elif cell == "H1hESC":
+        if cell == "H1hESC":
             tasks = ["Gene Expression", "Enhancers", "TSS", "TADs", "subTADs", "Loop Domains", "TAD Boundaries",
                      "subTAD Boundaries", "Subcompartments"]
             colors = ['C3', 'C1', 'C2', 'C6', 'C7', 'C8', 'C9', 'C10', 'C11']
@@ -1147,7 +1136,7 @@ if __name__ == "__main__":
     cfg = config.Config()
     plot_ob = PlotFns(cfg)
 
-    plot_ob.plot_combined(cell="GM12878")
+    plot_ob.plot_combined(cell="H1hESC")
     # plot_ob.plot_combined_all(cell="GM12878")
     # plot_ob.plot_mAP_celltypes()
     # plot_ob.plot_mAP_resolutions()
