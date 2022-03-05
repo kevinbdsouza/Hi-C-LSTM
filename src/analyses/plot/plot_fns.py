@@ -307,7 +307,7 @@ class PlotFns:
         df_main["PCA"] = pca_values_all_tasks
         df_main["SBCID"] = sbcid_values_all_tasks
 
-        df_main = pd.read_csv(self.path + "%s_auroc_df.csv" % (cell), sep="\t")
+        df_main = pd.read_csv(self.path + "%s_fscore_df.csv" % (cell), sep="\t")
         df_main = df_main.drop(['Unnamed: 0'], axis=1)
 
         plt.figure(figsize=(12, 10))
@@ -315,7 +315,7 @@ class PlotFns:
         plt.xticks(rotation=90, fontsize=20)
         plt.yticks(fontsize=20)
         plt.xlabel("Prediction Target", fontsize=20)
-        plt.ylabel("AuROC", fontsize=20)
+        plt.ylabel("F-score", fontsize=20)
         plt.plot('Tasks', 'Hi-C-LSTM', data=df_main, marker='o', markersize=16, color="C3", linewidth=3,
                  label="Hi-C-LSTM")
         plt.plot('Tasks', 'SNIPER-INTRA', data=df_main, marker='*', markersize=16, color="C0", linewidth=3,
