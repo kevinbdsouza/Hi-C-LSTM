@@ -95,25 +95,13 @@ def get_samples_sparse(data, chr, cfg):
     """
 
     hic_mat, nrows = get_hicmat(data)
-    indices = np.arange(0, nrows)
 
+    indices = np.arange(0, nrows)
     cum_idx = get_bin_idx(np.full(hic_mat.shape[0], chr), indices, cfg)
 
-    values = []
-    for row in range(nrows):
-        vals = hic_mat[row, :]
-        nvals = vals.shape[0]
-        if nvals == 0:
-            continue
-        else:
-            vals = contactProbabilities(vals, smoothing=cfg.hic_smoothing)
+    values = torch.from_numpy(hic_mat)
+    cum_idx = torch.from_numpy(cum_idx)
 
-        vals = torch.from_numpy(vals)
-        values.append(vals)
-
-    "convert to tensor"
-    values = torch.Tensor(values)
-    cum_idx = torch.Tensor(cum_idx)
     return cum_idx, values
 
 
