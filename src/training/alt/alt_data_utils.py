@@ -83,7 +83,7 @@ def get_hicmat(data, chr, cfg):
     hic_mat[np.diag_indices_from(hic_mat)] /= 2
 
     indices = np.arange(0, nrows)
-    cum_idx = get_bin_idx(np.full(hic_mat.shape[0], chr), indices, cfg)
+    cum_idx = get_bin_idx(np.full(nrows, chr), indices, cfg)
     indices = np.zeros(nrows_full, )
     indices[:nrows] = cum_idx
     return hic_mat, indices, nrows, nrows_full
