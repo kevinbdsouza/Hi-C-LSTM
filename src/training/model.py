@@ -179,8 +179,8 @@ class SeqLSTM(nn.Module):
                     writer.add_scalar('training loss',
                                       loss, i + epoch * len(data_loader))
 
-            "save model"
-            torch.save(self.state_dict(), cfg.model_dir + self.model_name + '.pth')
+                    "save model"
+                    torch.save(self.state_dict(), cfg.model_dir + self.model_name + '.pth')
             print('Completed epoch %s' % str(epoch + 1))
             print('Average loss: %s' % (running_loss / len(data_loader)))
 
