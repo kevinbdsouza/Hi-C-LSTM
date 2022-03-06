@@ -232,7 +232,7 @@ class SeqLSTM(nn.Module):
                     input_pairs = input_pairs.view((-1, self.cfg.mlp_batch_size, 2))
 
                     batch_loss = 0.0
-                    for i in range(input_pairs.shape[0]):
+                    for i in tqdm(range(input_pairs.shape[0])):
                         "Forward Pass"
                         full_reps = self(indices, nrows)
 
