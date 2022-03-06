@@ -112,7 +112,6 @@ class SeqLSTM(nn.Module):
             output_fc = self.sigm(output_fc).squeeze(1)
             value_pairs = values[rows, columns]
             loss = loss + criterion(output_fc, value_pairs)
-            print("done")
 
         return full_reps, loss
 
