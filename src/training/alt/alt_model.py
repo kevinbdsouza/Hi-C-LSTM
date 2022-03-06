@@ -131,20 +131,28 @@ class SeqLSTM(nn.Module):
         start = 1 + cum_pos
         stop = nrows + cum_pos + 1
 
-        full_reps[0] = torch.cat([output_pos[-1], output_mb[-1], output_mega[-1]], 0)
+        zero_embed = torch.cat([output_pos[-1], output_mb[-1], output_mega[-1]], 0)
 
-        output_mb = output_mb[:n_mb, :]
-        output_mega = output_mega[:n_mega, :]
+        output_mb_fit = output_mb[:n_mb, :]
+        output_mega_fit = output_mega[:n_mega, :]
 
-        full_reps[start:stop, :self.cfg.hs_pos_lstm] = output_pos[:nrows]
-        output_mb = torch.repeat_interleave(output_mb, self.cfg.sequence_length_pos, dim=0)
-        output_mb = output_mb[:nrows]
-        full_reps[start:stop, self.cfg.hs_pos_lstm:self.cfg.hs_pos_lstm + self.cfg.hs_mb_lstm] = output_mb
+        output_pos_fit = output_pos[:nrows]
+        #full_reps[start:stop, :self.cfg.hs_pos_lstm] = output_pos[:nrows]
 
-        output_mega = torch.repeat_interleave(output_mega, self.cfg.sequence_length_pos * self.cfg.sequence_length_mb,
+        output_mb_extended = torch.repeat_interleave(output_mb_fit, self.cfg.sequence_length_pos, dim=0)
+        output_mb_fit = output_mb_extended[:nrows]
+
+        #full_reps[start:stop, self.cfg.hs_pos_lstm:self.cfg.hs_pos_lstm + self.cfg.hs_mb_lstm] = output_mb
+
+        output_mega_extended = torch.repeat_interleave(output_mega_fit, self.cfg.sequence_length_pos * self.cfg.sequence_length_mb,
                                               dim=0)
-        output_mega = output_mega[:nrows]
-        full_reps[start:stop, self.cfg.hs_pos_lstm + self.cfg.hs_mb_lstm:self.cfg.pos_embed_size] = output_mega
+        output_mega_fit = output_mega_extended[:nrows]
+
+        concat_reps = torch.cat([output_pos_fit, output_mb_fit, output_mega_fit], 1)
+        full_reps = torch.cat([zero_embed, concat_reps], 0)
+
+        #full_reps[start:stop, self.cfg.hs_pos_lstm + self.cfg.hs_mb_lstm:self.cfg.pos_embed_size] = output_mega
+
         return full_reps
 
     def compile_optimizer(self):
