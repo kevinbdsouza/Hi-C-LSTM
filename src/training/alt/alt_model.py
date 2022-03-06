@@ -115,7 +115,8 @@ class SeqLSTM(nn.Module):
         representations = torch.zeros((output_pos.shape[0], self.cfg.pos_embed_size))
 
         representations[:, :self.cfg.hs_pos_lstm] = output_pos
-
+        output_mb = torch.repeat_interleave(output_mb, self.cfg.sequence_length_pos, dim=0)
+        
         return representations
 
     def compile_optimizer(self):
