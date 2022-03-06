@@ -329,8 +329,8 @@ class SeqLSTM(nn.Module):
                 pred_mat[input_pairs[:, 0], input_pairs[:, 1]] = pred_values
 
                 "detach everything for post"
-                og_mat = indices.cpu().detach().numpy()
-                pred_mat = values.cpu().detach().numpy()
+                og_mat = og_mat.cpu().detach().numpy()
+                pred_mat = pred_mat.cpu().detach().numpy()
 
         return og_mat, pred_mat
 
