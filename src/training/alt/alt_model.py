@@ -221,7 +221,7 @@ class SeqLSTM(nn.Module):
 
                     "Backward and optimize"
                     optimizer.zero_grad()
-                    loss.backward()
+                    loss.backward(retain_graph=True)
                     clip_grad_norm_(self.parameters(), max_norm=cfg.max_norm)
                     optimizer.step()
 
