@@ -90,7 +90,7 @@ class SeqLSTM(nn.Module):
         output_mega = output_mega.reshape((-1, self.cfg.hs_mega_lstm, 2))
         output_mega = torch.mean(output_mega, 2)
 
-        representations = self.combine_reps(output_pos, output_mb, output_mega, cum_pos, n_mega, n_mb, full_reps)
+        full_reps = self.combine_reps(output_pos, output_mb, output_mega, cum_pos, n_mega, n_mb, full_reps)
 
         input = input.view(-1, 1).squeeze(1)
         input_pairs = torch.combinations(input, with_replacement=True)
