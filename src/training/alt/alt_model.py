@@ -91,7 +91,7 @@ class SeqLSTM(nn.Module):
         output_mega, (hidden_mega, _) = self.mega_lstm(hidden_mb, (hidden_mega, state_mega))
         output_mega = output_mega.reshape((-1, self.cfg.hs_mega_lstm, 2))
         output_mega = torch.mean(output_mega, 2)
-        output_mega = output_mega[:n_mega, :]
+        output_mega = output_mega[:n_mega, :].squeeze(0)
 
         representations = self.combine_reps(output_pos, output_mb, output_mega)
 
@@ -116,7 +116,12 @@ class SeqLSTM(nn.Module):
 
         representations[:, :self.cfg.hs_pos_lstm] = output_pos
         output_mb = torch.repeat_interleave(output_mb, self.cfg.sequence_length_pos, dim=0)
-        
+        representations[:, self.cfg.hs_pos_lstm:self.cfg.hs_pos_lstm + self.cfg.hs_mb_lstm] = output_mb
+
+        output_mega = torch.repeat_interleave(output_mega, self.cfg.sequence_length_pos * self.cfg.sequence_length_mb,
+                                              dim=0)
+        output_mega = output_mega[:output_pos.shape[0]]
+
         return representations
 
     def compile_optimizer(self):
