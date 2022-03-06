@@ -1,5 +1,6 @@
 import numpy as np
 import pandas as pd
+import representations as representations
 from tqdm import tqdm
 import torch
 from torch import nn
@@ -57,14 +58,43 @@ class SeqLSTM(nn.Module):
         """
 
         input = input.view(-1, self.cfg.sequence_length_pos)
+        n_mb = input.shape[0]
 
         pos_reps = self.pos_embed_layer(input.long())
         pos_reps = pos_reps.view((input.shape[0], self.cfg.sequence_length_pos, -1))
 
         hidden_pos, state_pos = self._initHidden(input.shape[0], self.cfg.hs_pos_lstm)
-
         output_pos, (hidden_pos, _) = self.pos_lstm(pos_reps, (hidden_pos, state_pos))
+        output_pos = output_pos.reshape((-1, self.cfg.hs_pos_lstm, 2))
+        output_pos = torch.mean(output_pos, 2)
 
+        hidden_pos = torch.mean(hidden_pos, 0)
+        pad_len = self.cfg.sequence_length_mb - (hidden_pos.size()[0] % self.cfg.sequence_length_mb)
+        pad = torch.zeros(pad_len, self.cfg.hs_pos_lstm).to(self.device)
+        hidden_pos = torch.cat([hidden_pos, pad], 0)
+        hidden_pos = hidden_pos.view((-1, self.cfg.sequence_length_mb, self.cfg.hs_pos_lstm))
+
+        hidden_mb, state_mb = self._initHidden(hidden_pos.shape[0], self.cfg.hs_mb_lstm)
+        output_mb, (hidden_mb, _) = self.mb_lstm(hidden_pos, (hidden_mb, state_mb))
+        output_mb = output_mb.reshape((-1, self.cfg.hs_mb_lstm, 2))
+        output_mb = torch.mean(output_mb, 2)
+        output_mb = output_mb[:n_mb, :]
+
+        hidden_mb = torch.mean(hidden_mb, 0)
+        n_mega = hidden_mb.size()[0]
+        pad_len = self.cfg.sequence_length_mega - (hidden_mb.size()[0] % self.cfg.sequence_length_mega)
+        pad = torch.zeros(pad_len, self.cfg.hs_mb_lstm).to(self.device)
+        hidden_mb = torch.cat([hidden_mb, pad], 0)
+        hidden_mb = hidden_mb.unsqueeze(0)
+
+        hidden_mega, state_mega = self._initHidden(hidden_mb.shape[0], self.cfg.hs_mega_lstm)
+        output_mega, (hidden_mega, _) = self.mega_lstm(hidden_mb, (hidden_mega, state_mega))
+        output_mega = output_mega.reshape((-1, self.cfg.hs_mega_lstm, 2))
+        output_mega = torch.mean(output_mega, 2)
+        output_mega = output_mega[:n_mega, :]
+
+        representations = self.combine_reps(output_pos, output_mb, output_mega)
+        
         output = self.out(output_pos.reshape(input.shape[0], -1))
         output = self.sigm(output)
         return output, pos_reps
@@ -80,6 +110,13 @@ class SeqLSTM(nn.Module):
         c = Variable(torch.randn(2, batch_size, hidden_size)).to(self.device)
 
         return h, c
+
+    def combine_reps(self, output_pos, output_mb, output_mega):
+        representations = torch.zeros((output_pos.shape[0], self.cfg.pos_embed_size))
+
+        representations[:, self.cfg.hs_pos_lstm] = output_pos
+
+        return representations
 
     def compile_optimizer(self):
         """
