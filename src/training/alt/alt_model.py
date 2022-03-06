@@ -7,6 +7,9 @@ from torch.autograd import Variable
 from torch.nn.utils.clip_grad import clip_grad_norm_
 import training.ln_lstm as lstm
 from training.alt.alt_data_utils import get_data, get_cumpos
+import warnings
+
+warnings.filterwarnings("ignore")
 
 
 class FullMLP(nn.Module):
@@ -244,7 +247,6 @@ class SeqLSTM(nn.Module):
                     "save model"
                     torch.save(self.state_dict(), cfg.model_dir + self.model_name + '.pth')
 
-            print('Completed epoch %s' % str(epoch + 1))
             print('Average loss: %s' % (epoch_loss / (values.shape[0] * values.shape[1])))
 
     def post_processing(self, cfg, ind, val, pred, embed, pred_df, prev_error_list, error_compute, zero_embed):
