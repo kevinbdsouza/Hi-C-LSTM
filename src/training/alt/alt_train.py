@@ -6,7 +6,7 @@ from training.alt.alt_model import SeqLSTM
 from training.alt.alt_data_utils import get_data_loader_batch_chr, save_processed_data
 
 device = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
-
+device = "cpu"
 
 def train_model(cfg, writer):
     """
