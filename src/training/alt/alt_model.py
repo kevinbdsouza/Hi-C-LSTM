@@ -96,7 +96,7 @@ class SeqLSTM(nn.Module):
         input_pairs = torch.combinations(input, with_replacement=True)
         input_pairs = input_pairs.view((-1, self.cfg.mlp_batch_size, 2))
 
-        #loss = torch.Tensor(0).to(self.device)
+        loss = torch.tensor([0.0], requires_grad=True).to(self.device)
         for i in range(input_pairs.shape[0]):
             input_pair = input_pairs[i].long()
             rows = input_pair[:, 0] - cum_pos
@@ -111,7 +111,7 @@ class SeqLSTM(nn.Module):
             output_fc = self.fc2(output_fc)
             output_fc = self.sigm(output_fc).squeeze(1)
             value_pairs = values[rows, columns]
-            loss = criterion(output_fc, value_pairs)
+            loss = loss + criterion(output_fc, value_pairs)
             print("done")
 
         return full_reps, loss
