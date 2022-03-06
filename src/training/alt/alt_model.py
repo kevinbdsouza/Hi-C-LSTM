@@ -98,12 +98,13 @@ class SeqLSTM(nn.Module):
 
         loss = torch.Tensor(0).to(self.device)
         for i in range(input_pairs.shape[0]):
-            input_reps = full_reps[input_pairs[i].long()]
+            input_pair = input_pairs[i].long()
+            input_reps = full_reps[input_pair]
             input_reps = input_reps.view((-1, self.cfg.input_size_mlp))
             output_fc = self.fc1(input_reps)
             output_fc = self.fc2(output_fc)
             output_fc = self.sigm(output_fc).squeeze(1)
-            value_pairs = values[input_pairs[i, :, 0].long(), input_pairs[i, :, 1].long()]
+            value_pairs = values[input_pair[:, 0], input_pair[:, 1]]
             loss += criterion(output_fc, value_pairs)
 
         output = self.out(output_pos.reshape(input.shape[0], -1))
