@@ -58,7 +58,7 @@ class SeqLSTM(nn.Module):
 
         input = input.view(-1, self.cfg.sequence_length_pos)
 
-        pos_reps = self.pos_embed(input.long())
+        pos_reps = self.pos_embed_layer(input.long())
         pos_reps = pos_reps.view((input.shape[0], self.cfg.sequence_length_pos, -1))
 
         hidden_pos, state_pos = self._initHidden(input.shape[0])
