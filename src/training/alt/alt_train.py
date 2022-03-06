@@ -6,7 +6,7 @@ from training.alt.alt_model import SeqLSTM
 from training.alt.alt_data_utils import get_data_loader_batch_chr, save_processed_data
 
 device = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
-device = "cpu"
+
 
 def train_model(cfg, writer):
     """
@@ -28,8 +28,8 @@ def train_model(cfg, writer):
     optimizer, criterion = model.compile_optimizer()
 
     "Get data"
-    #data_loader = get_data_loader_batch_chr(cfg)
-    #print("%s batches loaded" % str(len(data_loader)))
+    # data_loader = get_data_loader_batch_chr(cfg)
+    # print("%s batches loaded" % str(len(data_loader)))
 
     "Train model"
     model.train_model(criterion, optimizer, writer)

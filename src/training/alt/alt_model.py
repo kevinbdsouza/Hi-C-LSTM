@@ -113,9 +113,7 @@ class SeqLSTM(nn.Module):
             value_pairs = values[rows, columns]
             loss += criterion(output_fc, value_pairs)
 
-        output = self.out(output_pos.reshape(input.shape[0], -1))
-        output = self.sigm(output)
-        return output, full_reps, loss
+        return full_reps, loss
 
     def _initHidden(self, batch_size, hidden_size):
         """
@@ -219,7 +217,7 @@ class SeqLSTM(nn.Module):
                     values = values.to(device)
 
                     "Forward Pass"
-                    output, full_reps, loss = self.forward(indices, values, criterion, cum_pos, nrows, full_reps)
+                    full_reps, loss = self.forward(indices, values, criterion, cum_pos, nrows, full_reps)
 
                     "Backward and optimize"
                     optimizer.zero_grad()
