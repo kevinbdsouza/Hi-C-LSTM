@@ -214,14 +214,15 @@ class SeqLSTM(nn.Module):
         cfg = self.cfg
         num_epochs = cfg.num_epochs
 
-        for epoch in range(num_epochs):
-            print("Epoch: {}".format(str(epoch)))
+        for epoch in tqdm(range(num_epochs)):
             with torch.autograd.set_detect_anomaly(True):
                 self.train()
                 epoch_loss = 0.0
 
                 for chr in cfg.chr_train_list:
                     indices, values, nrows = get_data(cfg, chr)
+                    input_pairs = torch.combinations(indices, with_replacement=True)
+                    input_pairs = input_pairs.long()
                     cum_pos = get_cumpos(cfg, chr)
 
                     indices = indices.float().to(device)
@@ -229,15 +230,6 @@ class SeqLSTM(nn.Module):
 
                     "Forward Pass"
                     full_reps = self(indices, nrows)
-
-                    input_pairs = torch.combinations(indices, with_replacement=True)
-                    input_pairs = input_pairs.long()
-                    #input_pairs = input_pairs.view((-1, self.cfg.mlp_batch_size, 2)).long()
-
-                    #batch_loss = 0.0
-                    #for i in tqdm(range(input_pairs.shape[0])):
-
-                    #input_pair = input_pairs.long()
                     loss = self.fullMLP(input_pairs, values, cum_pos, full_reps)
 
                     "Backward and optimize"
@@ -245,8 +237,6 @@ class SeqLSTM(nn.Module):
                     loss.backward()
                     clip_grad_norm_(self.parameters(), max_norm=cfg.max_norm)
                     optimizer.step()
-
-                    #batch_loss += loss.item()
 
                     epoch_loss += loss.item()
                     writer.add_scalar('training loss', loss, epoch * 22 + chr)
