@@ -102,6 +102,9 @@ class SeqLSTM(nn.Module):
             rows = input_pair[:, 0] - cum_pos
             columns = input_pair[:, 1] - cum_pos
 
+            rows[rows < 0] = 0
+            columns[columns < 0] = 0
+
             input_reps = full_reps[input_pair]
             input_reps = input_reps.view((-1, self.cfg.input_size_mlp))
             output_fc = self.fc1(input_reps)
