@@ -204,7 +204,7 @@ class SeqLSTM(nn.Module):
         full_reps = torch.zeros((cfg.genome_len, cfg.pos_embed_size)).to(device)
 
         for epoch in range(num_epochs):
-            print("Epoch:".format(epoch))
+            print("Epoch: %s".format(str(epoch)))
             with torch.autograd.set_detect_anomaly(True):
                 self.train()
                 epoch_loss = 0.0
