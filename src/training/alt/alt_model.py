@@ -48,7 +48,7 @@ class SeqLSTM(nn.Module):
             self.fc1.requires_grad = False
             self.fc2.requires_grad = False
 
-    def forward(self, input, cum_pos, nrows, full_reps):
+    def forward(self, input, values, criterion, cum_pos, nrows, full_reps):
         """
         forward(self, input, nrows) -> tensor, tensor
         Default forward method that reinitializes hidden sates in every frame.
@@ -96,16 +96,19 @@ class SeqLSTM(nn.Module):
         input_pairs = torch.combinations(input, with_replacement=True)
         input_pairs = input_pairs.view((-1, self.cfg.mlp_batch_size, 2))
 
+        loss = 0
         for i in range(input_pairs.shape[0]):
             input_reps = full_reps[input_pairs[i].long()]
             input_reps = input_reps.view((-1, self.cfg.input_size_mlp))
             output_fc = self.fc1(input_reps)
             output_fc = self.fc2(output_fc)
-            output_fc = self.sigm(output_fc)
+            output_fc = self.sigm(output_fc).squeeze(1)
+
+            loss += criterion(output_fc, values)
 
         output = self.out(output_pos.reshape(input.shape[0], -1))
         output = self.sigm(output)
-        return output, full_reps
+        return output, full_reps, loss
 
     def _initHidden(self, batch_size, hidden_size):
         """
@@ -198,7 +201,7 @@ class SeqLSTM(nn.Module):
             print(epoch)
             with torch.autograd.set_detect_anomaly(True):
                 self.train()
-                running_loss = 0.0
+                epoch_loss = 0.0
 
                 for chr in cfg.chr_train_list:
                     indices, values, nrows = get_data(cfg, chr)
@@ -208,8 +211,7 @@ class SeqLSTM(nn.Module):
                     values = values.to(device)
 
                     "Forward Pass"
-                    output, full_reps = self.forward(indices, cum_pos, nrows, full_reps)
-                    loss = criterion(output, values)
+                    output, full_reps, loss = self.forward(indices, values, criterion, cum_pos, nrows, full_reps)
 
                     "Backward and optimize"
                     optimizer.zero_grad()
@@ -217,14 +219,14 @@ class SeqLSTM(nn.Module):
                     clip_grad_norm_(self.parameters(), max_norm=cfg.max_norm)
                     optimizer.step()
 
-                    running_loss += loss.item()
+                    epoch_loss += loss.item()
                     writer.add_scalar('training loss', loss, epoch)
 
                     "save model"
                     torch.save(self.state_dict(), cfg.model_dir + self.model_name + '.pth')
 
             print('Completed epoch %s' % str(epoch + 1))
-            print('Average loss: %s' % (running_loss / values.shape[0] * values.shape[1]))
+            print('Average loss: %s' % (epoch_loss / values.shape[0] * values.shape[1]))
 
     def post_processing(self, cfg, ind, val, pred, embed, pred_df, prev_error_list, error_compute, zero_embed):
         """
