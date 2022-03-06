@@ -242,7 +242,7 @@ class SeqLSTM(nn.Module):
                     optimizer.step()
 
                     epoch_loss += loss.item()
-                    writer.add_scalar('training loss', loss, epoch * 22 + chr)
+                    writer.add_scalar('training loss', loss, epoch)
 
                     "save model"
                     torch.save(self.state_dict(), cfg.model_dir + self.model_name + '.pth')
