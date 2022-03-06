@@ -92,7 +92,7 @@ class SeqLSTM(nn.Module):
         output_mega = output_mega.reshape((-1, self.cfg.hs_mega_lstm, 2))
         output_mega = torch.mean(output_mega, 2)
 
-        full_reps = self.combine_reps(output_pos, output_mb, output_mega, cum_pos, n_mega, n_mb, nrows)
+        full_reps = self.combine_reps(output_pos, output_mb, output_mega, n_mega, n_mb, nrows)
 
         input = input.view(-1, 1).squeeze(1)
         input_pairs = torch.combinations(input, with_replacement=True)
@@ -130,7 +130,7 @@ class SeqLSTM(nn.Module):
 
         return h, c
 
-    def combine_reps(self, output_pos, output_mb, output_mega, cum_pos, n_mega, n_mb, nrows):
+    def combine_reps(self, output_pos, output_mb, output_mega, n_mega, n_mb, nrows):
         zero_embed = torch.cat([output_pos[-1], output_mb[-1], output_mega[-1]], 0).unsqueeze(0)
 
         output_mb_fit = output_mb[:n_mb, :]
@@ -217,7 +217,7 @@ class SeqLSTM(nn.Module):
                     values = values.float().to(device)
 
                     "Forward Pass"
-                    loss = self.forward(indices, values, cum_pos, nrows)
+                    loss = self(indices, values, cum_pos, nrows)
 
                     "Backward and optimize"
                     optimizer.zero_grad()
