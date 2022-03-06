@@ -76,8 +76,8 @@ class SeqLSTM(nn.Module):
         Args:
             batch_size (int): Batch size, usually the first dim of input data
         """
-        h = Variable(torch.randn(1, batch_size, hidden_size)).to(self.device)
-        c = Variable(torch.randn(1, batch_size, hidden_size)).to(self.device)
+        h = Variable(torch.randn(2, batch_size, hidden_size)).to(self.device)
+        c = Variable(torch.randn(2, batch_size, hidden_size)).to(self.device)
 
         return h, c
 
