@@ -6,7 +6,7 @@ from torch import nn
 from torch.autograd import Variable
 from torch.nn.utils.clip_grad import clip_grad_norm_
 import training.ln_lstm as lstm
-from training.alt.alt_data_utils import get_data, get_cumpos
+from training.alt.alt_data_utils import get_data, get_cumpos, convert_indices
 import warnings
 
 
@@ -27,11 +27,6 @@ class FullMLP(nn.Module):
 
         self.criterion = nn.MSELoss()
 
-    def convert_indices(self, input_pairs, cum_pos):
-        input_pairs = input_pairs - cum_pos
-        input_pairs[input_pairs < 0] = 0
-        return input_pairs
-
     def forward(self, input_pairs, values, cum_pos, full_reps):
         """
         forward(self, input_pair, values, cum_pos) -> tensor, tensor
@@ -40,7 +35,7 @@ class FullMLP(nn.Module):
             input (Tensor): The concatenated pairwise indices.
         """
 
-        input_pairs = self.convert_indices(input_pairs, cum_pos)
+        input_pairs = convert_indices(input_pairs, cum_pos)
 
         input_reps = full_reps[input_pairs]
         input_reps = input_reps.view((-1, self.cfg.input_size_mlp))
@@ -292,7 +287,7 @@ class SeqLSTM(nn.Module):
             for n in range(2 * cfg.pos_embed_size):
                 pred_df[n] = embed[:, n]
 
-        return pred_df, error_list, zero_embed
+        return pred_df, zero_embed
 
     def test(self):
         """
@@ -329,8 +324,8 @@ class SeqLSTM(nn.Module):
                 full_reps = self(indices, nrows)
                 error, og_values, pred_values = self.fullMLP(input_pairs, values, cum_pos, full_reps)
 
-                input_pairs = self.convert_indices(input_pairs, cum_pos)
-                og_mat[input_pairs[:,0], input_pairs[:,1]] = og_values
+                input_pairs = convert_indices(input_pairs, cum_pos)
+                og_mat[input_pairs[:, 0], input_pairs[:, 1]] = og_values
                 pred_mat[input_pairs[:, 0], input_pairs[:, 1]] = pred_values
 
                 "detach everything for post"

@@ -23,6 +23,11 @@ def get_cumpos(cfg, chr_num):
     return cum_pos
 
 
+def convert_indices(self, input_pairs, cum_pos):
+    input_pairs = input_pairs - cum_pos
+    input_pairs[input_pairs < 0] = 0
+    return input_pairs
+
 def get_bin_idx(chr, pos, cfg):
     """
     get_bin_idx(chr, pos, cfg) -> List
