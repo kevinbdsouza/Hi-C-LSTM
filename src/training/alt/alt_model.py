@@ -9,8 +9,6 @@ import training.ln_lstm as lstm
 from training.alt.alt_data_utils import get_data, get_cumpos
 import warnings
 
-warnings.filterwarnings("ignore")
-
 
 class FullMLP(nn.Module):
     """
@@ -224,7 +222,9 @@ class SeqLSTM(nn.Module):
 
                 for chr in cfg.chr_train_list:
                     indices, values, nrows = get_data(cfg, chr)
-                    input_pairs = torch.combinations(indices, with_replacement=True)
+                    with warnings.catch_warnings():
+                        warnings.simplefilter("ignore")
+                        input_pairs = torch.combinations(indices, with_replacement=True)
                     input_pairs = input_pairs.long()
                     cum_pos = get_cumpos(cfg, chr)
 
