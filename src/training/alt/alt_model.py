@@ -99,17 +99,18 @@ class SeqLSTM(nn.Module):
         loss = torch.tensor([0.0], requires_grad=True).float().to(self.device)
         for i in range(input_pairs.shape[0]):
             input_pair = input_pairs[i].long()
-            rows = input_pair[:, 0] - cum_pos
-            columns = input_pair[:, 1] - cum_pos
-
-            rows[rows < 0] = 0
-            columns[columns < 0] = 0
+            input_pair = input_pair - cum_pos
+            input_pair[input_pair<0] = 0
 
             input_reps = full_reps[input_pair]
             input_reps = input_reps.view((-1, self.cfg.input_size_mlp))
             output_fc = self.fc1(input_reps)
             output_fc = self.fc2(output_fc)
             output_fc = self.sigm(output_fc).squeeze(1)
+
+            rows = input_pair[:, 0]
+            columns = input_pair[:, 1]
+
             value_pairs = values[rows, columns]
             loss = loss + criterion(output_fc, value_pairs)
 
