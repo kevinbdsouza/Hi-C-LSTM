@@ -131,7 +131,7 @@ class SeqLSTM(nn.Module):
         start = 1 + cum_pos
         stop = nrows + cum_pos + 1
 
-        zero_embed = torch.cat([output_pos[-1], output_mb[-1], output_mega[-1]], 0).unsqueeze()(0)
+        zero_embed = torch.cat([output_pos[-1], output_mb[-1], output_mega[-1]], 0).unsqueeze(0)
 
         output_mb_fit = output_mb[:n_mb, :]
         output_mega_fit = output_mega[:n_mega, :]
