@@ -231,7 +231,8 @@ class SeqLSTM(nn.Module):
                     full_reps = self(indices, nrows)
 
                     input_pairs = torch.combinations(indices, with_replacement=True)
-                    input_pairs = input_pairs.view((-1, self.cfg.mlp_batch_size, 2)).long()
+                    input_pairs = input_pairs.long()
+                    #input_pairs = input_pairs.view((-1, self.cfg.mlp_batch_size, 2)).long()
 
                     #batch_loss = 0.0
                     #for i in tqdm(range(input_pairs.shape[0])):
