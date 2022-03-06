@@ -1,13 +1,12 @@
 import numpy as np
 import pandas as pd
-import representations as representations
 from tqdm import tqdm
 import torch
 from torch import nn
 from torch.autograd import Variable
 from torch.nn.utils.clip_grad import clip_grad_norm_
 import training.ln_lstm as lstm
-from training.alt.alt_data_utils import get_data
+from training.alt.alt_data_utils import get_data, get_cumpos
 
 
 class SeqLSTM(nn.Module):
@@ -49,9 +48,9 @@ class SeqLSTM(nn.Module):
             self.fc1.requires_grad = False
             self.fc2.requires_grad = False
 
-    def forward(self, input, nrows):
+    def forward(self, input, cum_pos, nrows, full_reps):
         """
-        forward_reinit(self, input) -> tensor, tensor
+        forward(self, input, nrows) -> tensor, tensor
         Default forward method that reinitializes hidden sates in every frame.
         Args:
             input (Tensor): The concatenated pairwise indices.
@@ -93,11 +92,14 @@ class SeqLSTM(nn.Module):
         output_mega = torch.mean(output_mega, 2)
         output_mega = output_mega[:n_mega, :].squeeze(0)
 
-        representations = self.combine_reps(output_pos, output_mb, output_mega)
+        representations = self.combine_reps(output_pos, output_mb, output_mega, input, cum_pos, full_reps)
+
+        input = input.view(-1, 1).squeeze(1)
+        input_pairs = torch.combinations(input, with_replacement=True)
 
         output = self.out(output_pos.reshape(input.shape[0], -1))
         output = self.sigm(output)
-        return output, pos_reps
+        return output, full_reps
 
     def _initHidden(self, batch_size, hidden_size):
         """
@@ -111,18 +113,19 @@ class SeqLSTM(nn.Module):
 
         return h, c
 
-    def combine_reps(self, output_pos, output_mb, output_mega):
-        representations = torch.zeros((output_pos.shape[0], self.cfg.pos_embed_size))
+    def combine_reps(self, output_pos, output_mb, output_mega, input, cum_pos, full_reps):
+        start = 1 + cum_pos
+        stop = output_pos.shape[0] + cum_pos
 
-        representations[:, :self.cfg.hs_pos_lstm] = output_pos
+        full_reps[start:stop, :self.cfg.hs_pos_lstm] = output_pos
         output_mb = torch.repeat_interleave(output_mb, self.cfg.sequence_length_pos, dim=0)
-        representations[:, self.cfg.hs_pos_lstm:self.cfg.hs_pos_lstm + self.cfg.hs_mb_lstm] = output_mb
+        full_reps[start:stop, self.cfg.hs_pos_lstm:self.cfg.hs_pos_lstm + self.cfg.hs_mb_lstm] = output_mb
 
         output_mega = torch.repeat_interleave(output_mega, self.cfg.sequence_length_pos * self.cfg.sequence_length_mb,
                                               dim=0)
         output_mega = output_mega[:output_pos.shape[0]]
-
-        return representations
+        full_reps[start:stop, self.cfg.hs_pos_lstm + self.cfg.hs_mb_lstm:self.cfg.pos_embed_size] = output_mega
+        return full_reps
 
     def compile_optimizer(self):
         """
@@ -178,6 +181,7 @@ class SeqLSTM(nn.Module):
         device = self.device
         cfg = self.cfg
         num_epochs = cfg.num_epochs
+        full_reps = torch.zeros((cfg.genome_len, cfg.pos_embed_size))
 
         for epoch in range(num_epochs):
             print(epoch)
@@ -187,12 +191,13 @@ class SeqLSTM(nn.Module):
 
                 for chr in cfg.chr_train_list:
                     indices, values, nrows = get_data(cfg, chr)
+                    cum_pos = get_cumpos(cfg, chr)
 
                     indices = indices.to(device)
                     values = values.to(device)
 
                     "Forward Pass"
-                    output, _ = self.forward(indices, nrows)
+                    output, full_reps = self.forward(indices, cum_pos, nrows, full_reps)
                     loss = criterion(output, values)
 
                     "Backward and optimize"
