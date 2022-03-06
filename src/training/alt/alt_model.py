@@ -99,9 +99,9 @@ class SeqLSTM(nn.Module):
         loss = torch.Tensor(0).to(self.device)
         for i in range(input_pairs.shape[0]):
             input_pair = input_pairs[i].long()
-            rows = input_pair[:, 0]
-            columns = input_pair[:, 1]
-            
+            rows = input_pair[:, 0] - cum_pos
+            columns = input_pair[:, 1] - cum_pos
+
             input_reps = full_reps[input_pair]
             input_reps = input_reps.view((-1, self.cfg.input_size_mlp))
             output_fc = self.fc1(input_reps)
