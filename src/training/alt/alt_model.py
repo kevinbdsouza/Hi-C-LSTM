@@ -94,6 +94,7 @@ class SeqLSTM(nn.Module):
 
         input = input.view(-1, 1).squeeze(1)
         input_pairs = torch.combinations(input, with_replacement=True)
+        input_pairs = input_pairs.view((-1, self.cfg.mlp_batch_size, 2))
 
         output = self.out(output_pos.reshape(input.shape[0], -1))
         output = self.sigm(output)
