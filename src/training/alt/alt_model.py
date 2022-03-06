@@ -113,7 +113,7 @@ class SeqLSTM(nn.Module):
             value_pairs = values[rows, columns]
             loss = loss + criterion(output_fc, value_pairs)
 
-        return full_reps, loss
+        return full_reps, loss.float()
 
     def _initHidden(self, batch_size, hidden_size):
         """
