@@ -94,7 +94,7 @@ class SeqLSTM(nn.Module):
         output_mega = output_mega[:n_mega, :]
 
         representations = self.combine_reps(output_pos, output_mb, output_mega)
-        
+
         output = self.out(output_pos.reshape(input.shape[0], -1))
         output = self.sigm(output)
         return output, pos_reps
@@ -114,7 +114,7 @@ class SeqLSTM(nn.Module):
     def combine_reps(self, output_pos, output_mb, output_mega):
         representations = torch.zeros((output_pos.shape[0], self.cfg.pos_embed_size))
 
-        representations[:, self.cfg.hs_pos_lstm] = output_pos
+        representations[:, :self.cfg.hs_pos_lstm] = output_pos
 
         return representations
 
