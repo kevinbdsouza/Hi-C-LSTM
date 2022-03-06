@@ -25,14 +25,14 @@ def train_model(cfg, writer):
     model.load_weights()
 
     "Initalize optimizer"
-    optimizer, criterion = model.compile_optimizer()
+    optimizer = model.compile_optimizer()
 
     "Get data"
     # data_loader = get_data_loader_batch_chr(cfg)
     # print("%s batches loaded" % str(len(data_loader)))
 
     "Train model"
-    model.train_model(criterion, optimizer, writer)
+    model.train_model(optimizer, writer)
 
     "Save model"
     torch.save(model.state_dict(), cfg.model_dir + cfg.model_name + '.pth')

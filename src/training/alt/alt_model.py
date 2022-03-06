@@ -39,6 +39,8 @@ class SeqLSTM(nn.Module):
         self.sigm = nn.Sigmoid()
         self.hidden, self.state = None, None
 
+        self.criterion = nn.MSELoss()
+
         "freezes LSTM during training"
         if cfg.lstm_nontrain:
             self.pos_lstm.requires_grad = False
@@ -48,7 +50,7 @@ class SeqLSTM(nn.Module):
             self.fc1.requires_grad = False
             self.fc2.requires_grad = False
 
-    def forward(self, input, values, criterion, cum_pos, nrows, full_reps):
+    def forward(self, input, values, cum_pos, nrows):
         """
         forward(self, input, nrows) -> tensor, tensor
         Default forward method that reinitializes hidden sates in every frame.
@@ -100,7 +102,7 @@ class SeqLSTM(nn.Module):
         for i in range(input_pairs.shape[0]):
             input_pair = input_pairs[i].long()
             input_pair = input_pair - cum_pos
-            input_pair[input_pair<0] = 0
+            input_pair[input_pair < 0] = 0
 
             input_reps = full_reps[input_pair]
             input_reps = input_reps.view((-1, self.cfg.input_size_mlp))
@@ -112,9 +114,9 @@ class SeqLSTM(nn.Module):
             columns = input_pair[:, 1]
 
             value_pairs = values[rows, columns]
-            loss = loss + criterion(output_fc, value_pairs)
+            loss = loss + self.criterion(output_fc, value_pairs)
 
-        return full_reps, loss
+        return loss
 
     def _initHidden(self, batch_size, hidden_size):
         """
@@ -128,32 +130,23 @@ class SeqLSTM(nn.Module):
 
         return h, c
 
-    def combine_reps(self, output_pos, output_mb, output_mega, cum_pos, n_mega, n_mb, nrows, full_reps):
-        start = 1 + cum_pos
-        stop = nrows + cum_pos + 1
-
+    def combine_reps(self, output_pos, output_mb, output_mega, cum_pos, n_mega, n_mb, nrows):
         zero_embed = torch.cat([output_pos[-1], output_mb[-1], output_mega[-1]], 0).unsqueeze(0)
 
         output_mb_fit = output_mb[:n_mb, :]
         output_mega_fit = output_mega[:n_mega, :]
-
         output_pos_fit = output_pos[:nrows]
-        #full_reps[start:stop, :self.cfg.hs_pos_lstm] = output_pos[:nrows]
 
         output_mb_extended = torch.repeat_interleave(output_mb_fit, self.cfg.sequence_length_pos, dim=0)
         output_mb_fit = output_mb_extended[:nrows]
 
-        #full_reps[start:stop, self.cfg.hs_pos_lstm:self.cfg.hs_pos_lstm + self.cfg.hs_mb_lstm] = output_mb
-
-        output_mega_extended = torch.repeat_interleave(output_mega_fit, self.cfg.sequence_length_pos * self.cfg.sequence_length_mb,
-                                              dim=0)
+        output_mega_extended = torch.repeat_interleave(output_mega_fit,
+                                                       self.cfg.sequence_length_pos * self.cfg.sequence_length_mb,
+                                                       dim=0)
         output_mega_fit = output_mega_extended[:nrows]
 
         concat_reps = torch.cat([output_pos_fit, output_mb_fit, output_mega_fit], 1)
         full_reps = torch.cat([zero_embed, concat_reps], 0)
-
-        #full_reps[start:stop, self.cfg.hs_pos_lstm + self.cfg.hs_mb_lstm:self.cfg.pos_embed_size] = output_mega
-
         return full_reps
 
     def compile_optimizer(self):
@@ -164,9 +157,8 @@ class SeqLSTM(nn.Module):
             No Args, specify learning rate in config. Uses Adam as default.
         """
         optimizer = torch.optim.Adam(self.parameters(), lr=self.cfg.learning_rate)
-        criterion = nn.MSELoss()
 
-        return optimizer, criterion
+        return optimizer
 
     def load_weights(self):
         """
@@ -195,7 +187,7 @@ class SeqLSTM(nn.Module):
         embeddings = self.pos_embed(indices)
         return embeddings.detach().cpu()
 
-    def train_model(self, criterion, optimizer, writer):
+    def train_model(self, optimizer, writer):
         """
         train_model(self, data_loader, criterion, optimizer, writer) -> No return object
         Method to train the model.
@@ -210,7 +202,6 @@ class SeqLSTM(nn.Module):
         device = self.device
         cfg = self.cfg
         num_epochs = cfg.num_epochs
-        full_reps = torch.zeros((cfg.genome_len, cfg.pos_embed_size), requires_grad=True).to(device)
 
         for epoch in range(num_epochs):
             print("Epoch: {}".format(str(epoch)))
@@ -226,7 +217,7 @@ class SeqLSTM(nn.Module):
                     values = values.float().to(device)
 
                     "Forward Pass"
-                    full_reps, loss = self.forward(indices, values, criterion, cum_pos, nrows, full_reps)
+                    loss = self.forward(indices, values, cum_pos, nrows)
 
                     "Backward and optimize"
                     optimizer.zero_grad()
