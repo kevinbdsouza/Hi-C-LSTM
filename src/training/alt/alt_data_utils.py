@@ -104,7 +104,7 @@ def get_samples_sparse(data, chr, cfg):
 
     values = torch.from_numpy(hic_mat)
     indices = torch.from_numpy(indices)
-    return indices, values
+    return indices, values, nrows
 
 
 def contactProbabilities(values, smoothing=8, delta=1e-10):
@@ -138,9 +138,9 @@ def get_data(cfg, chr):
         Skips: if error during extraction using Juicer Tools, prints out empty txt file
     """
     data = load_hic(cfg, chr)
-    cum_idx, values = get_samples_sparse(data, chr, cfg)
+    cum_idx, values, nrows = get_samples_sparse(data, chr, cfg)
 
-    return cum_idx, values
+    return cum_idx, values, nrows
 
 
 def get_data_loader_chr(cfg, chr, shuffle=True):

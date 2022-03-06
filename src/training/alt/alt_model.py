@@ -24,8 +24,8 @@ class SeqLSTM(nn.Module):
         self.model_name = cfg.model_name
 
         "Initializes ebedding layer"
-        self.pos_embed = nn.Embedding(cfg.genome_len, cfg.hs_pos_lstm).train()
-        nn.init.normal_(self.pos_embed.weight)
+        self.pos_embed_layer = nn.Embedding(cfg.genome_len, cfg.hs_pos_lstm).train()
+        nn.init.normal_(self.pos_embed_layer.weight)
 
         "Initializes BiLSTMs"
         self.pos_lstm = lstm.LSTM(cfg.hs_pos_lstm, cfg.hs_pos_lstm, bidirectional=1, batch_first=True)
@@ -41,24 +41,33 @@ class SeqLSTM(nn.Module):
 
         "freezes LSTM during training"
         if cfg.lstm_nontrain:
-            self.lstm.requires_grad = False
-            self.pos_embed.requires_grad = True
-            self.out.requires_grad = True
+            self.pos_lstm.requires_grad = False
+            self.mb_lstm.requires_grad = False
+            self.mega_lstm.requires_grad = False
+            self.pos_embed_layer.requires_grad = True
+            self.fc1.requires_grad = False
+            self.fc2.requires_grad = False
 
-    def forward(self, input):
+    def forward(self, input, nrows):
         """
         forward_reinit(self, input) -> tensor, tensor
         Default forward method that reinitializes hidden sates in every frame.
         Args:
             input (Tensor): The concatenated pairwise indices.
         """
-        hidden, state = self._initHidden(input.shape[0])
-        embeddings = self.pos_embed(input.long())
-        embeddings = embeddings.view((input.shape[0], self.cfg.sequence_length, -1))
-        output, (_, _) = self.lstm(embeddings, (hidden, state))
-        output = self.out(output.reshape(input.shape[0], -1))
+
+        input = input.view(-1, self.cfg.sequence_length_pos)
+
+        pos_reps = self.pos_embed(input.long())
+        pos_reps = pos_reps.view((input.shape[0], self.cfg.sequence_length_pos, -1))
+
+        hidden_pos, state_pos = self._initHidden(input.shape[0])
+
+        output_pos, (hidden_pos, _) = self.pos_lstm(pos_reps, (hidden_pos, state_pos))
+
+        output = self.out(output_pos.reshape(input.shape[0], -1))
         output = self.sigm(output)
-        return output, embeddings
+        return output, pos_reps
 
     def _initHidden(self, batch_size):
         """
@@ -134,13 +143,13 @@ class SeqLSTM(nn.Module):
                 running_loss = 0.0
 
                 for chr in cfg.chr_train_list:
-                    indices, values = get_data(cfg, chr)
+                    indices, values, nrows = get_data(cfg, chr)
 
                     indices = indices.to(device)
                     values = values.to(device)
 
                     "Forward Pass"
-                    output, _ = self.forward(indices)
+                    output, _ = self.forward(indices, nrows)
                     loss = criterion(output, values)
 
                     "Backward and optimize"
