@@ -201,7 +201,7 @@ class SeqLSTM(nn.Module):
         device = self.device
         cfg = self.cfg
         num_epochs = cfg.num_epochs
-        full_reps = torch.zeros((cfg.genome_len, cfg.pos_embed_size)).to(device)
+        full_reps = torch.zeros((cfg.genome_len, cfg.pos_embed_size), requires_grad=True).to(device)
 
         for epoch in range(num_epochs):
             print("Epoch: {}".format(str(epoch)))
