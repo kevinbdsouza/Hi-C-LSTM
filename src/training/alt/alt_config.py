@@ -39,7 +39,7 @@ class Config:
 
         "Hyperparameters"
         self.learning_rate = 0.01
-        self.num_epochs = 4
+        self.num_epochs = 50
         self.batch_size = 210
         self.max_norm = 10
         self.hic_smoothing = 8

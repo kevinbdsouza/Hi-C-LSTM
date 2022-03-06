@@ -247,7 +247,7 @@ class SeqLSTM(nn.Module):
                     "save model"
                     torch.save(self.state_dict(), cfg.model_dir + self.model_name + '.pth')
 
-            print('Average loss: %s' % (epoch_loss / (values.shape[0] * values.shape[1])))
+            print('Epoch loss: %s' % (epoch_loss))
 
     def post_processing(self, cfg, ind, val, pred, embed, pred_df, prev_error_list, error_compute, zero_embed):
         """
