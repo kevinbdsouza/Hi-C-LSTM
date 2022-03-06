@@ -213,8 +213,8 @@ class SeqLSTM(nn.Module):
                     indices, values, nrows = get_data(cfg, chr)
                     cum_pos = get_cumpos(cfg, chr)
 
-                    indices = indices.to(device)
-                    values = values.to(device)
+                    indices = indices.float().to(device)
+                    values = values.float().to(device)
 
                     "Forward Pass"
                     full_reps, loss = self.forward(indices, values, criterion, cum_pos, nrows, full_reps)
