@@ -9,6 +9,47 @@ import training.ln_lstm as lstm
 from training.alt.alt_data_utils import get_data, get_cumpos
 
 
+class FullMLP(nn.Module):
+    """
+    Full MLP.
+    """
+
+    def __init__(self, cfg, device):
+        super(FullMLP, self).__init__()
+        self.device = device
+        self.cfg = cfg
+
+        "Initializes FC"
+        self.fc1 = nn.Linear(cfg.input_size_mlp, cfg.hidden_size_fc2)
+        self.fc2 = nn.Linear(cfg.hidden_size_fc2, cfg.output_size_mlp)
+        self.sigm = nn.Sigmoid()
+
+        self.criterion = nn.MSELoss()
+
+    def forward(self, input_pair, values, cum_pos, full_reps):
+        """
+        forward(self, input_pair, values, cum_pos) -> tensor, tensor
+        Default forward method for MLP.
+        Args:
+            input (Tensor): The concatenated pairwise indices.
+        """
+
+        input_pair = input_pair - cum_pos
+        input_pair[input_pair < 0] = 0
+
+        input_reps = full_reps[input_pair]
+        input_reps = input_reps.view((-1, self.cfg.input_size_mlp))
+        output_fc = self.fc1(input_reps)
+        output_fc = self.fc2(output_fc)
+        output_fc = self.sigm(output_fc).squeeze(1)
+
+        rows = input_pair[:, 0]
+        columns = input_pair[:, 1]
+
+        value_pairs = values[rows, columns]
+        return self.criterion(output_fc, value_pairs)
+
+
 class SeqLSTM(nn.Module):
     """
     Hi-C-LSTM model.
@@ -32,14 +73,7 @@ class SeqLSTM(nn.Module):
         self.mb_lstm = lstm.LSTM(cfg.hs_pos_lstm, cfg.hs_mb_lstm, bidirectional=1, batch_first=True)
         self.mega_lstm = lstm.LSTM(cfg.hs_mb_lstm, cfg.hs_mega_lstm, bidirectional=1, batch_first=True)
 
-        "Initializes FC"
-        self.fc1 = nn.Linear(cfg.input_size_mlp, cfg.hidden_size_fc2)
-        self.fc2 = nn.Linear(cfg.hidden_size_fc2, cfg.output_size_mlp)
-
-        self.sigm = nn.Sigmoid()
-        self.hidden, self.state = None, None
-
-        self.criterion = nn.MSELoss()
+        self.fullMLP = FullMLP(cfg, device)
 
         "freezes LSTM during training"
         if cfg.lstm_nontrain:
@@ -50,7 +84,7 @@ class SeqLSTM(nn.Module):
             self.fc1.requires_grad = False
             self.fc2.requires_grad = False
 
-    def forward(self, input, values, cum_pos, nrows):
+    def forward(self, input, nrows):
         """
         forward(self, input, nrows) -> tensor, tensor
         Default forward method that reinitializes hidden sates in every frame.
@@ -93,30 +127,7 @@ class SeqLSTM(nn.Module):
         output_mega = torch.mean(output_mega, 2)
 
         full_reps = self.combine_reps(output_pos, output_mb, output_mega, n_mega, n_mb, nrows)
-
-        input = input.view(-1, 1).squeeze(1)
-        input_pairs = torch.combinations(input, with_replacement=True)
-        input_pairs = input_pairs.view((-1, self.cfg.mlp_batch_size, 2))
-
-        loss = torch.tensor([0.0], requires_grad=True).float().to(self.device)
-        for i in range(input_pairs.shape[0]):
-            input_pair = input_pairs[i].long()
-            input_pair = input_pair - cum_pos
-            input_pair[input_pair < 0] = 0
-
-            input_reps = full_reps[input_pair]
-            input_reps = input_reps.view((-1, self.cfg.input_size_mlp))
-            output_fc = self.fc1(input_reps)
-            output_fc = self.fc2(output_fc)
-            output_fc = self.sigm(output_fc).squeeze(1)
-
-            rows = input_pair[:, 0]
-            columns = input_pair[:, 1]
-
-            value_pairs = values[rows, columns]
-            loss = loss + self.criterion(output_fc, value_pairs)
-
-        return loss
+        return full_reps
 
     def _initHidden(self, batch_size, hidden_size):
         """
@@ -217,15 +228,26 @@ class SeqLSTM(nn.Module):
                     values = values.float().to(device)
 
                     "Forward Pass"
-                    loss = self(indices, values, cum_pos, nrows)
+                    full_reps = self(indices, nrows)
 
-                    "Backward and optimize"
-                    optimizer.zero_grad()
-                    loss.backward()
-                    clip_grad_norm_(self.parameters(), max_norm=cfg.max_norm)
-                    optimizer.step()
+                    input_pairs = torch.combinations(indices, with_replacement=True)
+                    input_pairs = input_pairs.view((-1, self.cfg.mlp_batch_size, 2))
 
-                    epoch_loss += loss.item()
+                    batch_loss = 0.0
+                    for i in range(input_pairs.shape[0]):
+                        input_pair = input_pairs[i].long()
+
+                        loss = self.fullMLP(input_pair, values, cum_pos, full_reps)
+
+                        "Backward and optimize"
+                        optimizer.zero_grad()
+                        loss.backward()
+                        clip_grad_norm_(self.parameters(), max_norm=cfg.max_norm)
+                        optimizer.step()
+
+                        batch_loss += loss.item()
+
+                    epoch_loss += batch_loss
                     writer.add_scalar('training loss', loss, epoch * 22 + chr)
 
                     "save model"
