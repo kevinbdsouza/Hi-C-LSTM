@@ -245,9 +245,9 @@ class SeqLSTM(nn.Module):
                     clip_grad_norm_(self.parameters(), max_norm=cfg.max_norm)
                     optimizer.step()
 
-                        batch_loss += loss.item()
+                    #batch_loss += loss.item()
 
-                    epoch_loss += batch_loss
+                    epoch_loss += loss.item()
                     writer.add_scalar('training loss', loss, epoch * 22 + chr)
 
                     "save model"
