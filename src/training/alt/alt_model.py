@@ -144,17 +144,17 @@ class SeqLSTM(nn.Module):
     def combine_reps(self, output_pos, output_mb, output_mega, n_mega, n_mb, nrows):
         zero_embed = torch.cat([output_pos[-1], output_mb[-1], output_mega[-1]], 0).unsqueeze(0)
 
-        output_mb_fit = output_mb[:n_mb, :]
-        output_mega_fit = output_mega[:n_mega, :]
-        output_pos_fit = output_pos[:nrows]
+        output_mb_fit = output_mb[:n_mb, :].clone()
+        output_mega_fit = output_mega[:n_mega, :].clone()
+        output_pos_fit = output_pos[:nrows].clone()
 
         output_mb_extended = torch.repeat_interleave(output_mb_fit, self.cfg.sequence_length_pos, dim=0)
-        output_mb_fit = output_mb_extended[:nrows]
+        output_mb_fit = output_mb_extended[:nrows].clone()
 
         output_mega_extended = torch.repeat_interleave(output_mega_fit,
                                                        self.cfg.sequence_length_pos * self.cfg.sequence_length_mb,
                                                        dim=0)
-        output_mega_fit = output_mega_extended[:nrows]
+        output_mega_fit = output_mega_extended[:nrows].clone() 
 
         concat_reps = torch.cat([output_pos_fit, output_mb_fit, output_mega_fit], 1)
         full_reps = torch.cat([zero_embed, concat_reps], 0)
