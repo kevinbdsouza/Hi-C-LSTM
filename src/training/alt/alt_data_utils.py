@@ -66,7 +66,7 @@ def load_hic(cfg, chr):
 
 def get_hicmat(data, chr, cfg):
     data = data.apply(pd.to_numeric)
-    nrows = max(data['i'].max(), data['j'].max()) + 1
+    nrows = max(data['i'].max(), data['j'].max())
     seq_diff = cfg.sequence_length_pos - (nrows % cfg.sequence_length_pos)
     nrows_full = nrows + seq_diff
 
@@ -74,19 +74,20 @@ def get_hicmat(data, chr, cfg):
     rows = np.array(data["i"]).astype(int)
     cols = np.array(data["j"]).astype(int)
 
-    hic_mat = np.zeros((nrows_full, nrows_full))
+    hic_mat = np.zeros((nrows + 1, nrows + 1))
     hic_mat[rows, cols] = np.array(data["v"])
     hic_upper = np.triu(hic_mat)
-    hic_mat[cols, rows] = np.array(data["v"])
+    hic_mat[cols, rows] = contactProbabilities(np.array(data["v"]))
     hic_lower = np.tril(hic_mat)
     hic_mat = hic_upper + hic_lower
     hic_mat[np.diag_indices_from(hic_mat)] /= 2
+    hic_mat[0 , 0] = 0
 
     indices = np.arange(1, nrows + 1)
     cum_idx = get_bin_idx(np.full(nrows, chr), indices, cfg)
     indices = np.zeros(nrows_full, )
     indices[:nrows] = cum_idx
-    return hic_mat, indices, nrows, nrows_full
+    return hic_mat, indices, nrows
 
 
 def get_samples_sparse(data, chr, cfg):
@@ -100,7 +101,7 @@ def get_samples_sparse(data, chr, cfg):
         cfg (Config): the configuration to use for the experiment.
     """
 
-    hic_mat, indices, nrows, nrows_full = get_hicmat(data, chr, cfg)
+    hic_mat, indices, nrows = get_hicmat(data, chr, cfg)
 
     values = torch.from_numpy(hic_mat)
     indices = torch.from_numpy(indices)

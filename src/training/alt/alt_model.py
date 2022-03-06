@@ -90,13 +90,13 @@ class SeqLSTM(nn.Module):
         output_mega = output_mega.reshape((-1, self.cfg.hs_mega_lstm, 2))
         output_mega = torch.mean(output_mega, 2)
 
-        full_reps = self.combine_reps(output_pos, output_mb, output_mega, cum_pos, n_mega, n_mb, full_reps)
+        full_reps = self.combine_reps(output_pos, output_mb, output_mega, cum_pos, n_mega, n_mb, nrows, full_reps)
 
         input = input.view(-1, 1).squeeze(1)
         input_pairs = torch.combinations(input, with_replacement=True)
         input_pairs = input_pairs.view((-1, self.cfg.mlp_batch_size, 2))
 
-        loss = 0
+        loss = torch.Tensor(0).to(self.device)
         for i in range(input_pairs.shape[0]):
             input_reps = full_reps[input_pairs[i].long()]
             input_reps = input_reps.view((-1, self.cfg.input_size_mlp))
@@ -122,22 +122,23 @@ class SeqLSTM(nn.Module):
 
         return h, c
 
-    def combine_reps(self, output_pos, output_mb, output_mega, cum_pos, n_mega, n_mb, full_reps):
+    def combine_reps(self, output_pos, output_mb, output_mega, cum_pos, n_mega, n_mb, nrows, full_reps):
         start = 1 + cum_pos
-        stop = output_pos.shape[0] + cum_pos + 1
+        stop = nrows + cum_pos + 1
 
         full_reps[0] = torch.cat([output_pos[-1], output_mb[-1], output_mega[-1]], 0)
 
         output_mb = output_mb[:n_mb, :]
         output_mega = output_mega[:n_mega, :]
 
-        full_reps[start:stop, :self.cfg.hs_pos_lstm] = output_pos
+        full_reps[start:stop, :self.cfg.hs_pos_lstm] = output_pos[:nrows]
         output_mb = torch.repeat_interleave(output_mb, self.cfg.sequence_length_pos, dim=0)
+        output_mb = output_mb[:nrows]
         full_reps[start:stop, self.cfg.hs_pos_lstm:self.cfg.hs_pos_lstm + self.cfg.hs_mb_lstm] = output_mb
 
         output_mega = torch.repeat_interleave(output_mega, self.cfg.sequence_length_pos * self.cfg.sequence_length_mb,
                                               dim=0)
-        output_mega = output_mega[:output_pos.shape[0]]
+        output_mega = output_mega[:nrows]
         full_reps[start:stop, self.cfg.hs_pos_lstm + self.cfg.hs_mb_lstm:self.cfg.pos_embed_size] = output_mega
         return full_reps
 
@@ -220,7 +221,7 @@ class SeqLSTM(nn.Module):
                     optimizer.step()
 
                     epoch_loss += loss.item()
-                    writer.add_scalar('training loss', loss, epoch)
+                    writer.add_scalar('training loss', loss, epoch * 22 + chr)
 
                     "save model"
                     torch.save(self.state_dict(), cfg.model_dir + self.model_name + '.pth')
