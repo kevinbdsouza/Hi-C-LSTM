@@ -308,8 +308,8 @@ class SeqLSTM(nn.Module):
             self.eval()
             for chr in cfg.chr_test_list:
                 indices, values, nrows = get_data(cfg, chr)
-                og_mat = torch.zeros((nrows + 1, nrows + 1))
-                pred_mat = torch.zeros((nrows + 1, nrows + 1))
+                og_mat = torch.zeros((nrows + 1, nrows + 1)).to(device)
+                pred_mat = torch.zeros((nrows + 1, nrows + 1)).to(device)
 
                 with warnings.catch_warnings():
                     warnings.simplefilter("ignore")
