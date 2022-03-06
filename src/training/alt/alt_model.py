@@ -115,7 +115,7 @@ class SeqLSTM(nn.Module):
 
     def combine_reps(self, output_pos, output_mb, output_mega, input, cum_pos, full_reps):
         start = 1 + cum_pos
-        stop = output_pos.shape[0] + cum_pos
+        stop = output_pos.shape[0] + cum_pos + 1
 
         full_reps[start:stop, :self.cfg.hs_pos_lstm] = output_pos
         output_mb = torch.repeat_interleave(output_mb, self.cfg.sequence_length_pos, dim=0)
