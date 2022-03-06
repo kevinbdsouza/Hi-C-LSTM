@@ -204,7 +204,7 @@ class SeqLSTM(nn.Module):
         full_reps = torch.zeros((cfg.genome_len, cfg.pos_embed_size)).to(device)
 
         for epoch in range(num_epochs):
-            print(epoch)
+            print("Epoch:".format(epoch))
             with torch.autograd.set_detect_anomaly(True):
                 self.train()
                 epoch_loss = 0.0
@@ -232,7 +232,7 @@ class SeqLSTM(nn.Module):
                     torch.save(self.state_dict(), cfg.model_dir + self.model_name + '.pth')
 
             print('Completed epoch %s' % str(epoch + 1))
-            print('Average loss: %s' % (epoch_loss / values.shape[0] * values.shape[1]))
+            print('Average loss: %s' % (epoch_loss / (values.shape[0] * values.shape[1])))
 
     def post_processing(self, cfg, ind, val, pred, embed, pred_df, prev_error_list, error_compute, zero_embed):
         """
