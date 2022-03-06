@@ -103,8 +103,8 @@ class SeqLSTM(nn.Module):
             output_fc = self.fc1(input_reps)
             output_fc = self.fc2(output_fc)
             output_fc = self.sigm(output_fc).squeeze(1)
-
-            loss += criterion(output_fc, values)
+            value_pairs = values[input_pairs[i, :, 0].long(), input_pairs[i, :, 1].long()]
+            loss += criterion(output_fc, value_pairs)
 
         output = self.out(output_pos.reshape(input.shape[0], -1))
         output = self.sigm(output)
