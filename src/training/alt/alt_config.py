@@ -32,6 +32,7 @@ class Config:
         self.hidden_size_fc1 = self.pos_embed_size
         self.hidden_size_fc2 = int(self.pos_embed_size / 2)
         self.output_size_mlp = 1
+        self.mlp_batch_size = self.sequence_length_pos
 
         self.lstm_nontrain = False
         self.method = "hiclstm"

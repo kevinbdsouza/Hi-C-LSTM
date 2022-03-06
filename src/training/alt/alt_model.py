@@ -77,7 +77,6 @@ class SeqLSTM(nn.Module):
         output_mb, (hidden_mb, _) = self.mb_lstm(hidden_pos, (hidden_mb, state_mb))
         output_mb = output_mb.reshape((-1, self.cfg.hs_mb_lstm, 2))
         output_mb = torch.mean(output_mb, 2)
-        output_mb = output_mb[:n_mb, :]
 
         hidden_mb = torch.mean(hidden_mb, 0)
         n_mega = hidden_mb.size()[0]
@@ -90,9 +89,8 @@ class SeqLSTM(nn.Module):
         output_mega, (hidden_mega, _) = self.mega_lstm(hidden_mb, (hidden_mega, state_mega))
         output_mega = output_mega.reshape((-1, self.cfg.hs_mega_lstm, 2))
         output_mega = torch.mean(output_mega, 2)
-        output_mega = output_mega[:n_mega, :].squeeze(0)
 
-        representations = self.combine_reps(output_pos, output_mb, output_mega, input, cum_pos, full_reps)
+        representations = self.combine_reps(output_pos, output_mb, output_mega, cum_pos, n_mega, n_mb, full_reps)
 
         input = input.view(-1, 1).squeeze(1)
         input_pairs = torch.combinations(input, with_replacement=True)
@@ -113,12 +111,15 @@ class SeqLSTM(nn.Module):
 
         return h, c
 
-    def combine_reps(self, output_pos, output_mb, output_mega, input, cum_pos, full_reps):
+    def combine_reps(self, output_pos, output_mb, output_mega, cum_pos, n_mega, n_mb, full_reps):
         start = 1 + cum_pos
         stop = output_pos.shape[0] + cum_pos + 1
 
-        full_reps[0] = output_pos[-1]
-        
+        full_reps[0] = torch.cat([output_pos[-1], output_mb[-1], output_mega[-1]], 0)
+
+        output_mb = output_mb[:n_mb, :]
+        output_mega = output_mega[:n_mega, :]
+
         full_reps[start:stop, :self.cfg.hs_pos_lstm] = output_pos
         output_mb = torch.repeat_interleave(output_mb, self.cfg.sequence_length_pos, dim=0)
         full_reps[start:stop, self.cfg.hs_pos_lstm:self.cfg.hs_pos_lstm + self.cfg.hs_mb_lstm] = output_mb
