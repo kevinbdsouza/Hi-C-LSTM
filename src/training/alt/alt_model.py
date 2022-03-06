@@ -61,7 +61,7 @@ class SeqLSTM(nn.Module):
         pos_reps = self.pos_embed_layer(input.long())
         pos_reps = pos_reps.view((input.shape[0], self.cfg.sequence_length_pos, -1))
 
-        hidden_pos, state_pos = self._initHidden(input.shape[0])
+        hidden_pos, state_pos = self._initHidden(input.shape[0], self.cfg.sequence_length_pos)
 
         output_pos, (hidden_pos, _) = self.pos_lstm(pos_reps, (hidden_pos, state_pos))
 
@@ -69,15 +69,15 @@ class SeqLSTM(nn.Module):
         output = self.sigm(output)
         return output, pos_reps
 
-    def _initHidden(self, batch_size):
+    def _initHidden(self, batch_size, hidden_size):
         """
         _initHidden(self, batch_size) -> tensor, tensor
         Method to initialize hidden and cell state
         Args:
             batch_size (int): Batch size, usually the first dim of input data
         """
-        h = Variable(torch.randn(1, batch_size, self.hidden_size_lstm)).to(self.device)
-        c = Variable(torch.randn(1, batch_size, self.hidden_size_lstm)).to(self.device)
+        h = Variable(torch.randn(1, batch_size, hidden_size)).to(self.device)
+        c = Variable(torch.randn(1, batch_size, hidden_size)).to(self.device)
 
         return h, c
 
