@@ -23,7 +23,7 @@ def get_cumpos(cfg, chr_num):
     return cum_pos
 
 
-def convert_indices(self, input_pairs, cum_pos):
+def convert_indices(input_pairs, cum_pos):
     input_pairs = input_pairs - cum_pos
     input_pairs[input_pairs < 0] = 0
     return input_pairs
