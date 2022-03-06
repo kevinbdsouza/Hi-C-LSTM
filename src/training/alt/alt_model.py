@@ -96,6 +96,13 @@ class SeqLSTM(nn.Module):
         input_pairs = torch.combinations(input, with_replacement=True)
         input_pairs = input_pairs.view((-1, self.cfg.mlp_batch_size, 2))
 
+        for i in range(input_pairs.shape[0]):
+            input_reps = full_reps[input_pairs[i].long()]
+            input_reps = input_reps.view((-1, self.cfg.input_size_mlp))
+            output_fc = self.fc1(input_reps)
+            output_fc = self.fc2(output_fc)
+            output_fc = self.sigm(output_fc)
+
         output = self.out(output_pos.reshape(input.shape[0], -1))
         output = self.sigm(output)
         return output, full_reps
@@ -185,7 +192,7 @@ class SeqLSTM(nn.Module):
         device = self.device
         cfg = self.cfg
         num_epochs = cfg.num_epochs
-        full_reps = torch.zeros((cfg.genome_len, cfg.pos_embed_size))
+        full_reps = torch.zeros((cfg.genome_len, cfg.pos_embed_size)).to(device)
 
         for epoch in range(num_epochs):
             print(epoch)
