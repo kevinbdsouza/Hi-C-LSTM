@@ -154,7 +154,7 @@ class SeqLSTM(nn.Module):
         output_mega_extended = torch.repeat_interleave(output_mega_fit,
                                                        self.cfg.sequence_length_pos * self.cfg.sequence_length_mb,
                                                        dim=0)
-        output_mega_fit = output_mega_extended[:nrows].clone() 
+        output_mega_fit = output_mega_extended[:nrows].clone()
 
         concat_reps = torch.cat([output_pos_fit, output_mb_fit, output_mega_fit], 1)
         full_reps = torch.cat([zero_embed, concat_reps], 0)
