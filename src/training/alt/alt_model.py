@@ -27,7 +27,12 @@ class FullMLP(nn.Module):
 
         self.criterion = nn.MSELoss()
 
-    def forward(self, input_pair, values, cum_pos, full_reps):
+    def convert_indices(self, input_pairs, cum_pos):
+        input_pairs = input_pairs - cum_pos
+        input_pairs[input_pairs < 0] = 0
+        return input_pairs
+
+    def forward(self, input_pairs, values, cum_pos, full_reps):
         """
         forward(self, input_pair, values, cum_pos) -> tensor, tensor
         Default forward method for MLP.
@@ -35,20 +40,20 @@ class FullMLP(nn.Module):
             input (Tensor): The concatenated pairwise indices.
         """
 
-        input_pair = input_pair - cum_pos
-        input_pair[input_pair < 0] = 0
+        input_pairs = self.convert_indices(input_pairs, cum_pos)
 
-        input_reps = full_reps[input_pair]
+        input_reps = full_reps[input_pairs]
         input_reps = input_reps.view((-1, self.cfg.input_size_mlp))
         output_fc = self.fc1(input_reps)
         output_fc = self.fc2(output_fc)
         output_fc = self.sigm(output_fc).squeeze(1)
 
-        rows = input_pair[:, 0]
-        columns = input_pair[:, 1]
+        rows = input_pairs[:, 0]
+        columns = input_pairs[:, 1]
 
         value_pairs = values[rows, columns]
-        return self.criterion(output_fc, value_pairs)
+        loss = self.criterion(output_fc, value_pairs)
+        return loss, value_pairs, output_fc
 
 
 class SeqLSTM(nn.Module):
@@ -233,7 +238,7 @@ class SeqLSTM(nn.Module):
 
                     "Forward Pass"
                     full_reps = self(indices, nrows)
-                    loss = self.fullMLP(input_pairs, values, cum_pos, full_reps)
+                    loss, _, _ = self.fullMLP(input_pairs, values, cum_pos, full_reps)
 
                     "Backward and optimize"
                     optimizer.zero_grad()
@@ -266,30 +271,6 @@ class SeqLSTM(nn.Module):
         """
         seq = cfg.sequence_length
         num_seq = int(np.ceil(len(ind) / seq))
-        error_list = None
-
-        "compute error"
-        if error_compute:
-            error_batch = np.zeros((num_seq, seq))
-
-            for n in range(num_seq):
-                ind_temp = ind[n * seq:(n + 1) * seq, :]
-                val_temp = val[n * seq:(n + 1) * seq]
-                pred_temp = pred[n * seq:(n + 1) * seq]
-                idx_temp = np.array(np.where(np.sum(ind_temp, axis=1) == 0))[0]
-
-                if len(idx_temp) == 0:
-                    error_batch[n, :] = np.square(val_temp - pred_temp)[:, 0]
-                else:
-                    val_temp = np.delete(val_temp, idx_temp, axis=0)
-                    pred_temp = np.delete(pred_temp, idx_temp, axis=0)
-                    error_batch[n, 0:len(val_temp)] = np.square(val_temp - pred_temp)[:, 0]
-
-            error_list = error_batch.mean(axis=0)
-            if prev_error_list is None:
-                print("first batch")
-            else:
-                error_list = np.mean((error_list, prev_error_list), axis=0)
 
         "return zero embed"
         if zero_embed:
@@ -313,7 +294,7 @@ class SeqLSTM(nn.Module):
 
         return pred_df, error_list, zero_embed
 
-    def test(self, data_loader):
+    def test(self):
         """
         test(self, data_loader) -> tensor, tensor, tensor, DataFrame, Array
         Method to test the given model. Computes error after forward pass.
@@ -324,49 +305,39 @@ class SeqLSTM(nn.Module):
         """
         device = self.device
         cfg = self.cfg
-        seq = cfg.sequence_length
-        error_list = None
 
-        predictions = torch.empty(0, seq).to(device)
-        test_error = torch.empty(0).to(device)
-        target_values = torch.empty(0, seq).to(device)
-        df_columns = ["i", "j", "v", "pred"] + list(np.arange(2 * cfg.pos_embed_size))
-        main_pred_df = pd.DataFrame(columns=df_columns)
+        # df_columns = ["i", "j", "v", "pred"] + list(np.arange(2 * cfg.pos_embed_size))
+        # main_pred_df = pd.DataFrame(columns=df_columns)
 
         with torch.no_grad():
             self.eval()
-            for i, (indices, values) in enumerate(tqdm(data_loader)):
-                pred_df = pd.DataFrame(columns=df_columns)
-                indices = indices.to(device)
-                values = values.to(device)
+            for chr in cfg.chr_test_list:
+                indices, values, nrows = get_data(cfg, chr)
+                og_mat = torch.zeros((nrows + 1, nrows + 1))
+                pred_mat = torch.zeros((nrows + 1, nrows + 1))
 
-                target_values = torch.cat((target_values, values), 0)
+                with warnings.catch_warnings():
+                    warnings.simplefilter("ignore")
+                    input_pairs = torch.combinations(indices, with_replacement=True)
+                input_pairs = input_pairs.long()
+                cum_pos = get_cumpos(cfg, chr)
 
-                "forward pass"
-                lstm_output, embeddings = self.forward(indices)
-                predictions = torch.cat((predictions, lstm_output), 0)
+                indices = indices.float().to(device)
+                values = values.float().to(device)
 
-                "compute error"
-                error = nn.MSELoss(reduction='none')(lstm_output, values)
-                test_error = torch.cat((test_error, error), 0)
+                "test Pass"
+                full_reps = self(indices, nrows)
+                error, og_values, pred_values = self.fullMLP(input_pairs, values, cum_pos, full_reps)
+
+                input_pairs = self.convert_indices(input_pairs, cum_pos)
+                og_mat[input_pairs[:,0], input_pairs[:,1]] = og_values
+                pred_mat[input_pairs[:, 0], input_pairs[:, 1]] = pred_values
 
                 "detach everything for post"
-                ind = indices.cpu().detach().numpy().reshape(-1, 2)
-                val = values.cpu().detach().numpy().reshape(-1, 1)
-                pred = lstm_output.cpu().detach().numpy().reshape(-1, 1)
-                embed = embeddings.cpu().detach().numpy().reshape(-1, 2 * cfg.pos_embed_size)
+                og_mat = indices.cpu().detach().numpy()
+                pred_mat = values.cpu().detach().numpy()
 
-                "compute error and get post processed data and embeddings"
-                pred_df, error_list, _ = self.post_processing(cfg, ind, val, pred, embed, pred_df,
-                                                              error_list, error_compute=False, zero_embed=False)
-
-                main_pred_df = pd.concat([main_pred_df, pred_df], axis=0)
-
-        predictions = torch.reshape(predictions, (-1, 1)).cpu().detach().numpy()
-        test_error = torch.reshape(test_error, (-1, 1)).cpu().detach().numpy()
-        target_values = torch.reshape(target_values, (-1, 1)).cpu().detach().numpy()
-
-        return predictions, test_error, target_values, main_pred_df, error_list
+        return og_mat, pred_mat
 
     def zero_embed(self, data_loader):
         """

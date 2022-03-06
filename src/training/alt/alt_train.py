@@ -27,10 +27,6 @@ def train_model(cfg, writer):
     "Initalize optimizer"
     optimizer = model.compile_optimizer()
 
-    "Get data"
-    # data_loader = get_data_loader_batch_chr(cfg)
-    # print("%s batches loaded" % str(len(data_loader)))
-
     "Train model"
     model.train_model(optimizer, writer)
 

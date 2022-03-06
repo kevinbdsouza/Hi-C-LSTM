@@ -39,7 +39,7 @@ class Config:
 
         "Hyperparameters"
         self.learning_rate = 0.01
-        self.num_epochs = 40
+        self.num_epochs = 4
         self.batch_size = 210
         self.max_norm = 10
         self.hic_smoothing = 8
@@ -67,3 +67,8 @@ class Config:
                 pathlib.Path(file_path).mkdir(parents=True, exist_ok=True)
             else:
                 print("Directory %s exists" % file_path)
+
+
+        "test"
+        self.full_test = True
+        self.get_zero_pred = False
