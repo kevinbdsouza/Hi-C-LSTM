@@ -134,7 +134,7 @@ def convert_to_batch(cfg, cum_idx, values, cum_pos):
     for i, r_idx in enumerate(cum_idx):
         for j, c_idx in enumerate(cum_idx):
             tens = torch.tensor([r_idx, c_idx])
-            batch_idx = torch.cat([batch_idx, tens])
+            batch_idx = torch.cat([batch_idx, tens], 0)
 
             r_idx = r_idx - cum_pos
             c_idx = c_idx - cum_pos
@@ -144,7 +144,7 @@ def convert_to_batch(cfg, cum_idx, values, cum_pos):
             if c_idx < 0:
                 c_idx = 0
 
-            val = torch.tensor([values[r_idx, c_idx]])
+            val = torch.tensor([values[r_idx, c_idx]], 0)
             batch_values = torch.cat([batch_values, val])
 
             if (batch_idx.size()[0] == cfg.mlp_batch_size) or (i == stop and j == stop):
