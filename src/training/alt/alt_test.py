@@ -25,14 +25,13 @@ def test_model(model, cfg, chr):
 
     if cfg.full_test:
         "test model"
-        og_mat, pred_mat = model.test()
+        comp_mat = model.test()
 
-        simple_plot(pred_mat)
-        simple_plot(og_mat)
+        simple_plot(comp_mat)
 
         print("done")
         "save predictions"
-        #pred_df.to_csv(cfg.output_directory + "hiclstm_%s_predictions_chr%s.csv" % (cfg.cell, str(chr)), sep="\t")
+        # pred_df.to_csv(cfg.output_directory + "hiclstm_%s_predictions_chr%s.csv" % (cfg.cell, str(chr)), sep="\t")
     elif cfg.get_zero_pred:
         "zero pred"
         data_loader = get_data_loader_chr(cfg, chr, shuffle=False)
