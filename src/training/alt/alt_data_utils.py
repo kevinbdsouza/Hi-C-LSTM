@@ -5,6 +5,7 @@ import torch.utils.data
 from training.alt.alt_config import Config
 from analyses.plot.plot_utils import simple_plot
 
+
 def get_cumpos(cfg, chr_num):
     """
     get_cumpos(cfg, chr_num) -> int
@@ -27,6 +28,7 @@ def convert_indices(input_pairs, cum_pos):
     input_pairs = input_pairs - cum_pos
     input_pairs[input_pairs < 0] = 0
     return input_pairs
+
 
 def get_bin_idx(chr, pos, cfg):
     """
@@ -81,13 +83,13 @@ def get_hicmat(data, chr, cfg):
 
     hic_mat = np.zeros((nrows + 1, nrows + 1))
     hic_mat[rows, cols] = contactProbabilities(np.array(data["v"]))
-    simple_plot(hic_mat)
-    hic_upper = np.triu(hic_mat)
+    # simple_plot(hic_mat)
+    # hic_upper = np.triu(hic_mat)
     hic_mat[cols, rows] = contactProbabilities(np.array(data["v"]))
-    hic_lower = np.tril(hic_mat)
-    hic_mat = hic_upper + hic_lower
-    hic_mat[np.diag_indices_from(hic_mat)] /= 2
-    hic_mat[0 , 0] = 0
+    # hic_lower = np.tril(hic_mat)
+    # hic_mat = hic_upper + hic_lower
+    # hic_mat[np.diag_indices_from(hic_mat)] /= 2
+    hic_mat[0, 0] = 0
 
     indices = np.arange(1, nrows + 1)
     cum_idx = get_bin_idx(np.full(nrows, chr), indices, cfg)
