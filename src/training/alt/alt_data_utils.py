@@ -140,9 +140,9 @@ def convert_to_batch(cfg, cum_idx, values, cum_pos):
             c_idx = c_idx - cum_pos
 
             if r_idx < 0:
-                r_idx = 0
+                r_idx = torch.tensor([0])
             if c_idx < 0:
-                c_idx = 0
+                c_idx = torch.tensor([0])
 
             val = torch.tensor([values[r_idx.long(), c_idx.long()]]).unsqueeze(0)
             batch_values = torch.cat([batch_values, val], 0)
