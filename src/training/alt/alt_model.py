@@ -225,6 +225,11 @@ class SeqLSTM(nn.Module):
                 for chr in cfg.chr_train_list:
                     cum_idx, nrows, data_generator = get_data(cfg, chr)
 
+                    try:
+                        batch_idx, batch_values = next(data_generator)
+                    except:
+                        continue
+
                     input_pairs = input_pairs.long()
                     cum_pos = get_cumpos(cfg, chr)
 
@@ -267,7 +272,7 @@ class SeqLSTM(nn.Module):
         with torch.no_grad():
             self.eval()
             for chr in cfg.chr_test_list:
-                indices, values, nrows = get_data(cfg, chr)
+                cum_idx, nrows, data_generator = get_data(cfg, chr)
                 comp_mat = torch.zeros((nrows + 1, nrows + 1)).to(device)
 
                 with warnings.catch_warnings():
