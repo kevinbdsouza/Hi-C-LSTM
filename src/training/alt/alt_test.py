@@ -27,8 +27,8 @@ def test_model(model, cfg, chr):
         "test model"
         og_mat, pred_mat = model.test()
 
-        simple_plot(og_mat)
         simple_plot(pred_mat)
+        simple_plot(og_mat)
 
         print("done")
         "save predictions"

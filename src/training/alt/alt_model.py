@@ -312,9 +312,9 @@ class SeqLSTM(nn.Module):
             self.eval()
             for chr in cfg.chr_test_list:
                 indices, values, nrows = get_data(cfg, chr)
-                og_mat = torch.zeros((nrows + 1, nrows + 1)).to(device)
-                #pred_mat = torch.zeros((nrows + 1, nrows + 1)).to(device)
-                pred_mat = None
+                #og_mat = torch.zeros((nrows + 1, nrows + 1)).to(device)
+                pred_mat = torch.zeros((nrows + 1, nrows + 1)).to(device)
+                og_mat = None
 
                 with warnings.catch_warnings():
                     warnings.simplefilter("ignore")
@@ -330,12 +330,12 @@ class SeqLSTM(nn.Module):
                 error, og_values, pred_values = self.fullMLP(input_pairs, values, cum_pos, full_reps)
 
                 input_pairs = convert_indices(input_pairs, cum_pos)
-                og_mat[input_pairs[:, 0], input_pairs[:, 1]] = og_values
-                #pred_mat[input_pairs[:, 0], input_pairs[:, 1]] = pred_values
+                #og_mat[input_pairs[:, 0], input_pairs[:, 1]] = og_values
+                pred_mat[input_pairs[:, 0], input_pairs[:, 1]] = pred_values
 
                 "detach everything for post"
-                og_mat = og_mat.cpu().detach().numpy()
-                #pred_mat = pred_mat.cpu().detach().numpy()
+                #og_mat = og_mat.cpu().detach().numpy()
+                pred_mat = pred_mat.cpu().detach().numpy()
 
         return og_mat, pred_mat
 
