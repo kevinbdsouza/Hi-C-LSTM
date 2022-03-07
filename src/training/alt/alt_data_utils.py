@@ -93,7 +93,7 @@ def get_hicmat(data, chr, cfg):
     return hic_mat, indices, nrows
 
 
-def get_samples_sparse(data, chr, cfg):
+def get_samples(data, chr, cfg):
     """
     get_samples_sparse(data, chr, cfg) -> List, List
     Organizes data into input ids and values.
@@ -126,6 +126,24 @@ def contactProbabilities(values, smoothing=8, delta=1e-10):
     return contact_prob
 
 
+def convert_to_batch(cfg, chr, cum_idx, values):
+    batch_idx = torch.empty(0, 2)
+    batch_values = torch.empty(0, 1)
+
+    for r in cum_idx:
+        for c in cum_idx:
+            tens = torch.Tensor(cum_idx[r], cum_idx[c])
+            batch_idx = torch.cat([batch_idx, tens])
+
+            val = torch.Tensor(values[r, c])
+            batch_values = torch.cat([batch_values, val])
+
+            if batch_idx.size()[0] == cfg.mlp_batch_size:
+                batch_idx = torch.empty(0, 2)
+                batch_values = torch.empty(0, 1)
+                yield batch_idx, batch_values
+
+
 def get_data(cfg, chr):
     """
     get_data(cfg, chr) -> List, List
@@ -142,8 +160,8 @@ def get_data(cfg, chr):
         Skips: if error during extraction using Juicer Tools, prints out empty txt file
     """
     data = load_hic(cfg, chr)
-    cum_idx, values, nrows = get_samples_sparse(data, chr, cfg)
-
+    cum_idx, values, nrows = get_samples(data, chr, cfg)
+    batch_idx, batch_values = convert_to_batch(cfg, chr, cum_idx, values)
     return cum_idx, values, nrows
 
 
@@ -228,9 +246,9 @@ def save_processed_data(cfg):
     for chr in cfg.chr_train_list:
         print("Saving input data for Chr", str(chr), "in the specified processed directory")
 
-        cum_idx, val = get_data(cfg, chr)
+        cum_idx, values, nrows = get_data(cfg, chr)
         torch.save(cum_idx, cfg.processed_data_dir + 'cum_idx_chr' + str(chr) + '.pth')
-        torch.save(val, cfg.processed_data_dir + 'values_chr' + str(chr) + '.pth')
+        torch.save(values, cfg.processed_data_dir + 'values_chr' + str(chr) + '.pth')
 
 
 if __name__ == "__main__":

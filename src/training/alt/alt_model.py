@@ -2,6 +2,7 @@ import numpy as np
 import pandas as pd
 from tqdm import tqdm
 import torch
+
 torch.cuda.empty_cache()
 from torch import nn
 from torch.autograd import Variable
@@ -223,11 +224,6 @@ class SeqLSTM(nn.Module):
 
                 for chr in cfg.chr_train_list:
                     indices, values, nrows = get_data(cfg, chr)
-                    with warnings.catch_warnings():
-                        warnings.simplefilter("ignore")
-                        input_pairs = torch.combinations(indices, with_replacement=True)
-                        # input_pairs_l = torch.combinations(torch.flip(indices, dims=[0]), with_replacement=True)
-                        # input_pairs = torch.cat([input_pairs_r, input_pairs_l], 0)
 
                     input_pairs = input_pairs.long()
                     cum_pos = get_cumpos(cfg, chr)
@@ -252,46 +248,6 @@ class SeqLSTM(nn.Module):
                     torch.save(self.state_dict(), cfg.model_dir + self.model_name + '.pth')
 
             print('\nEpoch loss: %s' % (epoch_loss))
-
-    def post_processing(self, cfg, ind, val, pred, embed, pred_df, prev_error_list, error_compute, zero_embed):
-        """
-        post_processing(self, cfg, ind, val, pred, embed, pred_df, prev_error_list, error_compute, zero_embed) -> DataFrame, Array
-        Post processing method. Compute error and remove padded indices.
-        Args:
-            cfg (Config): DataLoader containing dataset.
-            ind (Array): Loss function
-            val (Array): Adam like with learning rate.
-            pred (Array): Tensorboard SummaryWriter
-            embed (Array): embeddings
-            pred_df (DataFrame): Dataframe to put the columns in
-            prev_error_list (Array): Error list from the previous batch for averaging
-            error_compute (bool): Boolean for computing error
-            zero_embed (bool): Boolean to get zero embed
-        """
-        seq = cfg.sequence_length
-        num_seq = int(np.ceil(len(ind) / seq))
-
-        "return zero embed"
-        if zero_embed:
-            idx = np.array(np.where(np.sum(ind, axis=1) == 0))[0]
-            zero_embed = embed[idx[0]]
-        else:
-            "remove padded indices"
-            idx = np.array(np.where(np.sum(ind, axis=1) == 0))[0]
-            ind = np.delete(ind, idx, axis=0)
-            val = np.delete(val, idx, axis=0)
-            pred = np.delete(pred, idx, axis=0)
-            embed = np.delete(embed, idx, axis=0)
-
-            "make dataframe of indices, values, preds, and embeddings"
-            pred_df["i"] = ind[:, 0]
-            pred_df["j"] = ind[:, 1]
-            pred_df["v"] = val
-            pred_df["pred"] = pred
-            for n in range(2 * cfg.pos_embed_size):
-                pred_df[n] = embed[:, n]
-
-        return pred_df, zero_embed
 
     def test(self):
         """
@@ -335,6 +291,46 @@ class SeqLSTM(nn.Module):
                 comp_mat = comp_mat.cpu().detach().numpy()
 
         return comp_mat
+
+    def post_processing(self, cfg, ind, val, pred, embed, pred_df, prev_error_list, error_compute, zero_embed):
+        """
+        post_processing(self, cfg, ind, val, pred, embed, pred_df, prev_error_list, error_compute, zero_embed) -> DataFrame, Array
+        Post processing method. Compute error and remove padded indices.
+        Args:
+            cfg (Config): DataLoader containing dataset.
+            ind (Array): Loss function
+            val (Array): Adam like with learning rate.
+            pred (Array): Tensorboard SummaryWriter
+            embed (Array): embeddings
+            pred_df (DataFrame): Dataframe to put the columns in
+            prev_error_list (Array): Error list from the previous batch for averaging
+            error_compute (bool): Boolean for computing error
+            zero_embed (bool): Boolean to get zero embed
+        """
+        seq = cfg.sequence_length
+        num_seq = int(np.ceil(len(ind) / seq))
+
+        "return zero embed"
+        if zero_embed:
+            idx = np.array(np.where(np.sum(ind, axis=1) == 0))[0]
+            zero_embed = embed[idx[0]]
+        else:
+            "remove padded indices"
+            idx = np.array(np.where(np.sum(ind, axis=1) == 0))[0]
+            ind = np.delete(ind, idx, axis=0)
+            val = np.delete(val, idx, axis=0)
+            pred = np.delete(pred, idx, axis=0)
+            embed = np.delete(embed, idx, axis=0)
+
+            "make dataframe of indices, values, preds, and embeddings"
+            pred_df["i"] = ind[:, 0]
+            pred_df["j"] = ind[:, 1]
+            pred_df["v"] = val
+            pred_df["pred"] = pred
+            for n in range(2 * cfg.pos_embed_size):
+                pred_df[n] = embed[:, n]
+
+        return pred_df, zero_embed
 
     def zero_embed(self, data_loader):
         """
