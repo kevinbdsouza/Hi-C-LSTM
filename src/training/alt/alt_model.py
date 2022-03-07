@@ -223,7 +223,7 @@ class SeqLSTM(nn.Module):
                 epoch_loss = 0.0
 
                 for chr in cfg.chr_train_list:
-                    indices, values, nrows = get_data(cfg, chr)
+                    cum_idx, nrows, data_generator = get_data(cfg, chr)
 
                     input_pairs = input_pairs.long()
                     cum_pos = get_cumpos(cfg, chr)

@@ -126,7 +126,7 @@ def contactProbabilities(values, smoothing=8, delta=1e-10):
     return contact_prob
 
 
-def convert_to_batch(cfg, chr, cum_idx, values):
+def convert_to_batch(cfg, cum_idx, values):
     batch_idx = torch.empty(0, 2)
     batch_values = torch.empty(0, 1)
 
@@ -139,9 +139,9 @@ def convert_to_batch(cfg, chr, cum_idx, values):
             batch_values = torch.cat([batch_values, val])
 
             if batch_idx.size()[0] == cfg.mlp_batch_size:
+                yield batch_idx, batch_values
                 batch_idx = torch.empty(0, 2)
                 batch_values = torch.empty(0, 1)
-                yield batch_idx, batch_values
 
 
 def get_data(cfg, chr):
@@ -161,8 +161,8 @@ def get_data(cfg, chr):
     """
     data = load_hic(cfg, chr)
     cum_idx, values, nrows = get_samples(data, chr, cfg)
-    batch_idx, batch_values = convert_to_batch(cfg, chr, cum_idx, values)
-    return cum_idx, values, nrows
+    data_generator = convert_to_batch(cfg, cum_idx, values)
+    return cum_idx, nrows, data_generator
 
 
 def get_data_loader_chr(cfg, chr, shuffle=True):
@@ -246,9 +246,9 @@ def save_processed_data(cfg):
     for chr in cfg.chr_train_list:
         print("Saving input data for Chr", str(chr), "in the specified processed directory")
 
-        cum_idx, values, nrows = get_data(cfg, chr)
+        cum_idx, nrows, data_generator = get_data(cfg, chr)
         torch.save(cum_idx, cfg.processed_data_dir + 'cum_idx_chr' + str(chr) + '.pth')
-        torch.save(values, cfg.processed_data_dir + 'values_chr' + str(chr) + '.pth')
+        # torch.save(values, cfg.processed_data_dir + 'values_chr' + str(chr) + '.pth')
 
 
 if __name__ == "__main__":
