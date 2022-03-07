@@ -170,7 +170,8 @@ def get_data(cfg, chr):
     """
     data = load_hic(cfg, chr)
     cum_idx, values, nrows = get_samples(data, chr, cfg)
-    data_generator = convert_to_batch(cfg, cum_idx, values)
+    cum_pos = get_cumpos(cfg, chr)
+    data_generator = convert_to_batch(cfg, cum_idx, values, cum_pos)
     return cum_idx, nrows, data_generator
 
 
