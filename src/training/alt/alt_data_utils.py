@@ -149,7 +149,7 @@ def convert_to_batch(cfg, cum_idx, values, cum_pos):
 
             if (batch_pairs.size()[0] == cfg.mlp_batch_size) or (i == stop and j == stop):
                 yield batch_pairs.long(), batch_values
-                batch_idx = torch.empty(0, 2)
+                batch_pairs = torch.empty(0, 2)
                 batch_values = torch.empty(0, 1)
 
 
