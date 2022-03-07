@@ -227,7 +227,8 @@ class SeqLSTM(nn.Module):
 
                     try:
                         batch_idx, batch_values = next(data_generator)
-                    except:
+                    except Exception as e:
+                        print(e)
                         continue
 
                     input_pairs = input_pairs.long()
