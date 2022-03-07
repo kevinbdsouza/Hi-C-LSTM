@@ -224,7 +224,7 @@ class SeqLSTM(nn.Module):
 
                     cum_pos = get_cumpos(cfg, chr)
                     batch_loss = 0.0
-                    for batch_pairs, batch_values in next(data_generator):
+                    for batch_pairs, batch_values in data_generator:
                         cum_idx = cum_idx.float().to(device)
                         batch_values = batch_values.float().to(device)
 
