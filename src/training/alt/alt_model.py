@@ -38,9 +38,9 @@ class FullMLP(nn.Module):
 
         input_pairs = convert_indices(input_pairs, cum_pos)
 
-        input_reps = full_reps[input_pairs]
-        input_reps = input_reps.view((-1, self.cfg.input_size_mlp))
-        output_fc = self.fc1(input_reps)
+        full_reps = full_reps[input_pairs]
+        full_reps = full_reps.view((-1, self.cfg.input_size_mlp))
+        output_fc = self.fc1(full_reps)
         output_fc = self.fc2(output_fc)
         output_fc = self.sigm(output_fc).squeeze(1)
 
