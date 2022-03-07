@@ -15,7 +15,7 @@ class Config:
         self.resolution = 10000
         self.cell = "GM12878"
         self.chr_train_list = list(range(21, 23))
-        self.chr_test_list = list(range(21, 22))
+        self.chr_test_list = list(range(22, 23))
         self.save_processed_data = False
 
         "LSTM Paramters"
