@@ -227,7 +227,7 @@ class SeqLSTM(nn.Module):
                         input_pairs_r = torch.combinations(indices, with_replacement=True)
                         input_pairs_l = torch.combinations(torch.flip(indices, dims=[0]), with_replacement=True)
                         input_pairs = torch.cat([input_pairs_r, input_pairs_l], 0)
-                        
+
                     input_pairs = input_pairs.long()
                     cum_pos = get_cumpos(cfg, chr)
 
