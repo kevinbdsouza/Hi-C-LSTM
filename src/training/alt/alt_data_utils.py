@@ -3,7 +3,7 @@ import pandas as pd
 import torch
 import torch.utils.data
 from training.alt.alt_config import Config
-
+from analyses.plot.plot_utils import simple_plot
 
 def get_cumpos(cfg, chr_num):
     """
@@ -80,7 +80,7 @@ def get_hicmat(data, chr, cfg):
     cols = np.array(data["j"]).astype(int)
 
     hic_mat = np.zeros((nrows + 1, nrows + 1))
-    hic_mat[rows, cols] = np.array(data["v"])
+    hic_mat[rows, cols] = contactProbabilities(np.array(data["v"]))
     hic_upper = np.triu(hic_mat)
     hic_mat[cols, rows] = contactProbabilities(np.array(data["v"]))
     hic_lower = np.tril(hic_mat)
