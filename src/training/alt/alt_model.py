@@ -225,7 +225,7 @@ class SeqLSTM(nn.Module):
                     cum_pos = get_cumpos(cfg, chr)
 
                     batch_loss = 0.0
-                    for batch_pairs, batch_values in data_generator:
+                    for batch_pairs, batch_values in tqdm(data_generator):
                         batch_values = batch_values.float().to(device)
 
                         "Forward Pass"
