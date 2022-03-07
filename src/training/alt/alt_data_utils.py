@@ -83,12 +83,7 @@ def get_hicmat(data, chr, cfg):
 
     hic_mat = np.zeros((nrows + 1, nrows + 1))
     hic_mat[rows, cols] = contactProbabilities(np.array(data["v"]))
-    # simple_plot(hic_mat)
-    # hic_upper = np.triu(hic_mat)
     hic_mat[cols, rows] = contactProbabilities(np.array(data["v"]))
-    # hic_lower = np.tril(hic_mat)
-    # hic_mat = hic_upper + hic_lower
-    # hic_mat[np.diag_indices_from(hic_mat)] /= 2
     hic_mat[0, 0] = 0
 
     indices = np.arange(1, nrows + 1)
