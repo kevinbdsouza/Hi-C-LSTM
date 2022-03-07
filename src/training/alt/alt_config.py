@@ -14,7 +14,7 @@ class Config:
         self.genome_len = 288091
         self.resolution = 10000
         self.cell = "GM12878"
-        self.chr_train_list = list(range(14, 15))
+        self.chr_train_list = list(range(15, 16))
         self.chr_test_list = list(range(21, 22))
         self.save_processed_data = False
 
