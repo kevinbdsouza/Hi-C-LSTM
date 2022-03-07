@@ -44,13 +44,10 @@ class FullMLP(nn.Module):
         output_fc = self.fc1(input_reps)
         output_fc = self.fc2(output_fc)
         output_fc = self.sigm(output_fc).squeeze(1)
-
-        rows = input_pairs[:, 0]
-        columns = input_pairs[:, 1]
-
-        value_pairs = values[rows, columns]
-        loss = self.criterion(output_fc, value_pairs)
-        return loss, value_pairs, output_fc
+        values = values.squeeze(1)
+        
+        loss = self.criterion(output_fc, values)
+        return loss, values, output_fc
 
 
 class SeqLSTM(nn.Module):
