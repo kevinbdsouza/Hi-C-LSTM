@@ -127,14 +127,14 @@ def contactProbabilities(values, smoothing=8, delta=1e-10):
 
 
 def convert_to_batch(cfg, cum_idx, values, cum_pos):
-    batch_idx = torch.empty(0, 2)
+    batch_pairs = torch.empty(0, 2)
     batch_values = torch.empty(0, 1)
     stop = len(cum_idx) - 1
 
     for i, r_idx in enumerate(cum_idx):
         for j, c_idx in enumerate(cum_idx):
             tens = torch.tensor([r_idx, c_idx]).unsqueeze(0)
-            batch_idx = torch.cat([batch_idx, tens], 0)
+            batch_pairs = torch.cat([batch_pairs, tens], 0)
 
             r = r_idx - cum_pos
             c = c_idx - cum_pos
@@ -147,8 +147,8 @@ def convert_to_batch(cfg, cum_idx, values, cum_pos):
             val = torch.tensor([values[r.long(), c.long()]]).unsqueeze(0)
             batch_values = torch.cat([batch_values, val], 0)
 
-            if (batch_idx.size()[0] == cfg.mlp_batch_size) or (i == stop and j == stop):
-                yield batch_idx, batch_values
+            if (batch_pairs.size()[0] == cfg.mlp_batch_size) or (i == stop and j == stop):
+                yield batch_pairs.long(), batch_values
                 batch_idx = torch.empty(0, 2)
                 batch_values = torch.empty(0, 1)
 

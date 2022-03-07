@@ -226,20 +226,19 @@ class SeqLSTM(nn.Module):
                     cum_idx, nrows, data_generator = get_data(cfg, chr)
 
                     try:
-                        batch_idx, batch_values = next(data_generator)
+                        batch_pairs, batch_values = next(data_generator)
                     except Exception as e:
                         print(e)
                         continue
 
-                    input_pairs = input_pairs.long()
                     cum_pos = get_cumpos(cfg, chr)
 
-                    indices = indices.float().to(device)
-                    values = values.float().to(device)
+                    cum_idx = cum_idx.float().to(device)
+                    batch_values = batch_values.float().to(device)
 
                     "Forward Pass"
-                    full_reps = self(indices, nrows)
-                    loss, _, _ = self.fullMLP(input_pairs, values, cum_pos, full_reps)
+                    full_reps = self(cum_idx, nrows)
+                    loss, _, _ = self.fullMLP(batch_pairs, batch_values, cum_pos, full_reps)
 
                     "Backward and optimize"
                     optimizer.zero_grad()
