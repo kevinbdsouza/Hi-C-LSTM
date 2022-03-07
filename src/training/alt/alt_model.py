@@ -45,7 +45,7 @@ class FullMLP(nn.Module):
         output_fc = self.fc2(output_fc)
         output_fc = self.sigm(output_fc).squeeze(1)
         values = values.squeeze(1)
-        
+
         loss = self.criterion(output_fc, values)
         return loss, values, output_fc
 
@@ -222,28 +222,25 @@ class SeqLSTM(nn.Module):
                 for chr in cfg.chr_train_list:
                     cum_idx, nrows, data_generator = get_data(cfg, chr)
 
-                    try:
-                        batch_pairs, batch_values = next(data_generator)
-                    except Exception as e:
-                        print(e)
-                        continue
-
                     cum_pos = get_cumpos(cfg, chr)
+                    batch_loss = 0.0
+                    for batch_pairs, batch_values in next(data_generator):
+                        cum_idx = cum_idx.float().to(device)
+                        batch_values = batch_values.float().to(device)
 
-                    cum_idx = cum_idx.float().to(device)
-                    batch_values = batch_values.float().to(device)
+                        "Forward Pass"
+                        full_reps = self(cum_idx, nrows)
+                        loss, _, _ = self.fullMLP(batch_pairs, batch_values, cum_pos, full_reps)
 
-                    "Forward Pass"
-                    full_reps = self(cum_idx, nrows)
-                    loss, _, _ = self.fullMLP(batch_pairs, batch_values, cum_pos, full_reps)
+                        "Backward and optimize"
+                        optimizer.zero_grad()
+                        loss.backward()
+                        clip_grad_norm_(self.parameters(), max_norm=cfg.max_norm)
+                        optimizer.step()
 
-                    "Backward and optimize"
-                    optimizer.zero_grad()
-                    loss.backward()
-                    clip_grad_norm_(self.parameters(), max_norm=cfg.max_norm)
-                    optimizer.step()
+                        batch_loss += loss.item()
 
-                    epoch_loss += loss.item()
+                    epoch_loss += batch_loss
                     writer.add_scalar('training loss', loss, epoch)
 
                     "save model"
