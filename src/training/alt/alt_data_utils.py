@@ -133,16 +133,16 @@ def convert_to_batch(cfg, cum_idx, values, cum_pos):
 
     for i, r_idx in enumerate(cum_idx):
         for j, c_idx in enumerate(cum_idx):
-            tens = torch.IntTensor([r_idx, c_idx]).unsqueeze(0)
+            tens = torch.tensor([r_idx, c_idx]).unsqueeze(0)
             batch_idx = torch.cat([batch_idx, tens], 0)
 
             r = r_idx - cum_pos
             c = c_idx - cum_pos
 
             if r < 0:
-                r = torch.IntTensor([0])
+                r = torch.tensor([0])
             if c < 0:
-                c = torch.IntTensor([0])
+                c = torch.tensor([0])
 
             val = torch.tensor([values[r.long(), c.long()]]).unsqueeze(0)
             batch_values = torch.cat([batch_values, val], 0)
