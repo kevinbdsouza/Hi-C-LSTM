@@ -522,6 +522,7 @@ if __name__ == '__main__':
 
             hic_mat, st = get_heatmaps(pred_data, no_pred=False)
             simple_plot(hic_mat)
+            print("done")
 
     "TAL1 and LMO2"
     if cfg.run_tal:
