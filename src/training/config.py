@@ -126,7 +126,7 @@ class Config:
         self.foxg1_indices = [222863]
         self.ko_window = 10
         self.ko_increment = 10
-        self.ko_mode = "padding"
+        self.ko_mode = "shift"
         self.perform_ko = True
         self.load_ko = False
         self.compare_ko = False
