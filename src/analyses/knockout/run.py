@@ -301,7 +301,7 @@ class Knockout():
         pred = np.tril(diff_mat).T
         diff_mat = ko - pred
         simple_plot(diff_mat, mode="diff")
-        np.save(cfg.output_directory + "ctcf_diff_zero.npy", diff_mat)
+        np.save(cfg.output_directory + "ctcf_diff_average.npy", diff_mat)
         mean_diff = np.mean(diff_list, axis=1)
         return mean_diff, ko_pred_df, pred_data
 
