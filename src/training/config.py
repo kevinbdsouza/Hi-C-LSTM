@@ -130,6 +130,7 @@ class Config:
         self.load_ko = False
         self.compare_ko = True
         self.save_kopred = False
+        self.compute_avg_diff = False
         self.run_tal = False
         self.tal_pre = False
         self.tal_train = False

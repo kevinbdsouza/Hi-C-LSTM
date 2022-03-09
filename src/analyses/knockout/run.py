@@ -279,8 +279,10 @@ class Knockout():
                 ko_pred_df.to_csv(cfg.output_directory + "hiclstm_%s_afko_chr%s.csv" % (cfg.cell, str(chr)),
                                   sep="\t")
 
+        mean_diff = None
         "compute difference between WT and KO predictions"
-        mean_diff = self.compute_kodiff(pred_data, ko_pred_df, indices)
+        if self.cfg.compute_avg_diff:
+            mean_diff = self.compute_kodiff(pred_data, ko_pred_df, indices)
         return mean_diff, ko_pred_df, pred_data, indices
 
     def change_index(self, list_split):
