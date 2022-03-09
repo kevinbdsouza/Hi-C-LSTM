@@ -9,7 +9,7 @@ from torch.utils.tensorboard import SummaryWriter
 import torch.nn.functional as F
 from training.config import Config
 from analyses.feature_attribution.tf import TFChip
-from analyses.plot.plot_utils import get_heatmaps, simple_plot
+from analyses.plot.plot_utils import get_heatmaps, simple_plot, indices_diff_mat
 from training.test_model import test_model
 
 device = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
@@ -187,7 +187,7 @@ class Knockout():
 
         return representations, zero_embed
 
-    def compute_kodiff(self, pred_data, ko_pred_df, indices):
+    def compute_kodiff(self, pred_data, ko_pred_df, ind):
         """
         compute_kodiff(pred_data, ko_pred_df, indices) -> Array
         Compute difference between predicted contacts after and before knockout
@@ -198,41 +198,36 @@ class Knockout():
         """
 
         "initialize"
-        indices = np.array(indices)
-        diff_list = np.zeros((len(indices), 11))
+        ko_diffs = np.zeros((11,))
         win = self.cfg.ko_increment
         diff = np.arange(0, 101, 10)
 
-        "average over indices"
-        for i, ind in enumerate(indices):
-            for j, d in enumerate(diff):
-                "take subset of knockout data in window"
-                if j == 0:
-                    subset_og = pred_data.loc[pred_data["i"] == ind]
-                else:
-                    subset_og = pred_data.loc[
-                        ((pred_data["i"] <= ind + j * win) & (pred_data["i"] > ind + (j - 1) * win))
-                        | ((pred_data["i"] >= ind - j * win) & (pred_data["i"] < ind - (j - 1) * win))]
-                if subset_og.empty:
-                    continue
+        "compute diff"
+        for j, d in enumerate(diff):
+            "take subset of knockout data in window"
+            if j == 0:
+                subset_og = pred_data.loc[pred_data["i"] == ind]
+            else:
+                subset_og = pred_data.loc[
+                    ((pred_data["i"] <= ind + j * win) & (pred_data["i"] > ind + (j - 1) * win))
+                    | ((pred_data["i"] >= ind - j * win) & (pred_data["i"] < ind - (j - 1) * win))]
+            if subset_og.empty:
+                continue
 
-                "take subset of original data in window"
-                if j == 0:
-                    subset_ko = ko_pred_df.loc[ko_pred_df["i"] == ind]
-                else:
-                    subset_ko = ko_pred_df.loc[
-                        ((ko_pred_df["i"] <= ind + j * win) & (ko_pred_df["i"] > ind + (j - 1) * win))
-                        | ((ko_pred_df["i"] >= ind - j * win) & (ko_pred_df["i"] < ind - (j - 1) * win))]
+            "take subset of original data in window"
+            if j == 0:
+                subset_ko = ko_pred_df.loc[ko_pred_df["i"] == ind]
+            else:
+                subset_ko = ko_pred_df.loc[
+                    ((ko_pred_df["i"] <= ind + j * win) & (ko_pred_df["i"] > ind + (j - 1) * win))
+                    | ((ko_pred_df["i"] >= ind - j * win) & (ko_pred_df["i"] < ind - (j - 1) * win))]
 
-                "compute mean diff in window"
-                merged_df = pd.merge(subset_og, subset_ko, on=["i", "j"])
-                merged_df = merged_df.filter(['i', 'j', 'pred', 'ko_pred'], axis=1)
-                mean_diff = np.mean(np.array(merged_df["ko_pred"]) - np.array(merged_df["pred"]))
-                diff_list[i, j] = mean_diff
-
-        "mean diff over indices"
-        mean_diff = np.mean(diff_list, axis=0)
-        return mean_diff
+            "compute mean diff in window"
+            merged_df = pd.merge(subset_og, subset_ko, on=["i", "j"])
+            merged_df = merged_df.filter(['i', 'j', 'pred', 'ko_pred'], axis=1)
+            mean_diff = np.mean(np.array(merged_df["ko_pred"]) - np.array(merged_df["pred"]))
+            ko_diffs[j] = mean_diff
+        return ko_diffs
 
     def perform_ko(self, model):
         """
@@ -243,15 +238,6 @@ class Knockout():
         Args:
             model (SeqLSTM): model to use for knockout.
         """
-
-        "get knockout indices depending on experiment"
-        if self.cfg.ko_experiment == "ctcf":
-            if self.cfg.ctcf_indices == "all":
-                indices = self.get_ctcf_indices()
-            else:
-                indices = self.cfg.ctcf_indices_22
-        elif self.cfg.ko_experiment == "foxg1":
-            indices = [222863]
 
         "load data"
         data_loader = get_data_loader_chr(self.cfg, self.chr, shuffle=False)
@@ -265,25 +251,55 @@ class Knockout():
         self.cfg.get_zero_pred = True
         zero_embed = test_model(model, self.cfg, chr)
 
+        "get knockout indices depending on experiment"
+        if cfg.ko_experiment == "ctcf":
+            if cfg.ctcf_indices == "all":
+                indices = ko_ob.get_ctcf_indices()
+            else:
+                indices = ko_ob.cfg.ctcf_indices_22
+        elif cfg.ko_experiment == "foxg1":
+            indices = cfg.foxg1_indices
+
+        "plotting and metrics"
+        n_indices = len(indices)
+        diff_list = np.zeros((n_indices, 11))
+        diff_mat = np.zeros((n_indices, 200, 200))
         "alter representations"
-        representations, zero_embed = self.ko_representations(representations, start, indices, zero_embed,
-                                                              mode=cfg.ko_mode)
+        for i, indice in enumerate(indices):
+            representations, zero_embed = self.ko_representations(representations, start, indice, zero_embed,
+                                                                  mode=cfg.ko_mode)
 
-        if self.cfg.load_ko:
-            ko_pred_df = pd.read_csv(cfg.output_directory + "hiclstm_%s_afko_chr%s.csv" % (cfg.cell, str(chr)),
-                                     sep="\t")
-        else:
-            "run through model using altered representations, save ko predictions"
-            _, ko_pred_df = model.perform_ko(data_loader, representations, start, zero_embed, mode="ko")
-            if self.cfg.save_kopred:
-                ko_pred_df.to_csv(cfg.output_directory + "hiclstm_%s_afko_chr%s.csv" % (cfg.cell, str(chr)),
-                                  sep="\t")
+            if self.cfg.load_ko:
+                ko_pred_df = pd.read_csv(cfg.output_directory + "hiclstm_%s_afko_chr%s.csv" % (cfg.cell, str(chr)),
+                                         sep="\t")
+            else:
+                "run through model using altered representations, save ko predictions"
+                _, ko_pred_df = model.perform_ko(data_loader, representations, start, zero_embed, mode="ko")
+                if self.cfg.save_kopred:
+                    ko_pred_df.to_csv(cfg.output_directory + "hiclstm_%s_afko_chr%s.csv" % (cfg.cell, str(chr)),
+                                      sep="\t")
 
-        mean_diff = None
-        "compute difference between WT and KO predictions"
-        if self.cfg.compute_avg_diff:
-            mean_diff = self.compute_kodiff(pred_data, ko_pred_df, indices)
-        return mean_diff, ko_pred_df, pred_data, indices
+            "compute difference between WT and KO predictions"
+            if self.cfg.compute_avg_diff:
+                ko_diffs = self.compute_kodiff(pred_data, ko_pred_df, indice)
+                diff_list[i] = ko_diffs
+
+            "get merged heatmap"
+            pred_data = pd.merge(pred_data, ko_pred_df, on=["i", "j"])
+            pred_data = pred_data.rename(columns={"ko_pred": "v"})
+            hic_mat, st = get_heatmaps(pred_data, no_pred=False)
+            simple_plot(hic_mat, mode="reds")
+
+            "get diff mat"
+            hic_win = indices_diff_mat(indice, st, hic_mat)
+            n_win = len(hic_win)
+            diff_mat[i, :n_win, :n_win] = hic_win
+
+
+        diff_mat = diff_mat.mean(axis=0)
+        simple_plot(diff_mat, mode="diff")
+        mean_diff = np.mean(diff_list, axis=1)
+        return mean_diff, ko_pred_df, pred_data
 
     def change_index(self, list_split):
         """
@@ -513,7 +529,7 @@ if __name__ == '__main__':
 
         if cfg.perform_ko:
             "perform ko"
-            mean_diff, ko_pred_df, pred_data, indices = ko_ob.perform_ko(model)
+            mean_diff, ko_pred_df, pred_data = ko_ob.perform_ko(model)
 
         if cfg.compare_ko:
             "plot comparison"
@@ -527,25 +543,7 @@ if __name__ == '__main__':
             hic_mat, st = get_heatmaps(pred_data, no_pred=False)
             simple_plot(hic_mat, mode="reds")
 
-            n_indices = len(indices)
-            nrows = len(hic_mat)
-            diff_mat = np.zeros((n_indices, 200, 200))
-            for n, ind in enumerate(indices):
-                i = ind - st
-                if i - 100 >= 0:
-                    win_start = i - 100
-                else:
-                    win_start = 0
-                if i + 100 <= (nrows - 1):
-                    win_stop = i + 100
-                else:
-                    win_stop = nrows - 1
-
-                hic_win = hic_mat[win_start:win_stop, win_start:win_stop]
-                n_win = len(hic_win)
-                diff_mat[n, :n_win, :n_win] = hic_win
-
-            diff_mat = diff_mat.mean(axis=0)
+            diff_mat = indices_diff_mat(indices, st, hic_mat)
             simple_plot(diff_mat, mode="diff")
             print("done")
 

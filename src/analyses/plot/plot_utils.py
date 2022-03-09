@@ -92,6 +92,24 @@ def simple_plot(hic_win, mode):
         plt.show()
 
 
+def indices_diff_mat(ind, st, hic_mat):
+    nrows = len(hic_mat)
+
+    i = ind - st
+    if i - 100 >= 0:
+        win_start = i - 100
+    else:
+        win_start = 0
+    if i + 100 <= (nrows - 1):
+        win_stop = i + 100
+    else:
+        win_stop = nrows - 1
+
+    hic_win = hic_mat[win_start:win_stop, win_start:win_stop]
+
+    return diff_mat
+
+
 def plot_diff(hic_win):
     hic_up = np.triu(hic_win)
     hic_lo = np.tril(hic_win).T
