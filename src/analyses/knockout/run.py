@@ -527,10 +527,19 @@ if __name__ == '__main__':
             hic_mat, st = get_heatmaps(pred_data, no_pred=False)
             simple_plot(hic_mat, mode="reds")
 
-            diff_mat = np.zeros((len(indices), 200, 200))
+            n_indices = len(indices)
+            nrows = len(hic_mat)
+            diff_mat = np.zeros((n_indices, 200, 200))
             for n, ind in enumerate(indices):
                 i = ind - st
-                diff_mat[n, :, :] = hic_mat[i - 100:i + 100, i - 100:i + 100]
+                if i - 100 < 0:
+                    win_start = 0
+                if i + 100 > (nrows - 1):
+                    win_stop = nrows - 1
+
+                hic_win = hic_mat[win_start:win_stop, win_start:win_stop]
+                n_win = len(hic_win)
+                diff_mat[n, :n_win, :n_win] = hic_win
 
             diff_mat = diff_mat.mean(axis=0)
             simple_plot(hic_mat, mode="diff")
