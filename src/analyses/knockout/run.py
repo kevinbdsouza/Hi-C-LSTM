@@ -542,7 +542,7 @@ if __name__ == '__main__':
                 diff_mat[n, :n_win, :n_win] = hic_win
 
             diff_mat = diff_mat.mean(axis=0)
-            simple_plot(hic_mat, mode="diff")
+            simple_plot(diff_mat, mode="diff")
             print("done")
 
     "TAL1 and LMO2"
