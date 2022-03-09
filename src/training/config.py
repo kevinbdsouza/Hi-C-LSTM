@@ -119,7 +119,7 @@ class Config:
         "knockout"
         self.ko_compute_test = False
         self.ko_experiment = "ctcf"
-        self.ctcf_indices = "all"
+        self.ctcf_indices = "22"
         self.foxg1_chr = [14]
         self.ctcf_indices_21 = [279219, 279229]
         self.ctcf_indices_22 = [284706, 284743]
