@@ -297,7 +297,11 @@ class Knockout():
             diff_mat[i, :n_win, :n_win] = hic_win
 
         diff_mat = diff_mat.mean(axis=0)
+        ko = np.triu(diff_mat)
+        pred = np.tril(diff_mat).T
+        diff_mat = ko - pred
         simple_plot(diff_mat, mode="diff")
+        np.save(cfg.output_directory + "ctcf_diff_zero.npy", diff_mat)
         mean_diff = np.mean(diff_list, axis=1)
         return mean_diff, ko_pred_df, pred_data
 
