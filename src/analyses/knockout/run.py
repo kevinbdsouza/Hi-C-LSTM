@@ -66,7 +66,8 @@ class Knockout():
         "converts to cumulative indices"
         cum_pos = get_cumpos(self.cfg, self.chr)
         data["start"] = data["start"] + cum_pos
-        return data
+        indices = np.array(data["start"])
+        return indices
 
     def convert_df_to_np(self, pred_data, method="hiclstm"):
         """
