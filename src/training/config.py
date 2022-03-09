@@ -129,7 +129,7 @@ class Config:
         self.ko_mode = "zero"
         self.perform_ko = True
         self.load_ko = False
-        self.compare_ko = True
+        self.compare_ko = False
         self.save_kopred = False
         self.compute_avg_diff = False
         self.run_tal = False

@@ -542,9 +542,6 @@ if __name__ == '__main__':
 
             hic_mat, st = get_heatmaps(pred_data, no_pred=False)
             simple_plot(hic_mat, mode="reds")
-
-            diff_mat = indices_diff_mat(indices, st, hic_mat)
-            simple_plot(diff_mat, mode="diff")
             print("done")
 
     "TAL1 and LMO2"
