@@ -11,6 +11,7 @@ from training.config import Config
 from analyses.feature_attribution.tf import TFChip
 from analyses.plot.plot_utils import get_heatmaps, simple_plot, indices_diff_mat
 from training.test_model import test_model
+from random import sample
 
 device = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
 
@@ -250,7 +251,7 @@ class Knockout():
         if cfg.ko_experiment == "ctcf":
             if cfg.ctcf_indices == "all":
                 indices = ko_ob.get_ctcf_indices()
-                indices = indices[:100]
+                indices = sample(indices, 100)
             else:
                 indices = ko_ob.cfg.ctcf_indices_22
         elif cfg.ko_experiment == "foxg1":
