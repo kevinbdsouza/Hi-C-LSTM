@@ -275,12 +275,13 @@ class Knockout():
         else:
             "run through model using altered representations, save ko predictions"
             _, ko_pred_df = model.perform_ko(data_loader, representations, start, zero_embed, mode="ko")
-            ko_pred_df.to_csv(cfg.output_directory + "hiclstm_%s_afko_chr%s.csv" % (cfg.cell, str(chr)),
-                              sep="\t")
+            if self.cfg.save_kopred:
+                ko_pred_df.to_csv(cfg.output_directory + "hiclstm_%s_afko_chr%s.csv" % (cfg.cell, str(chr)),
+                                  sep="\t")
 
         "compute difference between WT and KO predictions"
         mean_diff = self.compute_kodiff(pred_data, ko_pred_df, indices)
-        return mean_diff, ko_pred_df
+        return mean_diff, ko_pred_df, pred_data, indices
 
     def change_index(self, list_split):
         """
@@ -510,12 +511,12 @@ if __name__ == '__main__':
 
         if cfg.perform_ko:
             "perform ko"
-            mean_diff, ko_pred_df = ko_ob.perform_ko(model)
+            mean_diff, ko_pred_df, pred_data, indices = ko_ob.perform_ko(model)
 
         if cfg.compare_ko:
             "plot comparison"
-            _, _, _, pred_data = ko_ob.get_trained_representations(method="hiclstm")
             if ko_pred_df is None:
+                _, _, _, pred_data = ko_ob.get_trained_representations(method="hiclstm")
                 ko_pred_df = pd.read_csv(cfg.output_directory + "hiclstm_%s_afko_chr%s.csv" % (cfg.cell, str(chr)),
                                          sep="\t")
             pred_data = pd.merge(pred_data, ko_pred_df, on=["i", "j"])
