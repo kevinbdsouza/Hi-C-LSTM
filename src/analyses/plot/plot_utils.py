@@ -106,8 +106,7 @@ def indices_diff_mat(ind, st, hic_mat):
         win_stop = nrows - 1
 
     hic_win = hic_mat[win_start:win_stop, win_start:win_stop]
-
-    return diff_mat
+    return hic_win
 
 
 def plot_diff(hic_win):
