@@ -532,10 +532,14 @@ if __name__ == '__main__':
             diff_mat = np.zeros((n_indices, 200, 200))
             for n, ind in enumerate(indices):
                 i = ind - st
-                if i - 100 < 0:
+                if i - 100 >= 0:
                     win_start = 0
-                if i + 100 > (nrows - 1):
+                else:
+                    win_start = i - 100
+                if i + 100 <= (nrows - 1):
                     win_stop = nrows - 1
+                else:
+                    win_stop = i + 100
 
                 hic_win = hic_mat[win_start:win_stop, win_start:win_stop]
                 n_win = len(hic_win)
