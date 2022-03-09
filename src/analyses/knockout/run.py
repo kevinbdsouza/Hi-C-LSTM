@@ -240,9 +240,6 @@ class Knockout():
         "load data"
         data_loader = get_data_loader_chr(self.cfg, self.chr, shuffle=False)
 
-        "get representations"
-        representations, start, stop, pred_data = self.get_trained_representations(method="hiclstm")
-
         "get zero embed"
         self.cfg.full_test = False
         self.cfg.compute_pca = False
@@ -253,6 +250,7 @@ class Knockout():
         if cfg.ko_experiment == "ctcf":
             if cfg.ctcf_indices == "all":
                 indices = ko_ob.get_ctcf_indices()
+                indices = indices[:100]
             else:
                 indices = ko_ob.cfg.ctcf_indices_22
         elif cfg.ko_experiment == "foxg1":
@@ -262,8 +260,12 @@ class Knockout():
         n_indices = len(indices)
         diff_list = np.zeros((n_indices, 11))
         diff_mat = np.zeros((n_indices, 200, 200))
-        "alter representations"
+        "run for all indices"
         for i, indice in enumerate(indices):
+            "get representations"
+            representations, start, stop, pred_data = self.get_trained_representations(method="hiclstm")
+
+            "alter representations"
             representations, zero_embed = self.ko_representations(representations, start, indice, zero_embed,
                                                                   mode=cfg.ko_mode)
 
