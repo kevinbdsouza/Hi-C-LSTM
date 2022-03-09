@@ -525,7 +525,15 @@ if __name__ == '__main__':
             pred_data = pred_data.rename(columns={"ko_pred": "v"})
 
             hic_mat, st = get_heatmaps(pred_data, no_pred=False)
-            simple_plot(hic_mat)
+            simple_plot(hic_mat, mode="reds")
+
+            diff_mat = np.zeros((len(indices), 200, 200))
+            for n, ind in enumerate(indices):
+                i = ind - st
+                diff_mat[n, :, :] = hic_mat[i - 100:i + 100, i - 100:i + 100]
+
+            diff_mat = diff_mat.mean(axis=0)
+            simple_plot(hic_mat, mode="diff")
             print("done")
 
     "TAL1 and LMO2"

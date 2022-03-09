@@ -64,7 +64,7 @@ def plot_tal1_lmo2(data):
     pass
 
 
-def simple_plot(hic_win):
+def simple_plot(hic_win, mode):
     '''
     plt.imshow(hic_win, cmap='hot', interpolation='nearest')
     plt.yticks([])
@@ -72,24 +72,24 @@ def simple_plot(hic_win):
     plt.show()
     '''
 
-    plt.figure()
-    sns.set_theme()
-    ax = sns.heatmap(hic_win, cmap="Reds", vmin=0, vmax=1)
-    ax.set_yticks([])
-    ax.set_xticks([])
-    #plt.savefig("/home/kevindsouza/Downloads/ctcf_ko.png")
-    plt.show()
+    if mode == "reds":
+        plt.figure()
+        sns.set_theme()
+        ax = sns.heatmap(hic_win, cmap="Reds", vmin=0, vmax=1)
+        ax.set_yticks([])
+        ax.set_xticks([])
+        # plt.savefig("/home/kevindsouza/Downloads/ctcf_ko.png")
+        plt.show()
 
-    '''
-    sns.set_theme()
-    rdgn = sns.diverging_palette(h_neg=220, h_pos=14, s=79, l=55, sep=3, as_cmap=True)
-    sns.heatmap(hic_win, cmap=rdgn, center=0.00, cbar=True)
-    plt.yticks([])
-    plt.xticks([])
-    plt.show()
-    '''
-
-    pass
+    if mode == "diff":
+        plt.figure()
+        sns.set_theme()
+        rdgn = sns.diverging_palette(h_neg=220, h_pos=14, s=79, l=55, sep=3, as_cmap=True)
+        sns.heatmap(hic_win, cmap=rdgn, center=0.00, cbar=True)
+        plt.yticks([])
+        plt.xticks([])
+        # plt.savefig("/home/kevindsouza/Downloads/ctcf_ko.png")
+        plt.show()
 
 
 def plot_diff(hic_win):
