@@ -519,7 +519,7 @@ class Knockout():
             lmo2_mat, _ = get_heatmaps(lmo2_data, no_pred=False)
 
             if cfg.tal_plot_wt:
-                simple_plot(tal1_mat, mode="red")
+                simple_plot(tal1_mat, mode="reds")
                 simple_plot(lmo2_mat, mode="reds")
 
         if cfg.check_ko:
