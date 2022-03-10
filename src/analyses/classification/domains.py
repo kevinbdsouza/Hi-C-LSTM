@@ -160,6 +160,8 @@ class Domains:
 
         "converts TAD start and ends to boundary positions."
         tads = self.get_tad_data(type="TADs")
+        if self.mode == "ko":
+            return tadbs
         df_start = tads[["start", "target"]].rename(columns={"start": "pos"})
         df_end = tads[["end", "target"]].rename(columns={"end": "pos"})
         tadbs = pd.concat([df_start, df_end])
