@@ -390,14 +390,22 @@ if __name__ == '__main__':
         plot_r2(comb_r2_df)
         '''
 
+        '''
         pred_data = pd.read_csv(cfg.output_directory + "hiclstm_%s_predictions_chr%s.csv" % (cell, str(chr)), sep="\t")
         hic_mat, st = get_heatmaps(pred_data, no_pred=False)
-        simple_plot(hic_mat)
+        simple_plot(hic_mat, mode="reds")
+        '''
 
         '''
         foxg1_data = pd.read_csv(cfg.output_directory + "shuffle_%s_afko_chr%s.csv" % (cell, str(chr)), sep="\t")
         plot_foxg1(foxg1_data)
         '''
+
+        ctcf_zero = np.load(cfg.output_directory + "ctcf_diff_zero.npy")
+        ctcf_average = np.load(cfg.output_directory + "ctcf_diff_average.npy")
+        ctcf_padding = np.load(cfg.output_directory + "ctcf_diff_padding.npy")
+        ctcf_shift = np.load(cfg.output_directory + "ctcf_diff_shift.npy")
+        simple_plot(ctcf_zero, mode="diff")
 
         # foxg1_ko = np.load(cfg.output_directory + "foxg1_ko.npy")
         # simple_plot(foxg1_ko)
