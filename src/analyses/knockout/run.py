@@ -160,7 +160,7 @@ class Knockout():
         zero_embed = zero_embed / norm
         return representations, zero_embed
 
-    def ko_representations(self, representations, start, ind, zero_embed, mode="average"):
+    def ko_representations(self, representations, start, indices, zero_embed, mode="average"):
         """
         ko_representations(representations, start, indices, zero_embed, mode) -> Array, Array
         Alter representations to feed to knockout.
@@ -175,23 +175,27 @@ class Knockout():
         window = self.cfg.ko_window
         size = len(representations)
 
+        if len(indices) == 1:
+            indices = [indices]
+
         "alter according to mode in config"
-        if mode == "average":
-            if ind - start - window < 0 or ind - start + window > size:
-                window = int(window // 2)
+        for ind in indices:
+            if mode == "average":
+                if ind - start - window < 0 or ind - start + window > size:
+                    window = int(window // 2)
 
-            window_left_arr = representations[ind - start - window: ind - start, :].copy()
-            window_right_arr = representations[ind - start + 1: ind - start + window + 1, :].copy()
+                window_left_arr = representations[ind - start - window: ind - start, :].copy()
+                window_right_arr = representations[ind - start + 1: ind - start + window + 1, :].copy()
 
-            window_arr_avg = np.stack((window_left_arr, window_right_arr)).mean(axis=0).mean(axis=0)
-            representations[ind - start, :] = window_arr_avg
-        elif mode == "zero":
-            representations[ind - start, :] = np.zeros((1, cfg.pos_embed_size))
-        elif mode == "shift":
-            representations[ind - start:size - 1, :] = representations[ind - start + 1:size, :]
-            representations[size - 1, :] = np.zeros((1, cfg.pos_embed_size))
-        elif mode == "padding":
-            representations[ind - start, :] = zero_embed[:cfg.pos_embed_size]
+                window_arr_avg = np.stack((window_left_arr, window_right_arr)).mean(axis=0).mean(axis=0)
+                representations[ind - start, :] = window_arr_avg
+            elif mode == "zero":
+                representations[ind - start, :] = np.zeros((1, cfg.pos_embed_size))
+            elif mode == "shift":
+                representations[ind - start:size - 1, :] = representations[ind - start + 1:size, :]
+                representations[size - 1, :] = np.zeros((1, cfg.pos_embed_size))
+            elif mode == "padding":
+                representations[ind - start, :] = zero_embed[:cfg.pos_embed_size]
 
         if mode == "reverse":
             representations = np.fliplr(representations)
