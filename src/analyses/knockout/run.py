@@ -9,6 +9,7 @@ from torch.utils.tensorboard import SummaryWriter
 import torch.nn.functional as F
 from training.config import Config
 from analyses.feature_attribution.tf import TFChip
+from analyses.classification.domains import Domains
 from analyses.plot.plot_utils import get_heatmaps, simple_plot, indices_diff_mat
 from training.test_model import test_model
 from random import sample
@@ -51,9 +52,23 @@ class Knockout():
         pred_data = pred_data.filter(['i', 'j', 'v', 'pred'], axis=1)
         return representations, start, stop, pred_data
 
+    def get_tadbs(self):
+        """
+        get_tadbs() -> Array
+        Gets TAD Boundaries to knockout.
+        Args:
+            NA
+        """
+
+        dom_ob = Domains(cfg, chr, mode="ko")
+        tf_ob = TFChip(cfg, chr)
+        tadbs = dom_ob.get_tad_boundaries(tf_ob, ctcf="all")
+
+        return tadbs
+
     def get_ctcf_indices(self):
         """
-        get_ctcf_indices() -> DataFrame
+        get_ctcf_indices() -> Array
         Gets CTCF positions to knockout.
         Args:
             NA
@@ -256,6 +271,8 @@ class Knockout():
                 indices = ko_ob.cfg.ctcf_indices_22
         elif cfg.ko_experiment == "foxg1":
             indices = cfg.foxg1_indices
+        elif cfg.ko_experiment == "tadbs":
+            indices = ko_ob.get_tadbs()
 
         "plotting and metrics"
         n_indices = len(indices)
