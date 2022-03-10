@@ -160,23 +160,33 @@ class Domains:
 
         "converts TAD start and ends to boundary positions."
         tads = self.get_tad_data(type="TADs")
-        if self.mode == "ko":
-            return tadbs
-        df_start = tads[["start", "target"]].rename(columns={"start": "pos"})
-        df_end = tads[["end", "target"]].rename(columns={"end": "pos"})
-        tadbs = pd.concat([df_start, df_end])
-
-        if self.mode == "ig":
-            tadbs["target"] = "TADBs"
-
-        "Form CTCF+ or CTCF- TAD boundaries"
         ctcf_data = tf_ob.get_ctcf_data()
-        if ctcf == "positive":
-            tadbctcf = tadbs[tadbs["pos"].isin(ctcf_data["start"])]
-            tadbs = pd.concat([tadbctcf, tadbs[tadbs["pos"].isin(ctcf_data["end"])]])
-        elif ctcf == "negative":
-            tadbctcf = tadbs[~tadbs["pos"].isin(ctcf_data["start"])]
-            tadbs = pd.concat([tadbctcf, tadbs[~tadbs["pos"].isin(ctcf_data["end"])]])
+
+        if self.mode == "ko":
+            tads = tads.filter(['start', 'end'], axis=1)
+
+            if ctcf == "positive":
+                tadbctcf = tads[tads["start"].isin(ctcf_data["start"])]
+                tadbs = pd.concat([tadbctcf, tads[tads["end"].isin(ctcf_data["end"])]])
+            elif ctcf == "negative":
+                tadbctcf = tads[~tads["start"].isin(ctcf_data["start"])]
+                tadbs = pd.concat([tadbctcf, tads[~tads["end"].isin(ctcf_data["end"])]])
+
+        elif self.mode == "ig":
+            df_start = tads[["start", "target"]].rename(columns={"start": "pos"})
+            df_end = tads[["end", "target"]].rename(columns={"end": "pos"})
+            tadbs = pd.concat([df_start, df_end])
+
+            if self.mode == "ig":
+                tadbs["target"] = "TADBs"
+
+            "Form CTCF+ or CTCF- TAD boundaries"
+            if ctcf == "positive":
+                tadbctcf = tadbs[tadbs["pos"].isin(ctcf_data["start"])]
+                tadbs = pd.concat([tadbctcf, tadbs[tadbs["pos"].isin(ctcf_data["end"])]])
+            elif ctcf == "negative":
+                tadbctcf = tadbs[~tadbs["pos"].isin(ctcf_data["start"])]
+                tadbs = pd.concat([tadbctcf, tadbs[~tadbs["pos"].isin(ctcf_data["end"])]])
 
         return tadbs
 
