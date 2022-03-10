@@ -3,7 +3,7 @@ import numpy as np
 import pandas as pd
 from training.model import SeqLSTM
 from training.data_utils import get_data_loader_chr
-from training.data_utils import get_samples_sparse, get_cumpos
+from training.data_utils import get_samples_sparse, get_cumpos, contactProbabilities
 import time
 from torch.utils.tensorboard import SummaryWriter
 import torch.nn.functional as F
@@ -525,8 +525,8 @@ class Knockout():
             tal1_ko = pd.read_csv(cfg.output_directory + "tal1_ko.txt", sep="\t")
             lmo2_ko = pd.read_csv(cfg.output_directory + "lmo2_ko.txt", sep="\t")
 
-            tal1_data["pred"] = tal1_ko["v"]
-            lmo2_data["pred"] = lmo2_ko["v"]
+            tal1_data["pred"] = contactProbabilities(tal1_ko["v"])
+            lmo2_data["pred"] = contactProbabilities(lmo2_ko["v"])
             tal1_mat, _ = get_heatmaps(tal1_data, no_pred=False)
             lmo2_mat, _ = get_heatmaps(lmo2_data, no_pred=False)
 
