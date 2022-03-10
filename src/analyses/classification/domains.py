@@ -166,11 +166,11 @@ class Domains:
             tadbs = tads.filter(['start', 'end'], axis=1)
 
             if ctcf == "positive":
-                tadbctcf = tadbs[tadbs["start"].isin(ctcf_data["start"])]
-                tadbs = pd.concat([tadbctcf, tadbs[tadbs["end"].isin(ctcf_data["end"])]])
+                tadbs = tadbs[(tadbs["start"].isin(ctcf_data["start"])) &
+                                 (tadbs["end"].isin(ctcf_data["end"]))]
             elif ctcf == "negative":
-                tadbctcf = tadbs[~tadbs["start"].isin(ctcf_data["start"])]
-                tadbs = pd.concat([tadbctcf, tadbs[~tadbs["end"].isin(ctcf_data["end"])]])
+                tadbs = tadbs[~((tadbs["start"].isin(ctcf_data["start"])) |
+                                (tadbs["end"].isin(ctcf_data["end"])))]
 
         elif self.mode == "ig":
             df_start = tads[["start", "target"]].rename(columns={"start": "pos"})
