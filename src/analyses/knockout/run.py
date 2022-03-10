@@ -63,7 +63,7 @@ class Knockout():
         dom_ob = Domains(cfg, chr, mode="ko")
         tf_ob = TFChip(cfg, chr)
         tadbs = dom_ob.get_tad_boundaries(tf_ob, ctcf="all")
-
+        tadbs = np.array(tadbs["pos"])
         return tadbs
 
     def get_ctcf_indices(self):
