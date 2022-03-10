@@ -491,6 +491,11 @@ class Knockout():
         pred_df = None
         tal1_data = None
         lmo2_data = None
+
+        "load model"
+        model = SeqLSTM(self.cfg, device).to(device)
+        model.load_weights()
+
         if cfg.tal_pre:
             "prepare tal1 and lmo2 data"
             self.convert_to_hic_format()

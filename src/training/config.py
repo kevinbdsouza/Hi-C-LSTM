@@ -140,7 +140,7 @@ class Config:
         self.compare_tal = True
         self.check_ko = True
         self.tal_pre_ko = False
-        self.tal_plot_wt = False
+        self.tal_plot_wt = True
         self.tal_plot_ko = True
         self.lmo2_chr = 11
 
