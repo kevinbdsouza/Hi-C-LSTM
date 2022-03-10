@@ -92,18 +92,30 @@ def simple_plot(hic_win, mode):
         plt.show()
 
 
-def indices_diff_mat(ind, st, hic_mat):
+def indices_diff_mat(indice, st, hic_mat, mode="ctcf"):
     nrows = len(hic_mat)
 
-    i = ind - st
-    if i - 100 >= 0:
-        win_start = i - 100
+    if mode == "tadbs":
+        i = indice[0] - st
+        j = indice[1] - st
+        if i - 98 >= 0:
+            win_start = i - 98
+        else:
+            win_start = 0
+        if j + 98 <= (nrows - 1):
+            win_stop = i + 98
+        else:
+            win_stop = nrows - 1
     else:
-        win_start = 0
-    if i + 100 <= (nrows - 1):
-        win_stop = i + 100
-    else:
-        win_stop = nrows - 1
+        i = indice - st
+        if i - 100 >= 0:
+            win_start = i - 100
+        else:
+            win_start = 0
+        if i + 100 <= (nrows - 1):
+            win_stop = i + 100
+        else:
+            win_stop = nrows - 1
 
     hic_win = hic_mat[win_start:win_stop, win_start:win_stop]
     return hic_win

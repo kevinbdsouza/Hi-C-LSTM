@@ -315,7 +315,7 @@ class Knockout():
             # simple_plot(hic_mat, mode="reds")
 
             "get diff mat"
-            hic_win = indices_diff_mat(indice, st, hic_mat)
+            hic_win = indices_diff_mat(indice, st, hic_mat, mode=cfg.ko_experiment)
             n_win = len(hic_win)
             diff_mat[i, :n_win, :n_win] = hic_win
 
