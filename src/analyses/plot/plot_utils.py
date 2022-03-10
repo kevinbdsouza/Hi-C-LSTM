@@ -405,6 +405,9 @@ if __name__ == '__main__':
         ctcf_average = np.load(cfg.output_directory + "ctcf_diff_average.npy")
         ctcf_padding = np.load(cfg.output_directory + "ctcf_diff_padding.npy")
         ctcf_shift = np.load(cfg.output_directory + "ctcf_diff_shift.npy")
+        tad_ctcfp = np.load(cfg.output_directory + "tad_diff_zero_ctctp.npy")
+        tad_ctcfn = np.load(cfg.output_directory + "tad_diff_zero_ctctn.npy")
+
         simple_plot(ctcf_zero, mode="diff")
 
         # foxg1_ko = np.load(cfg.output_directory + "foxg1_ko.npy")
