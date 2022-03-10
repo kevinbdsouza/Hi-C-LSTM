@@ -62,7 +62,7 @@ class Knockout():
 
         dom_ob = Domains(cfg, chr, mode="ko")
         tf_ob = TFChip(cfg, chr)
-        tadbs = dom_ob.get_tad_boundaries(tf_ob, ctcf="positive")
+        tadbs = dom_ob.get_tad_boundaries(tf_ob, ctcf="negative")
         cum_pos = get_cumpos(self.cfg, self.chr)
         tadbs = tadbs + cum_pos
         tadbs = np.array(tadbs)
@@ -324,7 +324,7 @@ class Knockout():
         pred = np.tril(diff_mat).T
         diff_mat = ko - pred
         simple_plot(diff_mat, mode="diff")
-        np.save(cfg.output_directory + "tad_diff_zero_ctctp.npy", diff_mat)
+        np.save(cfg.output_directory + "tad_diff_zero_ctctn.npy", diff_mat)
         mean_diff = np.mean(diff_list, axis=1)
         return mean_diff, ko_pred_df, pred_data
 
