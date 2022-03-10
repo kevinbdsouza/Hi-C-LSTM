@@ -63,6 +63,8 @@ class Knockout():
         dom_ob = Domains(cfg, chr, mode="ko")
         tf_ob = TFChip(cfg, chr)
         tadbs = dom_ob.get_tad_boundaries(tf_ob, ctcf="all")
+        cum_pos = get_cumpos(self.cfg, self.chr)
+        tadbs = tadbs + cum_pos
         tadbs = np.array(tadbs)
         return tadbs
 
