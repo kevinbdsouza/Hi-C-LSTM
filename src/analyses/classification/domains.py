@@ -163,7 +163,7 @@ class Domains:
         ctcf_data = tf_ob.get_ctcf_data()
 
         if self.mode == "ko":
-            tads = tads.filter(['start', 'end'], axis=1)
+            tadbs = tads.filter(['start', 'end'], axis=1)
 
             if ctcf == "positive":
                 tadbctcf = tads[tads["start"].isin(ctcf_data["start"])]
