@@ -863,7 +863,7 @@ if __name__ == "__main__":
 
     # plot_ob.plot_combined(cell="HFFhTERT")
     # plot_ob.plot_mAP_celltypes()
-    plot_ob.plot_mAP_resolutions()
+    #plot_ob.plot_mAP_resolutions()
     # plot_ob.plot_auroc_celltypes()
     # plot_ob.plot_auroc()
 
@@ -877,7 +877,7 @@ if __name__ == "__main__":
     # plot_ob.plot_r2_celltypes()
     # plot_ob.plot_symmetry()
 
-    # plot_ob.plot_knockout_results()
+    plot_ob.plot_knockout_results()
     # plot_ob.plot_knockout_tfs()
     # plot_ob.pr_curves()
 
