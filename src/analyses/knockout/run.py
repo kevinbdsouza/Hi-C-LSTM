@@ -515,8 +515,8 @@ class Knockout():
 
             tal1_data = pred_df.loc[pred_df["i"] < 7000]
             lmo2_data = pred_df.loc[pred_df["i"] > 7000]
-            tal1_mat, _ = get_heatmaps(tal1_data, no_pred=False)
-            lmo2_mat, _ = get_heatmaps(lmo2_data, no_pred=False)
+            tal1_mat, _ = get_heatmaps(tal1_data.copy(), no_pred=False)
+            lmo2_mat, _ = get_heatmaps(lmo2_data.copy(), no_pred=False)
 
             if cfg.tal_plot_wt:
                 simple_plot(tal1_mat, mode="reds")
