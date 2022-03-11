@@ -305,7 +305,7 @@ def scatter_tal_lm(ko, wt):
     pred = np.triu(diff_mat.T)
     pred = pred.flatten(order='C')
 
-    plt.figure()
+    plt.figure(figsize=(10, 8))
     plt.scatter(og, pred, marker='o')
     plt.tick_params(axis="x", labelsize=20, length=0)
     plt.tick_params(axis="y", labelsize=20)
