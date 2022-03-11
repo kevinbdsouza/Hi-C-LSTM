@@ -259,14 +259,23 @@ class Knockout():
             model (SeqLSTM): model to use for knockout.
         """
 
+        cfg = self.cfg
+
         "load data"
-        data_loader = get_data_loader_chr(self.cfg, self.chr, shuffle=False)
+        if cfg.run_tal and cfg.hnisz_region == "tal1":
+            self.cfg.get_tal1_only = True
+            data_loader = self.prepare_tal1_lmo2()
+        elif cfg.run_tal and cfg.hnisz_region == "lmo2":
+            self.cfg.get_lmo2_only = True
+            data_loader = self.prepare_tal1_lmo2()
+        else:
+            data_loader = get_data_loader_chr(cfg, self.chr, shuffle=False)
 
         "get zero embed"
-        self.cfg.full_test = False
-        self.cfg.compute_pca = False
-        self.cfg.get_zero_pred = True
-        zero_embed = test_model(model, self.cfg, chr)
+        cfg.full_test = False
+        cfg.compute_pca = False
+        cfg.get_zero_pred = True
+        zero_embed = test_model(model, cfg, self.chr)
 
         "get knockout indices depending on experiment"
         if cfg.ko_experiment == "ctcf":
@@ -279,6 +288,10 @@ class Knockout():
             indices = cfg.foxg1_indices
         elif cfg.ko_experiment == "tadbs":
             indices = ko_ob.get_tadbs()
+        elif cfg.hnisz_region == "tal1":
+            indices = cfg.tal1ko_indices
+        elif cfg.hnisz_region == "lmo2":
+            indices = cfg.lmo2ko_indices + get_cumpos(cfg, 11)
 
         "plotting and metrics"
         n_indices = len(indices)
@@ -438,6 +451,16 @@ class Knockout():
         values = torch.cat((values, values_tal1.float()), 0)
         input_idx = torch.cat((input_idx, input_idx_tal1), 0)
 
+        if self.cfg.get_tal1_only:
+            "create tal dataloader"
+            dataset = torch.utils.data.TensorDataset(input_idx, values)
+            data_loader = torch.utils.data.DataLoader(dataset=dataset, batch_size=cfg.batch_size, shuffle=True)
+            return data_loader
+
+        if self.cfg.get_lmo2_only:
+            values = torch.empty(0, cfg.sequence_length)
+            input_idx = torch.empty(0, cfg.sequence_length, 2)
+
         "prepare indices and values for LMO2 in chromosome 11"
         input_idx_lmo2, values_lmo2 = get_samples_sparse(lmo2_df, 11, cfg)
         values = torch.cat((values, values_lmo2.float()), 0)
@@ -462,6 +485,8 @@ class Knockout():
         writer = SummaryWriter('./tensorboard_logs/' + cfg.model_name + timestr)
 
         "initialize optimizer and prepare dataloader"
+        self.cfg.get_tal1_only = False
+        self.cfg.get_lmo2_only = False
         optimizer, criterion = model.compile_optimizer()
         data_loader = self.prepare_tal1_lmo2()
 
@@ -471,7 +496,7 @@ class Knockout():
 
     def test_tal1_lmo2(self, model):
         """
-        test_tal1_lmo2(model) -> No return object
+        test_tal1_lmo2(model) -> DataFrame
         Test model on 5C data from TAL1 and LMO2 regions.
         Args:
             model (SeqLSTM):  Model to be used to test on 5C data
@@ -481,14 +506,53 @@ class Knockout():
         data_loader = self.prepare_tal1_lmo2()
 
         "test model"
+        self.cfg.full_test = True
+        self.cfg.compute_pca = False
+        self.cfg.get_zero_pred = False
         _, _, _, pred_df, _ = model.test(data_loader)
 
         "save predictions"
-        pred_df.to_csv(cfg.output_directory + "%s_predictions.csv" % (cfg.cell), sep="\t")
+        pred_df.to_csv(self.cfg.output_directory + "hiclstm_%s_predictions_chr%s.csv" % (self.cell, str(self.chr)),
+                       sep="\t")
         return pred_df
+
+    def perform_tal1_ko(self, model):
+        """
+        perform_tal1_ko(model) -> DataFrame
+        Performs knockout of selected sites in TAL1 and LMO2 regions.
+        Args:
+            model (SeqLSTM):  Model to be used to test on 5C data
+        """
+
+        ko_pred_df = None
+
+        "save representations"
+        self.chr = 1
+        self.cfg.get_tal1_only = True
+        ko_ob.test_tal1_lmo2(model)
+
+        return ko_pred_df
+
+    def perform_lmo2_ko(self, model):
+        """
+        perform_tal1_ko(model) -> DataFrame
+        Performs knockout of selected sites in TAL1 and LMO2 regions.
+        Args:
+            model (SeqLSTM):  Model to be used to test on 5C data
+        """
+
+        ko_pred_df = None
+
+        "save representations"
+        self.chr = 11
+        self.cfg.get_lmo2_only = True
+        ko_ob.test_tal1_lmo2(model)
+
+        return ko_pred_df
 
     def run_tal_experiment(self):
         pred_df = None
+        ko_pred_df = None
         tal1_data = None
         lmo2_data = None
 
@@ -506,7 +570,15 @@ class Knockout():
 
         if cfg.tal_test:
             "test tal1 and lmo2 regions"
+            ko_ob.cfg.get_tal1_only = False
+            ko_ob.cfg.get_lmo2_only = False
             pred_df = ko_ob.test_tal1_lmo2(model)
+
+        if cfg.perform_tal1_ko:
+            ko_pred_df = ko_ob.perform_tal1_ko(model)
+
+        if cfg.perform_lmo2_ko:
+            ko_pred_df = ko_ob.perform_lmo2_ko(model)
 
         if cfg.compare_tal:
             "compare predictions and observed 5C"
@@ -561,6 +633,7 @@ if __name__ == '__main__':
 
         if cfg.perform_ko:
             "perform ko"
+            ko_ob.cfg.run_tal = False
             mean_diff, ko_pred_df, pred_data = ko_ob.perform_ko(model)
 
         if cfg.compare_ko:

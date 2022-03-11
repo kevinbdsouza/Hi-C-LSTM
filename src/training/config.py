@@ -135,14 +135,21 @@ class Config:
         self.run_tal = True
         self.tal_pre = False
         self.tal_train = False
-        self.tal_test = True
+        self.tal_test = False
         self.tal_mode = "tal1_ko"
-        self.compare_tal = True
-        self.check_ko = True
+        self.compare_tal = False
+        self.check_ko = False
         self.tal_pre_ko = False
         self.tal_plot_wt = True
         self.tal_plot_ko = True
         self.lmo2_chr = 11
+        self.perform_tal1_ko = True
+        self.perform_lmo2_ko = False
+        self.hnisz_region = "tal1"
+        self.tal1ko_indices = [4771]
+        self.lmo2_ko_indices = []
+        self.get_tal1_only = False
+        self.get_lmo2_only = False
 
         "duplication"
         self.melo_insert = True
