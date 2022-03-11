@@ -284,7 +284,7 @@ class Knockout():
                 indices = cfg.tal1ko_indices
             elif cfg.hnisz_region == "lmo2":
                 cfg.ko_experiment = "ctcf"
-                indices = cfg.lmo2ko_indices + get_cumpos(cfg, 11)
+                indices = np.array(cfg.lmo2ko_indices) + get_cumpos(cfg, 11)
         else:
             if cfg.ko_experiment == "ctcf":
                 if cfg.ctcf_indices == "all":
