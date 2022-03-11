@@ -10,7 +10,7 @@ import torch.nn.functional as F
 from training.config import Config
 from analyses.feature_attribution.tf import TFChip
 from analyses.classification.domains import Domains
-from analyses.plot.plot_utils import get_heatmaps, simple_plot, indices_diff_mat
+from analyses.plot.plot_utils import get_heatmaps, simple_plot, indices_diff_mat, scatter_tal_lm
 from training.test_model import test_model
 from random import sample
 
@@ -546,12 +546,14 @@ class Knockout():
             model (SeqLSTM):  Model to be used to test on 5C data
         """
 
-        ko_pred_df = None
-
         "save representations"
         self.chr = 11
         self.cfg.get_lmo2_only = True
         ko_ob.test_tal1_lmo2(model)
+
+        "perform ko"
+        self.cfg.hnisz_region = "lmo2"
+        _, ko_pred_df, _ = self.perform_ko(model)
 
         return ko_pred_df
 
@@ -617,10 +619,14 @@ class Knockout():
                     simple_plot(tal1_mat, mode="reds")
                     simple_plot(lmo2_mat, mode="reds")
 
-            tal1_wt = np.load(cfg.output_directory + "tal1_wt.npy")
-            tal1_ogko = np.load(cfg.output_directory + "tal1_comp.npy")
-            tal1_predko = np.load(cfg.output_directory + "tal1_comp_predko.npy")
-            print("stop")
+            if cfg.hnisz_region == "tal1":
+                wt = np.load(cfg.output_directory + "tal1_wt.npy")
+                ko = np.load(cfg.output_directory + "tal1_ko.npy")
+            else:
+                wt = np.load(cfg.output_directory + "lmo2_wt.npy")
+                ko = np.load(cfg.output_directory + "lmo2_ko.npy")
+
+            scatter_tal_lm(ko, wt)
 
 
 if __name__ == '__main__':

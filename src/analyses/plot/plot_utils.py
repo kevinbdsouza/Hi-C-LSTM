@@ -297,22 +297,21 @@ def plot_r2(comb_r2_df):
     pass
 
 
-def scatter_tal_lm(diff_mat):
-    pred = np.tril(diff_mat)
-    pred = pred.flatten(order='C')
-    pred_nz = pred[pred != 0]
+def scatter_tal_lm(ko, wt):
+    diff_mat = ko - wt
 
     og = np.triu(diff_mat)
-    og = og.flatten(order='F')
-    og_nz = og[og != 0]
+    og = og.flatten(order='C')
+    pred = np.triu(diff_mat.T)
+    pred = pred.flatten(order='C')
 
-    plt.scatter(og_nz, pred_nz, marker='o')
+    plt.figure()
+    plt.scatter(og, pred, marker='o')
     plt.tick_params(axis="x", labelsize=20, length=0)
     plt.tick_params(axis="y", labelsize=20)
-    plt.xlabel('(KO - WT) Original', fontsize=20)
-    plt.ylabel('(KO - WT) Predicted', fontsize=20)
-    plt.show()
-    print("done")
+    plt.xlabel('TAL1 KO - WT (Observed)', fontsize=20)
+    plt.ylabel('TAL1 KO - WT (Predicted)', fontsize=20)
+    plt.savefig("/home/kevindsouza/Downloads/lmo2_scatter.png")
 
 
 def hist_2d(og, pred):
