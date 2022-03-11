@@ -278,20 +278,23 @@ class Knockout():
         zero_embed = test_model(model, cfg, self.chr)
 
         "get knockout indices depending on experiment"
-        if cfg.ko_experiment == "ctcf":
-            if cfg.ctcf_indices == "all":
-                indices = ko_ob.get_ctcf_indices()
-                indices = sample(list(indices), 100)
-            else:
-                indices = ko_ob.cfg.ctcf_indices_22
-        elif cfg.ko_experiment == "foxg1":
-            indices = cfg.foxg1_indices
-        elif cfg.ko_experiment == "tadbs":
-            indices = ko_ob.get_tadbs()
-        elif cfg.hnisz_region == "tal1":
-            indices = cfg.tal1ko_indices
-        elif cfg.hnisz_region == "lmo2":
-            indices = cfg.lmo2ko_indices + get_cumpos(cfg, 11)
+        if cfg.run_tal:
+            if cfg.hnisz_region == "tal1":
+                indices = cfg.tal1ko_indices
+            elif cfg.hnisz_region == "lmo2":
+                indices = cfg.lmo2ko_indices + get_cumpos(cfg, 11)
+        else:
+            if cfg.ko_experiment == "ctcf":
+                if cfg.ctcf_indices == "all":
+                    indices = ko_ob.get_ctcf_indices()
+                    indices = sample(list(indices), 100)
+                else:
+                    indices = ko_ob.cfg.ctcf_indices_22
+            elif cfg.ko_experiment == "foxg1":
+                indices = cfg.foxg1_indices
+            elif cfg.ko_experiment == "tadbs":
+                indices = ko_ob.get_tadbs()
+
 
         "plotting and metrics"
         n_indices = len(indices)
