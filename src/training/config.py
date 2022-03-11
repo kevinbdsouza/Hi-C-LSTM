@@ -138,12 +138,12 @@ class Config:
         self.tal_test = False
         self.tal_mode = "tal1_ko"
         self.compare_tal = False
-        self.check_ko = False
+        self.check_ko = True
         self.tal_pre_ko = False
         self.tal_plot_wt = True
-        self.tal_plot_ko = True
+        self.tal_plot_ko = False
         self.lmo2_chr = 11
-        self.perform_tal1_ko = True
+        self.perform_tal1_ko = False
         self.perform_lmo2_ko = False
         self.hnisz_region = "tal1"
         self.tal1ko_indices = [4771]

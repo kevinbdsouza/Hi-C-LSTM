@@ -297,7 +297,6 @@ class Knockout():
             elif cfg.ko_experiment == "tadbs":
                 indices = ko_ob.get_tadbs()
 
-
         "plotting and metrics"
         n_indices = len(indices)
         diff_list = np.zeros((n_indices, 11))
@@ -536,8 +535,7 @@ class Knockout():
 
         "perform ko"
         self.cfg.hnisz_region = "tal1"
-        mean_diff, ko_pred_df, _ = self.perform_ko(model)
-
+        _, ko_pred_df, _ = self.perform_ko(model)
         return ko_pred_df
 
     def perform_lmo2_ko(self, model):
@@ -604,19 +602,25 @@ class Knockout():
         if cfg.check_ko:
             "compare ko and observed 5C"
             if cfg.tal_pre_ko:
-                self.cfg.tal_mode = "lmo2_ko"
+                self.cfg.tal_mode = "tal1_ko"
                 self.convert_to_hic_format()
-            tal1_ko = pd.read_csv(cfg.output_directory + "tal1_ko.txt", sep="\t")
-            lmo2_ko = pd.read_csv(cfg.output_directory + "lmo2_ko.txt", sep="\t")
 
-            tal1_data["pred"] = contactProbabilities(tal1_ko["v"])
-            lmo2_data["pred"] = contactProbabilities(lmo2_ko["v"])
-            tal1_mat, _ = get_heatmaps(tal1_data, no_pred=False)
-            lmo2_mat, _ = get_heatmaps(lmo2_data, no_pred=False)
+                tal1_ko = pd.read_csv(cfg.output_directory + "tal1_ko.txt", sep="\t")
+                lmo2_ko = pd.read_csv(cfg.output_directory + "lmo2_ko.txt", sep="\t")
 
-            if cfg.tal_plot_ko:
-                simple_plot(tal1_mat, mode="reds")
-                simple_plot(lmo2_mat, mode="reds")
+                tal1_data["pred"] = contactProbabilities(tal1_ko["v"])
+                lmo2_data["pred"] = contactProbabilities(lmo2_ko["v"])
+                tal1_mat, _ = get_heatmaps(tal1_data, no_pred=False)
+                lmo2_mat, _ = get_heatmaps(lmo2_data, no_pred=False)
+
+                if cfg.tal_plot_ko:
+                    simple_plot(tal1_mat, mode="reds")
+                    simple_plot(lmo2_mat, mode="reds")
+
+            tal1_wt = np.load(cfg.output_directory + "tal1_wt.npy")
+            tal1_ogko = np.load(cfg.output_directory + "tal1_comp.npy")
+            tal1_predko = np.load(cfg.output_directory + "tal1_comp_predko.npy")
+            print("stop")
 
 
 if __name__ == '__main__':
