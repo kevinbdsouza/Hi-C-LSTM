@@ -309,8 +309,11 @@ def scatter_tal_lm(ko, wt):
     plt.scatter(og, pred, marker='o')
     plt.tick_params(axis="x", labelsize=20, length=0)
     plt.tick_params(axis="y", labelsize=20)
+    plt.xlim([-1.0, 1.0])
+    plt.ylim([-1.0, 1.0])
     plt.xlabel('TAL1 KO - WT (Observed)', fontsize=20)
     plt.ylabel('TAL1 KO - WT (Predicted)', fontsize=20)
+    plt.tight_layout()
     plt.savefig("/home/kevindsouza/Downloads/lmo2_scatter.png")
 
 
