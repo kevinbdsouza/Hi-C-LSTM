@@ -280,8 +280,10 @@ class Knockout():
         "get knockout indices depending on experiment"
         if cfg.run_tal:
             if cfg.hnisz_region == "tal1":
+                cfg.ko_experiment = "ctcf"
                 indices = cfg.tal1ko_indices
             elif cfg.hnisz_region == "lmo2":
+                cfg.ko_experiment = "ctcf"
                 indices = cfg.lmo2ko_indices + get_cumpos(cfg, 11)
         else:
             if cfg.ko_experiment == "ctcf":
@@ -328,7 +330,7 @@ class Knockout():
             pred_data = pd.merge(pred_data, ko_pred_df, on=["i", "j"])
             pred_data = pred_data.rename(columns={"ko_pred": "v"})
             hic_mat, st = get_heatmaps(pred_data, no_pred=False)
-            # simple_plot(hic_mat, mode="reds")
+            simple_plot(hic_mat, mode="reds")
 
             "get diff mat"
             hic_win = indices_diff_mat(indice, st, hic_mat, mode=cfg.ko_experiment)
