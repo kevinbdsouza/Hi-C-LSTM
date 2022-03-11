@@ -147,7 +147,7 @@ class Config:
         self.perform_lmo2_ko = True
         self.hnisz_region = "lmo2"
         self.tal1ko_indices = [4771]
-        self.lmo2_ko_indices = [3401, 3402, 3403]
+        self.lmo2ko_indices = [3401, 3402, 3403]
         self.get_tal1_only = False
         self.get_lmo2_only = False
 
