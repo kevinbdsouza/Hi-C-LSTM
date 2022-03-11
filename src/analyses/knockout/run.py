@@ -524,12 +524,14 @@ class Knockout():
             model (SeqLSTM):  Model to be used to test on 5C data
         """
 
-        ko_pred_df = None
-
         "save representations"
         self.chr = 1
         self.cfg.get_tal1_only = True
         ko_ob.test_tal1_lmo2(model)
+
+        "perform ko"
+        self.cfg.hnisz_region = "tal1"
+        mean_diff, ko_pred_df, _ = self.perform_ko(model)
 
         return ko_pred_df
 
