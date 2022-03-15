@@ -814,7 +814,7 @@ class PlotFns:
 
     def plot_feature_signal(self):
 
-        mode = "chr21"
+        mode = "tad"
 
         if mode == "tad":
             pos = np.arange(-110, 120, 10)
@@ -877,11 +877,11 @@ if __name__ == "__main__":
     # plot_ob.plot_r2_celltypes()
     # plot_ob.plot_symmetry()
 
-    plot_ob.plot_knockout_results()
+    # plot_ob.plot_knockout_results()
     # plot_ob.plot_knockout_tfs()
     # plot_ob.pr_curves()
 
-    # plot_ob.plot_feature_signal()
+    plot_ob.plot_feature_signal()
     # plot_ob.plot_pred_range()
 
     print("done")
