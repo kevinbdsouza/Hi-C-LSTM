@@ -314,10 +314,10 @@ def scatter_tal_lm(ko, wt):
     plt.tick_params(axis="y", labelsize=20)
     plt.xlim([-1.0, 1.0])
     plt.ylim([-1.0, 1.0])
-    plt.xlabel('LMO2 KO - WT (Observed)', fontsize=20)
-    plt.ylabel('LMO2 KO - WT (Predicted)', fontsize=20)
+    plt.xlabel('TAL1 KO - WT (Observed)', fontsize=20)
+    plt.ylabel('TAL1 KO - WT (Predicted)', fontsize=20)
     plt.tight_layout()
-    plt.savefig("/home/kevindsouza/Downloads/lmo2_scatter.png")
+    plt.savefig("/home/kevindsouza/Downloads/tal1_scatter.png")
 
 
 def hist_2d(og, pred):
