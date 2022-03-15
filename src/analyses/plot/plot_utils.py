@@ -306,7 +306,7 @@ def scatter_tal_lm(ko, wt):
     pred = pred.flatten(order='C')
 
     plt.figure(figsize=(10, 8))
-    plt.scatter(og, pred, marker='o')
+    #plt.scatter(og, pred, marker='o')
     sns.regplot(og, pred)
     plt.tick_params(axis="x", labelsize=20, length=0)
     plt.tick_params(axis="y", labelsize=20)
