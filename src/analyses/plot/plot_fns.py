@@ -819,7 +819,8 @@ class PlotFns:
         if mode == "tad":
             pos = np.arange(-110, 120, 10)
             plt.figure(figsize=(6, 2))
-            feature_signal = np.load(self.path + "lstm/" + "feature_signal_tad.npy")
+            feature_signal = [0.012, -0.057, -0.081, -0.029, 0.053, 0.147, 0.231, 0.236, 0.210, 0.183, 0.201, 0.204,
+                              0.197, 0.181, 0.206, 0.209, 0.218, 0.128, 0.086, 0.014, -0.047, -0.061, -0.029]
             plt.plot(pos, feature_signal)
             plt.xticks(fontsize=14)
             plt.yticks(fontsize=14)
@@ -863,7 +864,7 @@ if __name__ == "__main__":
 
     # plot_ob.plot_combined(cell="HFFhTERT")
     # plot_ob.plot_mAP_celltypes()
-    #plot_ob.plot_mAP_resolutions()
+    # plot_ob.plot_mAP_resolutions()
     # plot_ob.plot_auroc_celltypes()
     # plot_ob.plot_auroc()
 
