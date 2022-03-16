@@ -1,10 +1,8 @@
-import logging
 import numpy as np
-import matplotlib as mpl
 import matplotlib.pyplot as plt
 import pandas as pd
 import seaborn as sns
-import training.config as config
+from training.config import Config
 
 
 class PlotFns:
@@ -103,6 +101,9 @@ class PlotFns:
             df_lists (List): list containing data for columns
             xlabel (string): xlabel
             ylabel (string): ylabel
+            colors (List): list of colors
+            markers (List): list of markers
+            labels (List): list of labels
             adjust (bool): If true adjusts bottom
             save (bool): if true saves figure
         """
@@ -124,13 +125,13 @@ class PlotFns:
 
         plt.legend(fontsize=18)
 
-        if adjust == "True":
+        if adjust:
             plt.subplots_adjust(bottom=0.35)
 
         plt.show()
 
-        if save == "True":
-            plt.savefig("/home/kevindsouza/Downloads/map_cells.png")
+        if save:
+            plt.savefig("/home/kevindsouza/Downloads/x.png")
 
     def plot_mAP_celltypes(self):
         """
@@ -151,99 +152,102 @@ class PlotFns:
         labels = ["GM12878 (Rao 2014, 3B)", "H1hESC (Dekker 4DN, 2.5B)", "HFFhTERT (Dekker 4DN, 354M)",
                   "GM12878 (Aiden 4DN, 300M)", "GM12878 (Aiden 4DN, 216M)"]
 
+        "load lists"
         gm_values_all_tasks = np.load(self.path + "gm_reduced_all_tasks.npy")
         h1_values_all_tasks = np.load(self.path + "h1_values_all_tasks.npy")
         hff_values_all_tasks = np.load(self.path + "hff_values_all_tasks.npy")
         gmlow_values_all_tasks = np.load(self.path + "gmlow_metrics_all_tasks.npy")
         gmlow2_values_all_tasks = np.load(self.path + "gmlow2_metrics_all_tasks.npy")
 
+        "setup lists"
         df_lists = [tasks, gm_values_all_tasks, h1_values_all_tasks, gmlow_values_all_tasks, gmlow2_values_all_tasks,
                     hff_values_all_tasks]
 
+        "plot"
         self.plot_main(df_columns, df_lists, xlabel, ylabel, colors, markers, labels, adjust=True, save=False)
 
     def plot_mAP_resolutions(self):
-        tasks = ["Gene Expression", "Enhancers", "TADs", "subTADs", "Subcompartments"]
+        """
+        plot_mAP_resolutions() -> No return object
+        Plots mAP across different resolutions
+        Args:
+            NA
+        """
 
+        tasks = ["Gene Expression", "Enhancers", "TADs", "subTADs", "Subcompartments"]
+        df_columns = ["Tasks", "lstm_2kbp", "lstm_10kbp",
+                      "lstm_100kbp", "lstm_500kbp"]
+        xlabel = "Prediction Target"
+        ylabel = "mAP"
+        colors = ["C1", "C0", "C2", "C3"]
+        markers = ['D', 'o', 'v', 's']
+        labels = ["2Kbp", "10Kbp", "100Kbp", "500Kbp"]
+
+        "load lists"
         lstm_2kbp = np.load(self.path + "lstm_gm_2kbp.npy")
         lstm_10kbp = np.load(self.path + "lstm_gm_10kbp.npy")
         lstm_100kbp = np.load(self.path + "lstm_gm_100kbp.npy")
         lstm_500kbp = np.load(self.path + "lstm_gm_500kbp.npy")
 
-        df_main = pd.DataFrame(columns=["Tasks", "lstm_2kbp", "lstm_10kbp",
-                                        "lstm_100kbp", "lstm_500kbp"])
-        df_main["Tasks"] = tasks
-        df_main["lstm_2kbp"] = lstm_2kbp
-        df_main["lstm_10kbp"] = lstm_10kbp
-        df_main["lstm_100kbp"] = lstm_100kbp
-        df_main["lstm_500kbp"] = lstm_500kbp
+        "setup lists"
+        df_lists = [tasks, lstm_2kbp, lstm_10kbp, lstm_100kbp, lstm_500kbp]
 
-        plt.figure(figsize=(12, 10))
-        plt.xticks(rotation=90, fontsize=20)
-        plt.yticks(fontsize=20)
-        plt.xlabel("Prediction Target", fontsize=20)
-        plt.ylabel("mAP", fontsize=20)
-        plt.plot('Tasks', 'lstm_2kbp', data=df_main, marker='D', markersize=16, color="C1", linewidth=3,
-                 label="2Kbp")
-        plt.plot('Tasks', 'lstm_10kbp', data=df_main, marker='o', markersize=16, color="C0", linewidth=3,
-                 label="10Kbp")
-        plt.plot('Tasks', 'lstm_100kbp', data=df_main, marker='v', markersize=16, color="C2", linewidth=3,
-                 label="100Kbp")
-        plt.plot('Tasks', 'lstm_500kbp', data=df_main, marker='s', markersize=16, color="C3", linewidth=3,
-                 label="500Kbp")
-        plt.legend(fontsize=18)
-        plt.subplots_adjust(bottom=0.35)
-        plt.savefig("/home/kevindsouza/Downloads/map_res.png")
+        "plot"
+        self.plot_main(df_columns, df_lists, xlabel, ylabel, colors, markers, labels, adjust=True, save=False)
 
     def plot_auroc_celltypes(self):
-        tasks = ["Gene Expression", "Replication Timing", "Enhancers", "TSS", "PE-Interactions", "FIREs",
-                 "Non-loop Domains",
-                 "Loop Domains", "Subcompartments"]
+        """
+        plot_auroc_celltypes() -> No return object
+        Plots AuROC for different celltypes
+        Args:
+            NA
+        """
 
+        tasks = ["Gene Expression", "Replication Timing", "Enhancers", "TSS", "PE-Interactions", "FIREs",
+                 "Non-loop Domains", "Loop Domains", "Subcompartments"]
+        df_columns = ["Tasks", "GM12878_Rao", "H1hESC_Dekker", "WTC11_Dekker", "HFFhTERT_Dekker", "GM12878_low",
+                      "GM12878_low2"]
+        xlabel = "Prediction Target"
+        ylabel = "AuROC"
+        colors = ["C1", "C0", "C2", "C3"]
+        markers = ['o', 'D', '^', 'v', 's', '*']
+        labels = ["GM12878 (Rao 2014, 3B)", "H1hESC (Dekker 4DN, 2.5B)", "WTC11 (Dekker 4DN, 1.3B)",
+                  "HFFhTERT (Dekker 4DN, 354M)", "GM12878 (Aiden 4DN, 300M)", "GM12878 (Aiden 4DN, 216M)"]
+
+        "load lists"
         gm_auroc_all_tasks = np.load(self.path + "gm_auroc_all_tasks.npy")
         h1_auroc_all_tasks = np.load(self.path + "h1_auroc_all_tasks.npy")
-        hff_auroc_all_tasks = np.load(self.path + "hff_auroc_all_tasks.npy")
         wtc_auroc_all_tasks = np.load(self.path + "wtc_auroc_all_tasks.npy")
+        hff_auroc_all_tasks = np.load(self.path + "hff_auroc_all_tasks.npy")
         gmlow_auroc_all_tasks = np.load(self.path + "gmlow_auroc_all_tasks.npy")
         gmlow2_auroc_all_tasks = np.load(self.path + "gmlow2_auroc_all_tasks.npy")
 
-        df_main = pd.DataFrame(columns=["Tasks", "GM12878_Rao", "H1hESC_Dekker", "WTC11_Dekker",
-                                        "GM12878_low", "HFFhTERT_Dekker", "GM12878_low2"])
-        df_main["Tasks"] = tasks
-        df_main["GM12878_Rao"] = gm_auroc_all_tasks
-        df_main["H1hESC_Dekker"] = h1_auroc_all_tasks
-        df_main["WTC11_Dekker"] = wtc_auroc_all_tasks
-        df_main["GM12878_low"] = gmlow_auroc_all_tasks
-        df_main["HFFhTERT_Dekker"] = hff_auroc_all_tasks
-        df_main["GM12878_low2"] = gmlow2_auroc_all_tasks
+        "setup lists"
+        df_lists = [tasks, gm_auroc_all_tasks, h1_auroc_all_tasks, wtc_auroc_all_tasks, hff_auroc_all_tasks,
+                    gmlow_auroc_all_tasks, gmlow2_auroc_all_tasks]
 
-        plt.figure(figsize=(12, 10))
-        plt.xticks(rotation=90, fontsize=20)
-        plt.yticks(fontsize=20)
-        plt.xlabel("Prediction Target", fontsize=20)
-        plt.ylabel("AuROC ", fontsize=20)
-        plt.plot('Tasks', 'GM12878_Rao', data=df_main, marker='o', markersize=16, color="C0", linewidth=3,
-                 label="GM12878 (Rao 2014, 3B)")
-        plt.plot('Tasks', 'H1hESC_Dekker', data=df_main, marker='D', markersize=16, color="C1", linewidth=3,
-                 label="H1hESC (Dekker 4DN, 2.5B)")
-        plt.plot('Tasks', 'WTC11_Dekker', data=df_main, marker='^', markersize=16, color="C2", linewidth=3,
-                 label="WTC11 (Dekker 4DN, 1.3B)")
-        plt.plot('Tasks', 'HFFhTERT_Dekker', data=df_main, marker='v', markersize=16, color="C4", linewidth=3,
-                 label="HFFhTERT (Dekker 4DN, 354M)")
-        plt.plot('Tasks', 'GM12878_low', data=df_main, marker='s', markersize=16, color="C3", linewidth=3,
-                 label="GM12878 (Aiden 4DN, 300M)")
-        plt.plot('Tasks', 'GM12878_low2', data=df_main, marker='*', markersize=16, color="C5", linewidth=3,
-                 label="GM12878 (Aiden 4DN, 216M)")
-
-        plt.legend(fontsize=18)
-        plt.show()
-        pass
+        "plot"
+        self.plot_main(df_columns, df_lists, xlabel, ylabel, colors, markers, labels, adjust=False, save=False)
 
     def plot_auroc(self):
-        tasks = ["Gene Expression", "Replication Timing", "Enhancers", "TSS", "PE-Interactions", "FIREs",
-                 "Non-loop Domains",
-                 "Loop Domains", "Subcompartments"]
+        """
+        plot_auroc_celltypes() -> No return object
+        Plots AuROC for different celltypes
+        Args:
+            NA
+        """
 
+        tasks = ["Gene Expression", "Replication Timing", "Enhancers", "TSS", "PE-Interactions", "FIREs",
+                 "Non-loop Domains", "Loop Domains", "Subcompartments"]
+        df_columns = ["Tasks", "Hi-C-LSTM", "SNIPER-INTRA", "SNIPER-INTER", "SCI", "PCA",
+                      "SBCID"]
+        xlabel = "Prediction Target"
+        ylabel = "AuROC"
+        colors = ["C3", "C0", "C1", "C2", "C4", "C5"]
+        markers = ['o', '*', 'X', '^', 'D', 's']
+        labels = ["Hi-C-LSTM", "SNIPER-INTRA", "SNIPER-INTER", "SCI", "PCA", "SBCID"]
+
+        "load lists"
         lstm_auroc_all_tasks = np.load(self.path + "gm_auroc_all_tasks.npy")
         sniper_intra_auroc_all_tasks = np.load(self.path + "sniper_intra_auroc_all_tasks.npy")
         sniper_inter_auroc_all_tasks = np.load(self.path + "sniper_inter_auroc_all_tasks.npy")
@@ -251,91 +255,83 @@ class PlotFns:
         pca_auroc_all_tasks = np.load(self.path + "pca_auroc_all_tasks.npy")
         sbcid_auroc_all_tasks = np.load(self.path + "sbcid_auroc_all_tasks.npy")
 
-        df_main = pd.DataFrame(columns=["Tasks", "Hi-C-LSTM", "SNIPER-INTRA", "SNIPER-INTER", "SCI", "PCA", "SBCID"])
-        df_main["Tasks"] = tasks
-        df_main["Hi-C-LSTM"] = lstm_auroc_all_tasks
-        df_main["SNIPER-INTRA"] = sniper_intra_auroc_all_tasks
-        df_main["SNIPER-INTER"] = sniper_inter_auroc_all_tasks
-        df_main["SCI"] = graph_auroc_all_tasks
-        df_main["PCA"] = pca_auroc_all_tasks
-        df_main["SBCID"] = sbcid_auroc_all_tasks
+        "setup lists"
+        df_lists = [tasks, lstm_auroc_all_tasks, sniper_intra_auroc_all_tasks, sniper_inter_auroc_all_tasks,
+                    graph_auroc_all_tasks,
+                    pca_auroc_all_tasks, sbcid_auroc_all_tasks]
 
-        plt.figure(figsize=(12, 10))
-        plt.xticks(rotation=90, fontsize=20)
-        plt.yticks(fontsize=20)
-        plt.xlabel("Prediction Target", fontsize=20)
-        plt.ylabel("AuROC ", fontsize=20)
-        plt.plot('Tasks', 'Hi-C-LSTM', data=df_main, marker='o', markersize=16, color="C3", linewidth=3,
-                 label="Hi-C-LSTM")
-        plt.plot('Tasks', 'SNIPER-INTRA', data=df_main, marker='*', markersize=16, color="C0", linewidth=3,
-                 linestyle='dashed', label="SNIPER-INTRA")
-        plt.plot('Tasks', 'SNIPER-INTER', data=df_main, marker='X', markersize=16, color="C1", linewidth=3,
-                 linestyle='dotted', label="SNIPER-INTER")
-        plt.plot('Tasks', 'SCI', data=df_main, marker='^', markersize=16, color="C2", linewidth=3, linestyle='dashdot',
-                 label="SCI")
-        plt.plot('Tasks', 'PCA', data=df_main, marker='D', markersize=16, color="C4", linewidth=3, label="PCA")
-        plt.plot('Tasks', 'SBCID', data=df_main, marker='s', markersize=16, color="C5", linewidth=3, linestyle='dashed',
-                 label="SBCID")
-        plt.legend(fontsize=18)
-        plt.show()
-        pass
+        "plot"
+        self.plot_main(df_columns, df_lists, xlabel, ylabel, colors, markers, labels, adjust=False, save=False)
+
+    def plot_two_axes(self, ax, fig, plt, x_list, y_list, xlabel, ylabel, colors, markers, labels, legend=False,
+                      save=False):
+
+        """
+        plot_two_axes(ax, fig, plt, x_list, y_list, xlabel, ylabel, colors, markers, labels, legend, save) -> ax, fig, plt
+        Plots AuROC for different celltypes
+        Args:
+            NA
+        """
+
+        for i, l in enumerate(labels):
+            ax.plot(x_list, y_list[i], marker=markers[i], markersize=16, color=colors[i], linewidth=3,
+                    label=l)
+
+        tick_list = [4, 16, 40, 80, 130]
+        ax.tick_params(axis="x", labelrotation=90, labelsize=20)
+        if not legend:
+            ax.tick_params(axis="y", labelsize=20)
+        ax.set_xticks(tick_list)
+        ax.set_xticklabels(tick_list)
+        ax.set_xlabel(xlabel, fontsize=20)
+        ax.set_ylabel(ylabel, fontsize=20)
+
+        if legend:
+            handles, labels = ax.get_legend_handles_labels()
+            fig.legend(handles, labels, loc='best', fontsize=18, bbox_to_anchor=(0.53, 0.6))
+            plt.show()
+
+            if save:
+                plt.savefig("/home/kevindsouza/Downloads/y.png")
+
+        return ax, fig, plt
 
     def plot_hidden(self, hidden_list):
+        """
+        plot_hidden(hidden_list) -> No return object
+        Plots LSTM ablations across number of hidden nodes
+        Args:
+            hidden_list (List): List of hidden nodes
+        """
+
         map_hidden = np.load(self.path + "lstm/" + "hiclstm_ablation.npy")
         map_2_layer = np.load(self.path + "lstm/" + "hiclstm_2_layer_ablation.npy")
-        map_bidir = np.load(self.path + "lstm/" + "hiclstm_bidir_ablation.npy")
-        map_dropout = np.load(self.path + "lstm/" + "hiclstm_dropout_ablation.npy")
         map_no_ln = np.load(self.path + "lstm/" + "hiclstm_no_ln_ablation.npy")
+        map_dropout = np.load(self.path + "lstm/" + "hiclstm_dropout_ablation.npy")
+        map_bidir = np.load(self.path + "lstm/" + "hiclstm_bidir_ablation.npy")
 
         r2_hidden = np.load(self.path + "lstm/" + "hiclstm_ablation_r2.npy")
-        r2_bidir = np.load(self.path + "lstm/" + "hiclstm_bidir_ablation_r2.npy")
         r2_2_layer = np.load(self.path + "lstm/" + "hiclstm_2_layer_ablation_r2.npy")
-        r2_dropout = np.load(self.path + "lstm/" + "hiclstm_dropout_ablation_r2.npy")
         r2_no_ln = np.load(self.path + "lstm/" + "hiclstm_no_ln_ablation_r2.npy")
+        r2_dropout = np.load(self.path + "lstm/" + "hiclstm_dropout_ablation_r2.npy")
+        r2_bidir = np.load(self.path + "lstm/" + "hiclstm_bidir_ablation_r2.npy")
+
+        xlabel = "Representation Size"
+        colors = ["C0", "C1", "C2", "C4", "C5"]
+        markers = ['o', 'D', '^', 's', 'p']
+        labels = ['Hi-C-LSTM', 'Hi-C-LSTM, No.Layers: 2', 'Hi-C-LSTM, w/o Layer Norm', 'Hi-C-LSTM, w Dropout',
+                  'Hi-C-LSTM, Bidirectional Lstm']
 
         fig, (ax1, ax2) = plt.subplots(1, 2, sharey=True, figsize=(12, 6))
 
-        ax1.plot(hidden_list, map_hidden, marker='o', markersize=16, color="C0", linewidth=3,
-                 label='Hi-C-LSTM')
-        ax1.plot(hidden_list, map_2_layer, marker='D', markersize=16, color="C1", linewidth=3, linestyle='dashed',
-                 label='Hi-C-LSTM, No.Layers: 2')
-        ax1.plot(hidden_list, map_no_ln, marker='^', markersize=16, color="C2", linewidth=3, linestyle='dotted',
-                 label='Hi-C-LSTM, w/o Layer Norm')
-        ax1.plot(hidden_list, map_dropout, marker='s', markersize=16, color="C4", linewidth=3, linestyle='dashdot',
-                 label='Hi-C-LSTM, w Dropout')
-        ax1.plot(hidden_list, map_bidir, marker='p', markersize=16, color="C5", linewidth=3, label='Hi-C-LSTM, '
-                                                                                                   'Bidirectional Lstm')
+        y_list = [map_hidden, map_2_layer, map_no_ln, map_dropout, map_bidir]
+        ylabel = "Avg mAP Across Tasks"
+        ax, fig, plt = self.plot_two_axes(ax1, fig, plt, hidden_list, y_list, xlabel, ylabel, colors, markers, labels, save=False)
 
-        ax2.plot(hidden_list, r2_hidden, marker='o', markersize=16, color="C0", linewidth=3,
-                 label='Hi-C-LSTM')
-        ax2.plot(hidden_list, r2_2_layer, marker='D', markersize=16, color="C1", linewidth=3, linestyle='dashed',
-                 label='Hi-C-LSTM, No.Layers: 2')
-        ax2.plot(hidden_list, r2_no_ln, marker='^', markersize=16, color="C2", linewidth=3, linestyle='dotted',
-                 label='Hi-C-LSTM, w/o Layer Norm')
-        ax2.plot(hidden_list, r2_dropout, marker='s', markersize=16, color="C4", linewidth=3, linestyle='dashdot',
-                 label='Hi-C-LSTM, w Dropout')
-        ax2.plot(hidden_list, r2_bidir, marker='p', markersize=16, color="C5", linewidth=3, label='Hi-C-LSTM, '
-                                                                                                  'Bidirectional Lstm')
-
-        ax1.tick_params(axis="x", labelrotation=90, labelsize=20)
-        ax2.tick_params(axis="x", labelrotation=90, labelsize=20)
-        ax1.tick_params(axis="y", labelsize=20)
-        tick_list = [4, 16, 40, 80, 130]
-        ax1.set_xticks(tick_list)
-        ax1.set_xticklabels(tick_list)
-        ax2.set_xticks(tick_list)
-        ax2.set_xticklabels(tick_list)
-        ax1.set_xlabel('Representation Size', fontsize=20)
-        ax2.set_xlabel('Representation Size', fontsize=20)
-        ax1.set_ylabel('Avg mAP Across Tasks', fontsize=20)
-        ax2.set_ylabel('Avg Hi-C R-squared', fontsize=20)
-
-        handles, labels = ax2.get_legend_handles_labels()
-        fig.legend(handles, labels, loc='best', fontsize=18, bbox_to_anchor=(0.53, 0.6))
-
-        plt.show()
-
-        pass
+        y_list = [r2_hidden, r2_2_layer, r2_no_ln, r2_dropout, r2_bidir]
+        ylabel = "Avg Hi-C R-squared"
+        _, _, _ = self.plot_two_axes(ax1, fig, plt, hidden_list, y_list, xlabel, ylabel, colors, markers, labels, legend=True,
+                                       save=False)
 
     def plot_xgb(self):
         depth_list = [2, 4, 6, 8, 12, 20]
@@ -389,10 +385,6 @@ class PlotFns:
         ax1.set_ylabel('Avg mAP Across Tasks', fontsize=20)
         ax2.set_ylabel('Avg mAP Across Tasks', fontsize=20)
 
-        # handles_1, labels_1 = ax1.get_legend_handles_labels()
-        # handles_2, labels_2 = ax1.get_legend_handles_labels()
-        # fig.legend(handles_1, labels_1, loc='center right', fontsize=18)
-        # fig.legend(handles_2, labels_2, loc='center right', fontsize=18)
         ax1.legend(fontsize=18)
         ax2.legend(fontsize=18)
 
@@ -905,17 +897,17 @@ class PlotFns:
 
 
 if __name__ == "__main__":
-    cfg = config.Config()
+    cfg = Config()
     plot_ob = PlotFns(cfg)
 
     # plot_ob.plot_combined(cell="HFFhTERT")
-    plot_ob.plot_mAP_celltypes()
+    # plot_ob.plot_mAP_celltypes()
     # plot_ob.plot_mAP_resolutions()
     # plot_ob.plot_auroc_celltypes()
     # plot_ob.plot_auroc()
 
-    # hidden_list = [4, 8, 16, 32, 64, 128]
-    # plot_ob.plot_hidden(hidden_list)
+    hidden_list = [4, 8, 16, 32, 64, 128]
+    plot_ob.plot_hidden(hidden_list)
 
     # plot_ob.plot_xgb()
     # plot_ob.plot_gbr()
