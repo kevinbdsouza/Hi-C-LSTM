@@ -263,14 +263,25 @@ class PlotFns:
         "plot"
         self.plot_main(df_columns, df_lists, xlabel, ylabel, colors, markers, labels, adjust=False, save=False)
 
-    def plot_two_axes(self, ax, fig, plt, x_list, y_list, xlabel, ylabel, colors, markers, labels, legend=False,
-                      save=False):
+    def plot_two_axes(self, ax, fig, x_list, y_list, xlabel, ylabel, colors, markers, labels, legend=False,
+                      save=False, common=False):
 
         """
-        plot_two_axes(ax, fig, plt, x_list, y_list, xlabel, ylabel, colors, markers, labels, legend, save) -> ax, fig, plt
-        Plots AuROC for different celltypes
+        plot_two_axes(ax, fig, x_list, y_list, xlabel, ylabel, colors, markers, labels, legend, save, common) -> ax, fig, plt
+        main function for plotting two axes
         Args:
-            NA
+            ax (AxesSubplot): axes object
+            fig (Figure): figure object
+            x_list (List): List of x axis values
+            y_list (List): List of y axis values
+            xlabel (string): xlabel
+            ylabel (string): ylabel
+            colors (list): List of color values
+            markers (list): List of markers
+            labels (list): List of labels
+            legend (bool): if true makes legend
+            save (bool): if true saves figure
+            common (bool): if true shares legend
         """
 
         for i, l in enumerate(labels):
@@ -286,23 +297,30 @@ class PlotFns:
         ax.set_xlabel(xlabel, fontsize=20)
         ax.set_ylabel(ylabel, fontsize=20)
 
+        if not common:
+            ax.legend(fontsize=18)
+
         if legend:
-            handles, labels = ax.get_legend_handles_labels()
-            fig.legend(handles, labels, loc='best', fontsize=18, bbox_to_anchor=(0.53, 0.6))
+            if common:
+                handles, labels = ax.get_legend_handles_labels()
+                fig.legend(handles, labels, loc='best', fontsize=18, bbox_to_anchor=(0.53, 0.6))
+
             plt.show()
 
             if save:
                 plt.savefig("/home/kevindsouza/Downloads/y.png")
 
-        return ax, fig, plt
+        return ax, fig
 
-    def plot_hidden(self, hidden_list):
+    def plot_hidden(self):
         """
-        plot_hidden(hidden_list) -> No return object
+        plot_hidden() -> No return object
         Plots LSTM ablations across number of hidden nodes
         Args:
-            hidden_list (List): List of hidden nodes
+            NA
         """
+
+        hidden_list = [4, 8, 16, 32, 64, 128]
 
         map_hidden = np.load(self.path + "lstm/" + "hiclstm_ablation.npy")
         map_2_layer = np.load(self.path + "lstm/" + "hiclstm_2_layer_ablation.npy")
@@ -326,73 +344,64 @@ class PlotFns:
 
         y_list = [map_hidden, map_2_layer, map_no_ln, map_dropout, map_bidir]
         ylabel = "Avg mAP Across Tasks"
-        ax, fig, plt = self.plot_two_axes(ax1, fig, plt, hidden_list, y_list, xlabel, ylabel, colors, markers, labels, save=False)
+        ax, fig = self.plot_two_axes(ax1, fig, hidden_list, y_list, xlabel, ylabel, colors, markers, labels,
+                                     legend=False, save=False, common=True)
 
         y_list = [r2_hidden, r2_2_layer, r2_no_ln, r2_dropout, r2_bidir]
         ylabel = "Avg Hi-C R-squared"
-        _, _, _ = self.plot_two_axes(ax1, fig, plt, hidden_list, y_list, xlabel, ylabel, colors, markers, labels, legend=True,
-                                       save=False)
+        _, _ = self.plot_two_axes(ax1, fig, hidden_list, y_list, xlabel, ylabel, colors, markers, labels,
+                                  legend=True, save=False, common=True)
 
     def plot_xgb(self):
+        """
+        plot_xgb() -> No return object
+        Plots XGB ablations across number of estimators and depth.
+        Args:
+            NA
+        """
+
         depth_list = [2, 4, 6, 8, 12, 20]
         estimators_list = [2000, 4000, 5000, 6000, 8000, 10000]
 
-        plt.figure(figsize=(10, 6))
-        map_depth_2000 = np.load(self.path + "lstm/" + "xgb_map_depth_2000.npy")
-        map_depth_4000 = np.load(self.path + "lstm/" + "xgb_map_depth_4000.npy")
-        map_depth_5000 = np.load(self.path + "lstm/" + "xgb_map_depth_5000.npy")
-        map_depth_6000 = np.load(self.path + "lstm/" + "xgb_map_depth_6000.npy")
-        map_depth_10000 = np.load(self.path + "lstm/" + "xgb_map_depth_10000.npy")
+        map_depth_2000 = np.load(self.path + "xgb_map_depth_2000.npy")
+        map_depth_4000 = np.load(self.path + "xgb_map_depth_4000.npy")
+        map_depth_5000 = np.load(self.path + "xgb_map_depth_5000.npy")
+        map_depth_6000 = np.load(self.path + "xgb_map_depth_6000.npy")
+        map_depth_10000 = np.load(self.path + "xgb_map_depth_10000.npy")
 
-        map_est_2 = np.load(self.path + "lstm/" + "xgb_map_est_2.npy")
-        map_est_4 = np.load(self.path + "lstm/" + "xgb_map_est_4.npy")
-        map_est_6 = np.load(self.path + "lstm/" + "xgb_map_est_6.npy")
-        map_est_12 = np.load(self.path + "lstm/" + "xgb_map_est_12.npy")
-        map_est_20 = np.load(self.path + "lstm/" + "xgb_map_est_20.npy")
+        map_est_2 = np.load(self.path + "xgb_map_est_2.npy")
+        map_est_4 = np.load(self.path + "xgb_map_est_4.npy")
+        map_est_6 = np.load(self.path + "xgb_map_est_6.npy")
+        map_est_12 = np.load(self.path + "xgb_map_est_12.npy")
+        map_est_20 = np.load(self.path + "xgb_map_est_20.npy")
 
         fig, (ax1, ax2) = plt.subplots(1, 2, sharey=True, figsize=(12, 6))
+        ylabel = "Avg mAP Across Tasks"
+        colors = ["C0", "C1", "C2", "C4", "C5"]
+        markers = ['o', 's', '^', 'D', 'p']
 
-        ax1.plot(depth_list, map_depth_2000, marker='o', markersize=16, color="C0", linewidth=3,
-                 label='Max Estimators: 2000')
-        ax1.plot(depth_list, map_depth_4000, marker='s', markersize=16, color="C1", linewidth=3, linestyle='dashed',
-                 label='Max Estimators: 4000')
-        ax1.plot(depth_list, map_depth_5000, marker='^', markersize=16, color="C2", linewidth=3, linestyle='dotted',
-                 label='Max Estimators: 5000')
-        ax1.plot(depth_list, map_depth_6000, marker='D', markersize=16, color="C4", linewidth=3, linestyle='dashdot',
-                 label='Max Estimators: 6000')
-        ax1.plot(depth_list, map_depth_10000, marker='p', markersize=16, color="C5", linewidth=3,
-                 label='Max Estimators: 10000')
+        y_list = [map_depth_2000, map_depth_4000, map_depth_5000, map_depth_6000, map_depth_10000]
+        labels = ['Max Estimators: 2000', 'Max Estimators: 4000', 'Max Estimators: 5000', 'Max Estimators: 6000',
+                  'Max Estimators: 10000']
+        xlabel = "Max Depth"
+        ax, fig = self.plot_two_axes(ax1, fig, depth_list, y_list, xlabel, ylabel, colors, markers, labels,
+                                     legend=False, save=False, common=False)
 
-        ax2.plot(estimators_list, map_est_2, marker='o', markersize=16, color="C0", linewidth=3,
-                 label='Max Depth: 2')
-        ax2.plot(estimators_list, map_est_4, marker='s', markersize=16, color="C1", linewidth=3, linestyle='dashed',
-                 label='Max Depth: 4')
-        ax2.plot(estimators_list, map_est_6, marker='^', markersize=16, color="C2", linewidth=3, linestyle='dotted',
-                 label='Max Depth: 6')
-        ax2.plot(estimators_list, map_est_12, marker='D', markersize=16, color="C4", linewidth=3, linestyle='dashdot',
-                 label='Max Depth: 12')
-        ax2.plot(estimators_list, map_est_20, marker='p', markersize=16, color="C5", linewidth=3, label='Max Depth: 20')
+        y_list = [map_est_2, map_est_4, map_est_6, map_est_12, map_est_20]
+        labels = ['Max Depth: 2', 'Max Depth: 4', 'Max Depth: 6', 'Max Depth: 12',
+                  'Max Depth: 20']
+        xlabel = "Max Estimators"
+        _, _ = self.plot_two_axes(ax1, fig, estimators_list, y_list, xlabel, ylabel, colors, markers, labels,
+                                  legend=True, save=False, common=False)
 
-        ax1.tick_params(axis="x", labelrotation=90, labelsize=20)
-        ax2.tick_params(axis="x", labelrotation=90, labelsize=20)
-        ax1.tick_params(axis="y", labelsize=20)
-        ax1.set_xticks(depth_list)
-        ax1.set_xticklabels(depth_list)
-        ax2.set_xticks(estimators_list)
-        ax2.set_xticklabels(estimators_list)
-        ax1.set_xlabel('Max Depth', fontsize=20)
-        ax2.set_xlabel('Max Estimators', fontsize=20)
-        ax1.set_ylabel('Avg mAP Across Tasks', fontsize=20)
-        ax2.set_ylabel('Avg mAP Across Tasks', fontsize=20)
+    def plot_violin(self):
+        """
+        plot_violin() -> No return object
+        Plots violin plots for segway and TFs
+        Args:
+            NA
+        """
 
-        ax1.legend(fontsize=18)
-        ax2.legend(fontsize=18)
-
-        plt.show()
-
-        pass
-
-    def plot_gbr(self):
         # ig_log_df = pd.DataFrame(np.load(self.path + "ig_log_df_all.npy", allow_pickle=True))
         ig_log_df = pd.DataFrame(np.load(self.path + "ig_tf_df_plus_ctcf.npy", allow_pickle=True))
         ig_log_df = ig_log_df.rename(columns={0: "ig_val", 1: "label"})
@@ -407,20 +416,14 @@ class PlotFns:
         ax.set(xlabel='', ylabel='IG Importance')
         plt.show()
 
-        '''
-        #plt.figure(figsize=(14, 10))
-        plt.figure(figsize=(8, 8))
-        sns.set(font_scale=1.4)
-        plt.xticks(rotation=90, fontsize=14)
-        ax = sns.violinplot(x="label", y="ig_val", data=ig_log_df)
-        ax.set(xlabel='', ylabel='IG Importance')
-        #plt.subplots_adjust(bottom=0.4)
-        plt.show()
-        '''
-
-        print("done")
-
     def plot_r2_celltypes(self):
+        """
+        plot_r2_celltypes() -> No return object
+        Plots R2 for Hi-C_LSTM across celltypes
+        Args:
+            NA
+        """
+
         pos = [10, 20, 30, 40, 50]
 
         r1_hiclstm_gm = np.load(self.path + "r1_hiclstm_full.npy")
@@ -438,67 +441,29 @@ class PlotFns:
         r2_hiclstm_gmlow2 = np.load(self.path + "r2_hiclstm_gmlow2.npy")
 
         fig, (ax1, ax2) = plt.subplots(1, 2, sharey=True, figsize=(14, 8))
+        labels = ['GM12878 (Rao 2014, 3B)', 'H1hESC (Dekker 4DN, 2.5B)', 'WTC11 (Dekker 4DN, 1.3B)',
+                  'HFFhTERT (Dekker 4DN, 354M)', 'GM12878 (Aiden 4DN, 300M)', 'GM12878 (Aiden 4DN, 216M)']
+        xlabel = "Distance between positions in Mbp"
+        colors = ["C0", "C1", "C2", "C4", "C3", "C5"]
+        markers = ['o', 'D', '^', 'v', 's', '*']
 
-        ax1.plot(pos, r1_hiclstm_gm, marker='o', markersize=16, color='C0', linewidth=3, label='GM12878 (Rao 2014, 3B)')
-        ax1.plot(pos, r1_hiclstm_h1, marker='D', markersize=16, color='C1', linewidth=3,
-                 label='H1hESC (Dekker 4DN, 2.5B)')
-        ax1.plot(pos, r1_hiclstm_wtc, marker='^', markersize=16, color='C2', linewidth=3,
-                 label='WTC11 (Dekker 4DN, 1.3B)')
-        ax1.plot(pos, r1_hiclstm_hff, marker='v', markersize=16, color='C4', linewidth=3,
-                 label='HFFhTERT (Dekker 4DN, 354M)')
-        ax1.plot(pos, r1_hiclstm_gmlow, marker='s', markersize=16, color='C3', linewidth=3,
-                 label='GM12878 (Aiden 4DN, 300M)')
-        ax1.plot(pos, r1_hiclstm_gmlow2, marker='*', markersize=16, color='C5', linewidth=3,
-                 label='GM12878 (Aiden 4DN, 216M)')
+        y_list = [r1_hiclstm_gm, r1_hiclstm_h1, r1_hiclstm_wtc, r1_hiclstm_hff, r1_hiclstm_gmlow, r1_hiclstm_gmlow2]
+        ylabel = "R-squared for Replicate-1"
+        ax, fig = self.plot_two_axes(ax1, fig, pos, y_list, xlabel, ylabel, colors, markers, labels,
+                                     legend=False, save=False, common=True)
 
-        ax2.plot(pos, r2_hiclstm_gm, marker='o', markersize=16, color='C0', linewidth=3, label='GM12878 (Rao 2014, 3B)')
-        ax2.plot(pos, r2_hiclstm_h1, marker='D', markersize=16, color='C1', linewidth=3,
-                 label='H1hESC (Dekker 4DN, 2.5B)')
-        ax2.plot(pos, r2_hiclstm_wtc, marker='^', markersize=16, color='C2', linewidth=3,
-                 label='WTC11 (Dekker 4DN, 1.3B)')
-        ax2.plot(pos, r2_hiclstm_hff, marker='v', markersize=16, color='C4', linewidth=3,
-                 label='HFFhTERT (Dekker 4DN, 354M)')
-        ax2.plot(pos, r2_hiclstm_gmlow, marker='s', markersize=16, color='C3', linewidth=3,
-                 label='GM12878 (Aiden 4DN, 300M)')
-        ax2.plot(pos, r2_hiclstm_gmlow2, marker='*', markersize=16, color='C5', linewidth=3,
-                 label='GM12878 (Aiden 4DN, 216M)')
-
-        ax1.tick_params(axis="x", labelsize=20, length=0)
-        ax2.tick_params(axis="x", labelsize=20, length=0)
-        ax1.tick_params(axis="y", labelsize=20)
-        ax1.set_xlabel('Distance between positions in Mbp', fontsize=20)
-        ax1.set_ylabel('R-squared for Replicate-1', fontsize=20)
-
-        ax2.set_xlabel('Distance between positions in Mbp', fontsize=20)
-        ax2.set_ylabel('R-squared for Replicate-2', fontsize=20)
-
-        handles, labels = ax1.get_legend_handles_labels()
-        fig.legend(handles, labels, loc='upper right', fontsize=18)
-
-        plt.savefig("/home/kevindsouza/Downloads/r2_cells_hiclstm.png")
-        # plt.show()
-
-        '''
-        plt.figure(figsize=(10, 8))
-        plt.plot(pos, r1_hiclstm_gm, marker='', markersize=16, color='C0', linewidth=3, label='GM12878 (Rao 2014)')
-        plt.plot(pos, r1_hiclstm_h1, marker='o', markersize=16, color='C1', linewidth=3, label='H1hESC (Dekker 4DN)')
-        plt.plot(pos, r1_hiclstm_wtc, marker='v', markersize=16, color='C3', linewidth=3, label='WTC11 (Dekker 4DN)')
-        plt.plot(pos, r1_hiclstm_gmlow, marker='D', markersize=16, color='C4', linewidth=3,
-                 label='GM12878 (low - Aiden 4DN)')
-        plt.plot(pos, r1_hiclstm_hff, marker='^', markersize=16, color='C2', linewidth=3, label='HFFhTERT (Dekker 4DN)')
-
-        plt.tick_params(axis="x", labelsize=20, length=0)
-        plt.tick_params(axis="y", labelsize=20)
-        plt.xlabel('Distance between positions in Mbp', fontsize=20)
-        plt.ylabel('R-squared for Replicate-1', fontsize=20)
-        plt.legend(loc='upper right', fontsize=20)
-
-        plt.show()
-        '''
-
-        pass
+        y_list = [r2_hiclstm_gm, r2_hiclstm_h1, r2_hiclstm_wtc, r2_hiclstm_hff, r2_hiclstm_gmlow, r2_hiclstm_gmlow2]
+        xlabel = "R-squared for Replicate-2"
+        _, _ = self.plot_two_axes(ax1, fig, pos, y_list, xlabel, ylabel, colors, markers, labels,
+                                  legend=True, save=False, common=True)
 
     def plot_r2(self, cell):
+        """
+        plot_r2() -> No return object
+        Plots R2 for various celltypes. Compare methods.
+        Args:
+            NA
+        """
         if cell == "GM12878":
             r1_hiclstm_full = np.load(self.path + "r1_hiclstm_full.npy")
             r1_hiclstm_lstm = np.load(self.path + "r1_hiclstm_lstm.npy")
@@ -586,86 +551,25 @@ class PlotFns:
 
         pos = [10, 20, 30, 40, 50]
 
-        '''
-        plt.figure(figsize=(12, 10))
-        plt.plot(pos, r1_hiclstm_full, marker='', markersize=14, color='C0', label='Hi-C-LSTM')
-        plt.plot(pos, r1_hiclstm_lstm, marker='o', markersize=14, color='C0', label='Hi-C-LSTM-LSTM')
-        plt.plot(pos, r1_hiclstm_cnn, marker='^', markersize=14, color='C0', label='Hi-C-LSTM-CNN')
-        plt.plot(pos, r1_hiclstm_fc, marker='v', markersize=14, color='C0', label='Hi-C-LSTM-FC')
-        plt.plot(pos, r1_sci_lstm, marker='o', markersize=14, color='C1', label='SCI-LSTM')
-        plt.plot(pos, r1_sci_cnn, marker='^', markersize=14, color='C1', label='SCI-CNN')
-        plt.plot(pos, r1_sci_fc, marker='v', markersize=14, color='C1', label='SCI-FC')
-        plt.plot(pos, r1_sniper_lstm, marker='o', markersize=14, color='C2', label='SNIPER-LSTM')
-        plt.plot(pos, r1_sniper_cnn, marker='^', markersize=14, color='C2', label='SNIPER-CNN')
-        plt.plot(pos, r1_sniper_fc, marker='v', markersize=14, color='C2', label='SNIPER-FC')
-        '''
-
         fig, (ax1, ax2) = plt.subplots(1, 2, sharey=True, figsize=(14, 8))
+        labels = ['Hi-C-LSTM-LSTM', 'Hi-C-LSTM-CNN', 'Hi-C-LSTM-FC', 'SCI-LSTM', 'SCI-CNN', 'SCI-FC',
+                  'SNIPER-LSTM', 'SNIPER-CNN', 'SNIPER-FC']
+        xlabel = "Distance between positions in Mbp"
+        colors = ["C0", "C0", "C0", "C1", "C1", "C1", "C2", "C2", "C2"]
+        markers = ['D', '^', 's', 'D', '^', 's', 'D', '^', 's']
+        style = ["dashed", "dotted", "dashdot", "dashed", "dotted", "dashdot", "dashed", "dotted", "dashdot"]
 
-        ax1.plot(pos, r1_hiclstm_full, marker='o', markersize=16, color='C0', linewidth=3, label='Hi-C-LSTM')
-        ax1.plot(pos, r1_hiclstm_lstm, marker='D', markersize=16, color='C0', linewidth=3,
-                 linestyle='dashed', label='Hi-C-LSTM-LSTM')
-        ax1.plot(pos, r1_hiclstm_cnn, marker='^', markersize=16, color='C0', linewidth=3,
-                 linestyle='dotted', label='Hi-C-LSTM-CNN')
-        ax1.plot(pos, r1_hiclstm_fc, marker='s', markersize=16, color='C0', linewidth=3,
-                 linestyle='dashdot', label='Hi-C-LSTM-FC')
-        ax1.plot(pos, r1_sci_lstm, marker='D', markersize=16, color='C1', linewidth=3,
-                 linestyle='dashed', label='SCI-LSTM')
-        ax1.plot(pos, r1_sci_cnn, marker='^', markersize=16, color='C1', linewidth=3,
-                 linestyle='dotted', label='SCI-CNN')
-        ax1.plot(pos, r1_sci_fc, marker='s', markersize=16, color='C1', linewidth=3,
-                 linestyle='dashdot', label='SCI-FC')
-        ax1.plot(pos, r1_sniper_lstm, marker='D', markersize=16, color='C2', linewidth=3,
-                 linestyle='dashed', label='SNIPER-LSTM')
-        ax1.plot(pos, r1_sniper_cnn, marker='^', markersize=16, color='C2', linewidth=3,
-                 linestyle='dotted', label='SNIPER-CNN')
-        ax1.plot(pos, r1_sniper_fc, marker='s', markersize=16, color='C2', linewidth=3,
-                 linestyle='dashdot', label='SNIPER-FC')
+        y_list = [r1_hiclstm_lstm, r1_hiclstm_cnn, r1_hiclstm_fc, r1_sci_lstm, r1_sci_cnn, r1_sci_fc, r1_sniper_lstm,
+                  r1_sniper_cnn, r1_sniper_fc]
+        ylabel = "R-squared for Replicate-1"
+        ax, fig = self.plot_two_axes(ax1, fig, pos, y_list, xlabel, ylabel, colors, markers, labels,
+                                     legend=False, save=False, common=True)
 
-        # ax2.plot(pos, r2_hiclstm_full, marker='', markersize=14, color='C0', label='Hi-C-LSTM')
-        ax2.plot(pos, r2_hiclstm_lstm, marker='D', markersize=16, color='C0', linewidth=3,
-                 linestyle='dashed', label='Hi-C-LSTM-LSTM')
-        ax2.plot(pos, r2_hiclstm_cnn, marker='^', markersize=16, color='C0', linewidth=3,
-                 linestyle='dotted', label='Hi-C-LSTM-CNN')
-        ax2.plot(pos, r2_hiclstm_fc, marker='s', markersize=16, color='C0', linewidth=3,
-                 linestyle='dashdot', label='Hi-C-LSTM-FC')
-        ax2.plot(pos, r2_sci_lstm, marker='D', markersize=16, color='C1', linewidth=3,
-                 linestyle='dashed', label='SCI-LSTM')
-        ax2.plot(pos, r2_sci_cnn, marker='^', markersize=16, color='C1', linewidth=3,
-                 linestyle='dotted', label='SCI-CNN')
-        ax2.plot(pos, r2_sci_fc, marker='s', markersize=16, color='C1', linewidth=3,
-                 linestyle='dashdot', label='SCI-FC')
-        ax2.plot(pos, r2_sniper_lstm, marker='D', markersize=16, color='C2', linewidth=3,
-                 linestyle='dashed', label='SNIPER-LSTM')
-        ax2.plot(pos, r2_sniper_cnn, marker='^', markersize=16, color='C2', linewidth=3,
-                 linestyle='dotted', label='SNIPER-CNN')
-        ax2.plot(pos, r2_sniper_fc, marker='s', markersize=16, color='C2', linewidth=3,
-                 linestyle='dashdot', label='SNIPER-FC')
-
-        ax1.tick_params(axis="x", labelsize=20, length=0)
-        ax2.tick_params(axis="x", labelsize=20, length=0)
-        ax1.tick_params(axis="y", labelsize=20)
-        ax1.set_xlabel('Distance between positions in Mbp', fontsize=20)
-        ax1.set_ylabel('R-squared for Replicate-1', fontsize=20)
-
-        ax2.set_xlabel('Distance between positions in Mbp', fontsize=20)
-        ax2.set_ylabel('R-squared for Replicate-2', fontsize=20)
-
-        handles, labels = ax1.get_legend_handles_labels()
-        fig.legend(handles, labels, loc='upper right', fontsize=18)
-
-        '''
-        plt.tick_params(axis="x", labelsize=20, length=0)
-        plt.tick_params(axis="y", labelsize=20)
-        plt.xlabel('Distance between positions in Mbp', fontsize=20)
-        plt.ylabel('R-squared for Replicate-1', fontsize=20)
-        plt.legend(loc='upper right', fontsize=20)
-        '''
-
-        plt.savefig("/home/kevindsouza/Downloads/r2_wtc.png")
-        plt.show()
-
-        print("done")
+        y_list = [r2_hiclstm_lstm, r2_hiclstm_cnn, r2_hiclstm_fc, r2_sci_lstm, r2_sci_cnn, r2_sci_fc, r2_sniper_lstm,
+                  r2_sniper_cnn, r2_sniper_fc]
+        xlabel = "R-squared for Replicate-2"
+        _, _ = self.plot_two_axes(ax1, fig, pos, y_list, xlabel, ylabel, colors, markers, labels,
+                                  legend=True, save=False, common=True)
 
     def plot_knockout_tfs(self):
         pos = np.linspace(0, 1, 11)
@@ -812,8 +716,6 @@ class PlotFns:
         subc_p = np.load(path + "subcompartments/" + precision_file)
         subc_r = np.load(path + "subcompartments/" + recall_file)
 
-        # list(map(lambda x: 10 if x == 'x' else x, a))
-
         plt.figure(figsize=(8, 6))
         plt.step(gene_r, gene_p, color='b', alpha=0.5, where='post', linewidth=3, label="Gene Expression")
         plt.step(rep_r, rep_p, color='g', alpha=0.5, where='post', linewidth=3, label="Replication Timing")
@@ -905,21 +807,15 @@ if __name__ == "__main__":
     # plot_ob.plot_mAP_resolutions()
     # plot_ob.plot_auroc_celltypes()
     # plot_ob.plot_auroc()
-
-    hidden_list = [4, 8, 16, 32, 64, 128]
-    plot_ob.plot_hidden(hidden_list)
-
+    # plot_ob.plot_hidden()
     # plot_ob.plot_xgb()
-    # plot_ob.plot_gbr()
-
-    # plot_ob.plot_r2(cell = "WTC11")
+    # plot_ob.plot_violin()
     # plot_ob.plot_r2_celltypes()
+    plot_ob.plot_r2(cell="GM12878")
     # plot_ob.plot_symmetry()
-
     # plot_ob.plot_knockout_results()
     # plot_ob.plot_knockout_tfs()
     # plot_ob.pr_curves()
-
     # plot_ob.plot_feature_signal()
     # plot_ob.plot_pred_range()
 
