@@ -8,56 +8,73 @@ import training.config as config
 
 
 class PlotFns:
+    """
+    Class to plot major analyses plots. Uses plot utils.
+    """
+
     def __init__(self, cfg):
         self.cfg = cfg
         self.path = cfg.output_directory
-        self.cell_type = ["E116", "GM12878"]
 
     def plot_stackedbar(self, df_main, tasks, colors):
-        # df_main = df_main.set_index("Tasks")
+        """
+        plot_stackedbar(df_main, tasks, colors) -> No return object
+        Gets upper and lower comperison heatmaps.
+        Args:
+            df_main (DataFrame): Frame with methods and metric values
+            tasks (List): List of tasks
+            colors (List): List of colors
+        """
+
         df_main = df_main.T
         df_main.columns = df_main.iloc[0]
         df_main = df_main.drop(["Tasks"], axis=0)
         fields = df_main.columns.tolist()
 
-        # figure and axis
+        "figure and axis"
         fig, ax = plt.subplots(1, figsize=(22, 12))
 
-        # plot bars
+        "plot bars"
         left = len(df_main) * [0]
         for idx, name in enumerate(fields):
             plt.barh(df_main.index, df_main[name], left=left, color=colors[idx])
             left = left + df_main[name]
 
-        # legend
+        "legend"
         plt.rcParams.update({'font.size': 22})
         plt.legend(tasks, bbox_to_anchor=([0.02, 1, 0, 0]), ncol=6, frameon=False, fontsize=14)
 
-        # remove spines
+        "remove spines"
         ax.spines['right'].set_visible(False)
         ax.spines['left'].set_visible(False)
         ax.spines['top'].set_visible(False)
         ax.spines['bottom'].set_visible(False)
 
-        # format x ticks
+        "format x ticks"
         xticks = np.arange(0, 36.1, 4)
         xlabels = ['{}'.format(i) for i in np.arange(0, 36.1, 4)]
         plt.xticks(xticks, xlabels, fontsize=20)
 
-        # adjust limits and draw grid lines
+        "adjust limits and draw grid lines"
         plt.ylim(-0.5, ax.get_yticks()[-1] + 0.5)
         ax.xaxis.grid(color='gray', linestyle='dashed')
         plt.xlabel("Prediction Target", fontsize=20)
         plt.ylabel("Cumulative Prediction Score", fontsize=20)
-
         plt.savefig("/home/kevindsouza/Downloads/H1hESC_metrics.png")
 
-    def plot_combined(self, cell):
-        df_main = pd.read_csv(self.path + "%s_accuracy_df.csv" % (cell), sep="\t")
+    def plot_combined(self, cell, metric):
+        """
+        plot_combined(cell) -> No return object
+        Plots given metrics in the given cell
+        Args:
+            cell (string): One of GM12878, H1hESC, HFFhTERT
+            metric (string): One of map, auroc, accuracy, fscore
+        """
+
+        df_main = pd.read_csv(self.path + "%s_%s_df.csv" % (cell, metric), sep="\t")
         df_main = df_main.drop(['Unnamed: 0'], axis=1)
 
         plt.figure(figsize=(12, 10))
-        # plt.tight_layout()
         plt.xticks(rotation=90, fontsize=20)
         plt.yticks(fontsize=20)
         plt.xlabel("Prediction Target", fontsize=20)
@@ -77,9 +94,62 @@ class PlotFns:
         plt.subplots_adjust(bottom=0.35)
         plt.savefig("/home/kevindsouza/Downloads/map.png")
 
+    def plot_main(self, df_columns, df_lists, xlabel, ylabel, colors, markers, labels, adjust=False, save=True):
+        """
+        plot_main(df_columns, df_lists, adjust=False, save=True) -> No return object
+        Main plotting function
+        Args:
+            df_columns (List): list of df columns
+            df_lists (List): list containing data for columns
+            xlabel (string): xlabel
+            ylabel (string): ylabel
+            adjust (bool): If true adjusts bottom
+            save (bool): if true saves figure
+        """
+
+        df_main = pd.DataFrame(columns=df_columns)
+
+        for i, v in enumerate(df_columns):
+            df_main[v] = df_lists[i]
+
+        plt.figure(figsize=(12, 10))
+        plt.xticks(rotation=90, fontsize=20)
+        plt.yticks(fontsize=20)
+        plt.xlabel(xlabel, fontsize=20)
+        plt.ylabel(ylabel, fontsize=20)
+        for i, l in enumerate(labels):
+            plt.plot(df_columns[0], df_columns[i + 1], data=df_main, marker=markers[i], markersize=16, color=colors[i],
+                     linewidth=3,
+                     label=l)
+
+        plt.legend(fontsize=18)
+
+        if adjust == "True":
+            plt.subplots_adjust(bottom=0.35)
+
+        plt.show()
+
+        if save == "True":
+            plt.savefig("/home/kevindsouza/Downloads/map_cells.png")
+
     def plot_mAP_celltypes(self):
+        """
+        plot_mAP_celltypes() -> No return object
+        Plots mAP in all celltypes
+        Args:
+            NA
+        """
+
         tasks = ["Gene Expression", "Enhancers", "TSS", "TADs", "subTADs", "Loop Domains",
                  "TAD Boundaries", "subTAD Boundaries", "Subcompartments"]
+        df_columns = ["Tasks", "GM12878_Rao", "H1hESC_Dekker",
+                      "HFFhTERT_Dekker", "GM12878_low", "GM12878_low2"]
+        xlabel = "Prediction Target"
+        ylabel = "mAP"
+        colors = ["C0", "C1", "C4", "C3", "C5"]
+        markers = ['o', 'D', 'v', 's', '*']
+        labels = ["GM12878 (Rao 2014, 3B)", "H1hESC (Dekker 4DN, 2.5B)", "HFFhTERT (Dekker 4DN, 354M)",
+                  "GM12878 (Aiden 4DN, 300M)", "GM12878 (Aiden 4DN, 216M)"]
 
         gm_values_all_tasks = np.load(self.path + "gm_reduced_all_tasks.npy")
         h1_values_all_tasks = np.load(self.path + "h1_values_all_tasks.npy")
@@ -87,33 +157,10 @@ class PlotFns:
         gmlow_values_all_tasks = np.load(self.path + "gmlow_metrics_all_tasks.npy")
         gmlow2_values_all_tasks = np.load(self.path + "gmlow2_metrics_all_tasks.npy")
 
-        df_main = pd.DataFrame(columns=["Tasks", "GM12878_Rao", "H1hESC_Dekker",
-                                        "GM12878_low", "HFFhTERT_Dekker", "GM12878_low2"])
-        df_main["Tasks"] = tasks
-        df_main["GM12878_Rao"] = gm_values_all_tasks
-        df_main["H1hESC_Dekker"] = h1_values_all_tasks
-        df_main["GM12878_low"] = gmlow_values_all_tasks
-        df_main["GM12878_low2"] = gmlow2_values_all_tasks
-        df_main["HFFhTERT_Dekker"] = hff_values_all_tasks
+        df_lists = [tasks, gm_values_all_tasks, h1_values_all_tasks, gmlow_values_all_tasks, gmlow2_values_all_tasks,
+                    hff_values_all_tasks]
 
-        plt.figure(figsize=(12, 10))
-        plt.xticks(rotation=90, fontsize=20)
-        plt.yticks(fontsize=20)
-        plt.xlabel("Prediction Target", fontsize=20)
-        plt.ylabel("mAP", fontsize=20)
-        plt.plot('Tasks', 'GM12878_Rao', data=df_main, marker='o', markersize=16, color="C0", linewidth=3,
-                 label="GM12878 (Rao 2014, 3B)")
-        plt.plot('Tasks', 'H1hESC_Dekker', data=df_main, marker='D', markersize=16, color="C1", linewidth=3,
-                 label="H1hESC (Dekker 4DN, 2.5B)")
-        plt.plot('Tasks', 'HFFhTERT_Dekker', data=df_main, marker='v', markersize=16, color="C4", linewidth=3,
-                 label="HFFhTERT (Dekker 4DN, 354M)")
-        plt.plot('Tasks', 'GM12878_low', data=df_main, marker='s', markersize=16, color="C3", linewidth=3,
-                 label="GM12878 (Aiden 4DN, 300M)")
-        plt.plot('Tasks', 'GM12878_low2', data=df_main, marker='*', markersize=16, color="C5", linewidth=3,
-                 label="GM12878 (Aiden 4DN, 216M)")
-        plt.legend(fontsize=18)
-        plt.subplots_adjust(bottom=0.35)
-        plt.savefig("/home/kevindsouza/Downloads/map_cells.png")
+        self.plot_main(df_columns, df_lists, xlabel, ylabel, colors, markers, labels, adjust=True, save=False)
 
     def plot_mAP_resolutions(self):
         tasks = ["Gene Expression", "Enhancers", "TADs", "subTADs", "Subcompartments"]
@@ -862,7 +909,7 @@ if __name__ == "__main__":
     plot_ob = PlotFns(cfg)
 
     # plot_ob.plot_combined(cell="HFFhTERT")
-    # plot_ob.plot_mAP_celltypes()
+    plot_ob.plot_mAP_celltypes()
     # plot_ob.plot_mAP_resolutions()
     # plot_ob.plot_auroc_celltypes()
     # plot_ob.plot_auroc()
@@ -881,7 +928,7 @@ if __name__ == "__main__":
     # plot_ob.plot_knockout_tfs()
     # plot_ob.pr_curves()
 
-    plot_ob.plot_feature_signal()
+    # plot_ob.plot_feature_signal()
     # plot_ob.plot_pred_range()
 
     print("done")

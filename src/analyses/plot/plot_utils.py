@@ -2,11 +2,20 @@ import pandas as pd
 import numpy as np
 import seaborn as sns
 import seaborn as sn
-import training.config as config
+from training.config import Config
 import matplotlib.pyplot as plt
+from sklearn.metrics import confusion_matrix
 
 
 def get_heatmaps(data, no_pred=False):
+    """
+    get_heatmaps(data, no_pred) -> Array, int
+    Gets upper and lower comperison heatmaps.
+    Args:
+        data (DataFrame): Frame with values and predictions
+        no_pred (bool): One of True or False. If True, then plots observed values on both sides.
+    """
+
     st = int(data["i"].min())
     data["i"] = data["i"] - st
     data["j"] = data["j"] - st
@@ -14,9 +23,12 @@ def get_heatmaps(data, no_pred=False):
     rows = np.array(data["i"]).astype(int)
     cols = np.array(data["j"]).astype(int)
 
+    "initialize"
     hic_mat = np.zeros((nr, nr))
     hic_mat[rows, cols] = np.array(data["v"])
     hic_upper = np.triu(hic_mat)
+
+    "check for pred"
     if no_pred:
         hic_mat[cols, rows] = np.array(data["v"])
     else:
@@ -25,21 +37,29 @@ def get_heatmaps(data, no_pred=False):
     hic_lower = np.tril(hic_mat)
     hic_mat = hic_upper + hic_lower
     hic_mat[np.diag_indices_from(hic_mat)] /= 2
-
     return hic_mat, st
 
 
-def plot_foxg1(data):
-    site = 222863
+def plot_foxg1(cfg, data):
+    """
+    plot_foxg1(cfg, data) -> No return object
+    Plots window around foxg1 ko site.
+    Args:
+        cfg (Config): configuration to use
+        data (DataFrame): Frame with values and predictions
+    """
+
+    site = cfg.foxg1_indices
     data["i"] = data["i"] - site
     data["j"] = data["j"] - site
 
+    "window"
     data = data.loc[(data["i"] >= -100) & (data["i"] <= 100) &
                     (data["j"] >= -100) & (data["j"] <= 100)]
-
     data["i"] = data["i"] + 100
     data["j"] = data["j"] + 100
 
+    "form matrix"
     nr = 201
     rows = np.array(data["i"]).astype(int)
     cols = np.array(data["j"]).astype(int)
@@ -51,26 +71,18 @@ def plot_foxg1(data):
     hic_mat = hic_upper + hic_lower
     hic_mat[np.diag_indices_from(hic_mat)] /= 2
 
-    simple_plot(hic_mat)
-    pass
-
-
-def plot_tal1_lmo2(data):
-    tal_data = data.loc[data["i"] < 5000]
-    lmo2_data = data.loc[data["i"] > 5000]
-
-    get_heatmaps(tal_data)
-    get_heatmaps(lmo2_data)
-    pass
+    "plot"
+    simple_plot(hic_mat, mode="reds")
 
 
 def simple_plot(hic_win, mode):
-    '''
-    plt.imshow(hic_win, cmap='hot', interpolation='nearest')
-    plt.yticks([])
-    plt.xticks([])
-    plt.show()
-    '''
+    """
+    simple_plot(hic_win, mode) -> No return object
+    plots heatmaps of reds or differences.
+    Args:
+        hic_win (Array): Matrix of Hi-C values
+        mode (string): one of reds or diff
+    """
 
     if mode == "reds":
         plt.figure()
@@ -93,6 +105,16 @@ def simple_plot(hic_win, mode):
 
 
 def indices_diff_mat(indice, st, hic_mat, mode="ctcf"):
+    """
+    indices_diff_mat(indice, st, hic_mat, mode) -> Array
+    gets window matrices given indices
+    Args:
+        indice (Array): Matrix of Hi-C values
+        st (int): Starting indice
+        hic_mat (Array): Matrix of Hi-C values
+        mode (string): tadbs or others
+    """
+
     nrows = len(hic_mat)
 
     if mode == "tadbs":
@@ -121,42 +143,40 @@ def indices_diff_mat(indice, st, hic_mat, mode="ctcf"):
     return hic_win
 
 
-def plot_diff(hic_win):
-    hic_up = np.triu(hic_win)
-    hic_lo = np.tril(hic_win).T
-    hic_diff = hic_up - hic_lo
-
-    plt.figure()
-    sns.set_theme()
-    rdgn = sns.diverging_palette(h_neg=220, h_pos=14, s=79, l=55, sep=3, as_cmap=True)
-    sns.heatmap(hic_diff, cmap=rdgn, center=0.00, cbar=True)
-    plt.yticks([])
-    plt.xticks([])
-    plt.savefig("/home/kevindsouza/Downloads/ctcf_ko.png")
-
-
 def plot_frame_error(error_list):
+    """
+    plot_frame_error(error_list) -> No return object
+    Plot frame error given error list
+    Args:
+        error_list (List): List of errors
+    """
+
     pos_list = np.arange(0, 150)
     plt.figure()
-    # plt.title("Average Prediction Error within Frame")
     plt.xlabel("Position in Frame", fontsize=14)
     plt.ylabel("Average Error", fontsize=14)
     plt.plot(pos_list, error_list)
     plt.grid(False)
     plt.show()
-    pass
 
 
-def plot_smoothness(embeddings):
+def plot_smoothness(representations):
+    """
+    plot_smoothness(representations) -> No return object
+    Plot smoothness of representations.
+    Args:
+        representations (Array): representation matrix
+    """
+
     window = 2000
-    nrows = len(embeddings)
+    nrows = len(representations)
     diff_list = np.arange(-window, window + 1)
     diff_list = np.delete(diff_list, [window])
     diff_vals = np.zeros((nrows, 2 * window))
     for r in range(nrows):
         for i, d in enumerate(diff_list):
             if (r + d) >= 0 and (r + d) <= nrows - 1:
-                diff_vals[r, i] = np.linalg.norm(embeddings[r, :] - embeddings[r + d, :], ord=1)
+                diff_vals[r, i] = np.linalg.norm(representations[r, :] - representations[r + d, :], ord=1)
             else:
                 continue
 
@@ -167,32 +187,50 @@ def plot_smoothness(embeddings):
     plt.plot(diff_list, diff_reduce)
     plt.grid(b=None)
     plt.show()
-    pass
 
 
-def plot3d(embeddings):
-    fig = plt.figure()
+def plot3d(representations):
+    """
+    plot3d(representations) -> No return object
+    Plot first 3 dims of representations.
+    Args:
+        representations (Array): representation matrix
+    """
+
+    plt.figure()
     ax = plt.axes(projection='3d')
-    ax.scatter3D(embeddings[:, 0], embeddings[:, 1], embeddings[:, 2], 'red')
+    ax.scatter3D(representations[:, 0], representations[:, 1], representations[:, 2], 'red')
     plt.show()
-    pass
 
 
-def plot_euclid_heatmap(embeddings):
-    nr = len(embeddings)
+def plot_euclid_heatmap(representations):
+    """
+    plot_euclid_heatmap(representations) -> No return object
+    Plot heatmap of euclidean distance.
+    Args:
+        representations (Array): representation matrix
+    """
+
+    nr = len(representations)
     euclid_heatmap = np.zeros((nr, nr))
 
     for r1 in range(nr):
         for r2 in range(nr):
-            euclid_heatmap[r1, r2] = np.linalg.norm(embeddings[r1, :] - embeddings[r2, :])
+            euclid_heatmap[r1, r2] = np.linalg.norm(representations[r1, :] - representations[r2, :])
 
-    simple_plot(euclid_heatmap)
-    pass
+    simple_plot(euclid_heatmap, mode="reds")
 
 
 def plot_pr_curve(precision, recall):
+    """
+    plot_pr_curve(precision, recall) -> No return object
+    Plot PR curve.
+    Args:
+        precision (List): List of precision values
+        recall (List): List of recall values
+    """
+
     plt.step(recall, precision, color='b', alpha=0.2, where='post')
-    # plt.fill_between(recall, precision, step='post', alpha=0.2, color='b')
     plt.xlabel('Recall')
     plt.ylabel('Precision')
     plt.ylim([0.0, 1.05])
@@ -203,6 +241,13 @@ def plot_pr_curve(precision, recall):
 
 
 def plot_confusion_matrix(predictions):
+    """
+    plot_confusion_matrix(predictions) -> No return object
+    Plot confusion matrix for subcompartments.
+    Args:
+        predictions (DataFrame): frame of true and predicted subcompartments
+    """
+
     conf_matrix = confusion_matrix(predictions[:, 7], predictions[:, 6])
     conf_matrix = conf_matrix[1:, 1:]
     df_cm = pd.DataFrame(conf_matrix)
@@ -214,12 +259,17 @@ def plot_confusion_matrix(predictions):
 
     sn.set(font_scale=1.4)
     sn.heatmap(df_cm, annot=True, cmap="YlGnBu", fmt="d", xticklabels=x_axis_labels,
-               yticklabels=y_axis_labels)  # font size
-
+               yticklabels=y_axis_labels)
     plt.show()
 
 
 def plot_combined(map_frame):
+    """
+    plot_combined(map_frame) -> No return object
+    Plot map for tasks
+    Args:
+        map_frame (DataFrame): dataframe of map values
+    """
     tasks = ["Gene Expression", "Replication Timing", "Enhancers", "TSS", "PE-Interactions", "FIREs",
              "Non-loop Domains", "Loop Domains"]
 
@@ -241,17 +291,13 @@ def plot_combined(map_frame):
     plt.legend(fontsize=18)
     plt.show()
 
-    pass
-
 
 def plot_gbr(main_df):
     """
-    captum_test(cfg, model, chr) -> DataFrame
-    Gets data for chromosome and cell type. Runs IG using captum.
+    plot_gbr(main_df) -> No return object
+    Gets violin plots of Segway GBR
     Args:
-        cfg (Config): The configuration to use for the experiment.
-        model (SeqLSTM): The model to run captum on.
-        chr (int): The chromosome to run captum on.
+        main_df (DataFrame): DF containing if values and targets
     """
     main_df["ig"] = main_df["ig"].astype(float)
 
@@ -266,6 +312,13 @@ def plot_gbr(main_df):
 
 
 def plot_r2(comb_r2_df):
+    """
+    plot_r2(comb_r2_df) -> No return object
+    plots average R2 values at a particular difference.
+    Args:
+        comb_r2_df (DataFrame): DF containing R2 values for various differences in positions.
+    """
+
     max_diff = int(comb_r2_df['diff'].max())
     max_mb = 50
     pos = [10, 20, 30, 40, 50]
@@ -273,19 +326,21 @@ def plot_r2(comb_r2_df):
     r2_list = []
     r2_list_pos = []
 
+    "get average r2"
     for diff in range(max_diff):
         subset_diff = comb_r2_df.loc[comb_r2_df["diff"] == diff]
         r2_mean = subset_diff["r2"].mean()
         avg_diff = avg_diff.append({"diff": diff, "r2": r2_mean}, ignore_index=True)
 
+    "mean in window"
     for i in range(max_mb):
         r2_sub = avg_diff.loc[i:(i + 1) * 100, :]
         r2_mean = r2_sub["r2"].mean(skipna=True)
         r2_list.append(r2_mean)
-
     for k in range(5):
         r2_list_pos.append(np.mean(r2_list[k * 10: (k + 1) * 10]))
 
+    "plot"
     plt.figure(figsize=(12, 10))
     plt.plot(pos, r2_list_pos, marker='', markersize=14, color='C0', label='Hi-C-LSTM')
     plt.tick_params(axis="x", labelsize=20, length=0)
@@ -294,12 +349,18 @@ def plot_r2(comb_r2_df):
     plt.ylabel('R-squared for Replicate-1', fontsize=20)
     plt.legend(loc='upper right', fontsize=20)
     plt.show()
-    pass
 
 
 def scatter_tal_lm(ko, wt):
-    diff_mat = ko - wt
+    """
+    scatter_tal_lm(ko, wt) -> No return object
+    Scatter plot of TAL1 and LMO2 prediction differences.
+    Args:
+        ko (Array): Array containing after knockout values
+        wt (Array): Array containing before knockout values
+    """
 
+    diff_mat = ko - wt
     og = np.triu(diff_mat)
     og = og.flatten(order='C')
     pred = np.triu(diff_mat.T)
@@ -307,7 +368,7 @@ def scatter_tal_lm(ko, wt):
 
     plt.figure(figsize=(10, 8))
     plt.scatter(og, pred, marker='o', alpha=0.5)
-    #sns.regplot(og, pred)
+    # sns.regplot(og, pred)
     plt.tick_params(axis="x", labelsize=20, length=0)
     plt.tick_params(axis="y", labelsize=20)
     plt.xlim([-1.0, 1.0])
@@ -319,6 +380,13 @@ def scatter_tal_lm(ko, wt):
 
 
 def hist_2d(og, pred):
+    """
+    hist_2d(og, pred) -> No return object
+    2D histogram of observed and predicted differences.
+    Args:
+        og (Array): Array containing observed differences
+        pred (Array): Array containing predicted differences
+    """
     x_min = np.min(og)
     x_max = np.max(og)
 
@@ -328,64 +396,23 @@ def hist_2d(og, pred):
     x_bins = np.linspace(x_min, x_max, 50)
     y_bins = np.linspace(y_min, y_max, 50)
 
-    # Creating plot
     plt.figure(figsize=(10, 8))
     hist, _, _, _ = plt.hist2d(og, pred, bins=[x_bins, y_bins])
-
     plt.xticks(fontsize=18)
     plt.xlim([0, 0.1])
     plt.yticks(fontsize=18)
     plt.ylim([0.004, 0.1])
     plt.xlabel('LMO2 KO - WT (Original)', fontsize=20)
     plt.ylabel('LMO2 KO - WT (Predicted)', fontsize=20)
-
-    # show plot
     plt.tight_layout()
     plt.savefig("/home/kevindsouza/Downloads/lmo2_hist.png")
-    pass
-
-
-def barplot_tal_lm():
-    tal_og = np.load(cfg.output_directory + "tal1og_difflist.npy")
-    tal_pred = np.load(cfg.output_directory + "tal1pred_difflist.npy")
-
-    lmo2_og = np.load(cfg.output_directory + "lmo2og_difflist.npy")
-    lmo2_pred = np.load(cfg.output_directory + "lmo2pred_difflist.npy")
-
-    hist_2d(lmo2_og, lmo2_pred)
-
-    plt.figure(figsize=(12, 10))
-    sns.set(font_scale=1.8)
-    sns.set_style(style='white')
-
-    data_lists = [tal_og, tal_pred, lmo2_og, lmo2_pred]
-    label_lists = ["TAL1 Original (KO - WT)", "TAL1 Predicted (KO - WT)", "LMO2 Original (KO - WT)",
-                   "LMO2 Predicted (KO - WT)"]
-    tallm_df = pd.DataFrame(columns=["data", "label"])
-    for i, l in enumerate(label_lists):
-        temp = pd.DataFrame(columns=["data", "label"])
-        temp["data"] = data_lists[i]
-        temp["label"] = l
-        tallm_df = tallm_df.append(temp)
-
-    plt.figure(figsize=(14, 12))
-    sns.barplot(x="label", y="data", data=tallm_df, ci="sd")
-    plt.xticks(rotation=90)
-    plt.xlabel('Data', fontsize=20)
-    plt.ylabel('Contact Strengths', fontsize=20)
-    plt.subplots_adjust(bottom=0.4)
-    # plt.show()
-    plt.savefig("/home/kevindsouza/Downloads/bar_tal_lm.png")
-    print("done")
 
 
 if __name__ == '__main__':
-    plot_chr = list(range(22, 23))
-    cfg = config.Config()
+    cfg = Config()
     cell = cfg.cell
-    comb_r2_df = pd.DataFrame(columns=["diff", "r2"])
 
-    for chr in plot_chr:
+    for chr in cfg.chr_test_list:
         '''
         r2_diff = pd.read_csv(cfg.output_directory + "r2frame_%s_chr%s.csv" % (cell, str(chr)), sep="\t")
         r2_diff = r2_diff.drop(['Unnamed: 0'], axis=1)
@@ -403,48 +430,3 @@ if __name__ == '__main__':
         foxg1_data = pd.read_csv(cfg.output_directory + "shuffle_%s_afko_chr%s.csv" % (cell, str(chr)), sep="\t")
         plot_foxg1(foxg1_data)
         '''
-
-        ctcf_zero = np.load(cfg.output_directory + "ctcf_diff_zero.npy")
-        ctcf_average = np.load(cfg.output_directory + "ctcf_diff_average.npy")
-        ctcf_padding = np.load(cfg.output_directory + "ctcf_diff_padding.npy")
-        ctcf_shift = np.load(cfg.output_directory + "ctcf_diff_shift.npy")
-        tad_ctcfp = np.load(cfg.output_directory + "tad_diff_zero_ctctp.npy")
-        tad_ctcfn = np.load(cfg.output_directory + "tad_diff_zero_ctctn.npy")
-
-        simple_plot(ctcf_zero, mode="diff")
-
-        # foxg1_ko = np.load(cfg.output_directory + "foxg1_ko.npy")
-        # simple_plot(foxg1_ko)
-
-        # tal1_diff = np.load(cfg.output_directory + "tal1_diff.npy")
-        # simple_plot(tal1_diff)
-        # scatter_tal_lm(tal1_diff)
-        # barplot_tal_lm()
-
-        # pred_data = pd.read_csv(cfg.output_directory + "%s_predictions_chr.csv" % (cell), sep="\t")
-        # plot_tal1_lmo2(pred_data)
-
-        # tal_ko = pd.read_csv(cfg.hic_path + cell +"/talko_tal_df.txt", sep="\t")
-        # plot_heatmaps(tal_ko)
-
-        # pred_data = pd.read_csv(cfg.output_directory + "shuffle_%s_predictions_chr%s.csv" % (cell, str(chr)), sep="\t")
-        # plot_heatmaps(pred_data)
-
-    print("done")
-
-    # foxg1_data = pd.read_csv(cfg.output_directory + "shuffle_%s_afko_chr%s.csv" % (self.cfg.cell, str(self.chr)), sep="\t")
-    # pred_data = pd.read_csv(cfg.output_directory + "shuffle_%s_predictions_chr%s.csv" % (cell, str(chr)), sep="\t")
-    # pred_data = pd.read_csv(cfg.output_directory + "testwin_predictions_chr%s.csv" % str(chr), sep="\t")
-    # pred_data = pd.read_csv(cfg.output_directory + "combined150_melobfko_chr%s.csv" % str(chr), sep="\t")
-    # pred_data = pd.read_csv(cfg.output_directory + "combined150_meloafkofusion_chr%s.csv" % str(chr), sep="\t")
-    # embeddings = np.load(cfg.output_directory + "combined_150_embeddings_chr21.npy")
-    # Whic_win_af = np.load(cfg.output_directory + "hic_melowin_afko2.npy")
-    # hic_win_bf = np.load(cfg.output_directory + "hic_melowin.npy")
-    # error_list = np.load(cfg.output_directory + "combined150_frameerror_chr%s.npy" % str(chr))
-
-    # simple_plot(hic_win_bf)
-    # plot_heatmaps(pred_data)
-    # plot_smoothness(embeddings)
-    # plot3d(embeddings)
-    # plot_euclid_heatmap(embeddings)
-    # plot_frame_error(error_list)
