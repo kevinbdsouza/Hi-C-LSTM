@@ -4,6 +4,7 @@
 *.xml
 .idea/*
 */.DS_store
+*/.DS_Store
 .idea/Hi-C-LSTM.iml
 .idea/misc.xml
 .idea/remote-mappings.xml

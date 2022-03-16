@@ -306,8 +306,6 @@ def scatter_tal_lm(ko, wt):
     pred = pred.flatten(order='C')
 
     plt.figure(figsize=(10, 8))
-    #m, b = np.polyfit(og, pred, 1)
-    #plt.plot(og, m*og+b)
     plt.scatter(og, pred, marker='o', alpha=0.5)
     #sns.regplot(og, pred)
     plt.tick_params(axis="x", labelsize=20, length=0)
