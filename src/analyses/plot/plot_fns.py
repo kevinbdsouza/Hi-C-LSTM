@@ -303,7 +303,7 @@ class PlotFns:
         if legend:
             if common:
                 handles, labels = ax.get_legend_handles_labels()
-                fig.legend(handles, labels, loc='best', fontsize=18, bbox_to_anchor=(0.53, 0.6))
+                fig.legend(handles, labels, fontsize=18, bbox_to_anchor=(0.53, 0.6))
 
             plt.show()
 
