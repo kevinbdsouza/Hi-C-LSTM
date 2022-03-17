@@ -529,7 +529,7 @@ class PlotFns:
         labels = ["CTCF+Cohesin KO (Loop)", "CTCF+Cohesin KO (Non-loop)", "Div->Conv CTCF", "Conv->Div CTCF",
                   "ZNF143 KO", "FOXG1 KO", "SOX2 KO", "XBP1 KO"]
         df_columns = ["pos", "CTCF_Cohesin_KO_Loop", "CTCF_Cohesin_KO_nl", "Convergent_CTCF", "Divergent_CTCF",
-                  "ZNF143_KO", "FOXG1_KO", "SOX2_KO", "XBP1_KO"]
+                      "ZNF143_KO", "FOXG1_KO", "SOX2_KO", "XBP1_KO"]
         markers = ['o', 's', '*', 'D', '^', 'v', 'x', '+']
         colors = ["C0", "C2", "C5", "C1", "C3", "C4", "C6", "C7"]
 
@@ -590,26 +590,28 @@ class PlotFns:
         plt.legend(fontsize=14)
         plt.show()
 
-        pass
-
     def plot_symmetry(self):
+        """
+        plot_symmetry() -> No return object
+        Plots histogram of differences.
+        Args:
+            NA
+        """
 
-        mode = "hist"
-        if mode == "hist":
-            sym_hist = np.load(self.path + "lstm/" + "symmetry_hist.npy")
-            count, bins, ignored = plt.hist(sym_hist, 100, density=True, color='blue', edgecolor='black')
-            plt.xlabel("Difference in Contact Strength (Predicted - Original)", fontsize=14)
-            plt.ylabel("Normalized Density", fontsize=14)
-            plt.yticks([])
-            plt.show()
-        elif mode == "diff":
-            pass
+        sym_hist = np.load(self.path + "symmetry_hist.npy")
+        _, _, _ = plt.hist(sym_hist, 100, density=True, color='blue', edgecolor='black')
+        plt.xlabel("Difference in Contact Strength (Predicted - Original)", fontsize=14)
+        plt.ylabel("Normalized Density", fontsize=14)
+        plt.yticks([])
+        plt.show()
 
-        pass
-
-    def plot_feature_signal(self):
-
-        mode = "tad"
+    def plot_feature_signal(self, mode):
+        """
+        plot_symmetry(mode) -> No return object
+        Plots ig feature signal
+        Args:
+            mode (string): one of tad or chr21
+        """
 
         if mode == "tad":
             pos = np.arange(-110, 120, 10)
@@ -621,11 +623,9 @@ class PlotFns:
             plt.xlabel("Distance in Kbp", fontsize=14)
             plt.ylabel("IG Importance", fontsize=14)
             plt.show()
-
-            pass
         elif mode == "chr21":
             pos = np.arange(28, 29.2, 0.025)
-            feature_signal_chr21 = np.load(self.path + "lstm/" + "feature_signal_chr21.npy")
+            feature_signal_chr21 = np.load(self.path + "feature_signal_chr21.npy")
             plt.figure(figsize=(6, 2))
             plt.plot(pos, feature_signal_chr21)
             plt.xticks(fontsize=14)
@@ -633,12 +633,14 @@ class PlotFns:
             plt.xlabel("Positions in Mbp", fontsize=14)
             plt.ylabel("IG Importance", fontsize=14)
             plt.show()
-            pass
-
-        pass
 
     def plot_pred_range(self):
-        chr = 21
+        """
+        plot_pred_range() -> No return object
+        Plots range of prediction differences.
+        Args:
+            NA
+        """
 
         diff_list = [0.12, 0.114, 0.105, 0.0714, 0.048, 0.002, -0.021, -0.043, -0.067, -0.082, -0.096]
         og_list = np.arange(0, 1.1, 0.1)
@@ -649,7 +651,6 @@ class PlotFns:
         plt.xlabel("Original Hi-C Contact Strength", fontsize=14)
         plt.ylabel("Difference in Contact Strength \n (Predicted - Original)", fontsize=14)
         plt.show()
-        pass
 
 
 if __name__ == "__main__":
@@ -668,9 +669,9 @@ if __name__ == "__main__":
     # plot_ob.plot_r2(cell="GM12878")
     # plot_ob.plot_knockout_results()
     # plot_ob.plot_knockout_tfs()
-    plot_ob.pr_curves()
+    # plot_ob.pr_curves()
     # plot_ob.plot_symmetry()
-    # plot_ob.plot_feature_signal()
-    # plot_ob.plot_pred_range()
+    # plot_ob.plot_feature_signal(mode="tad)
+    plot_ob.plot_pred_range()
 
     print("done")
