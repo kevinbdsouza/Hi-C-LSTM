@@ -263,11 +263,12 @@ class PlotFns:
         self.plot_main(None, None, df_columns, df_lists, xlabel, ylabel, colors, markers, labels, form_df=True,
                        adjust=False, save=False)
 
-    def plot_two_axes(self, ax, fig, x_list, y_list, xlabel, ylabel, colors, markers, labels, legend=False,
+    def plot_two_axes(self, ax, fig, x_list, y_list, xlabel, ylabel, colors, markers, labels, style, legend=False,
                       save=False, common=False, mode="hidden"):
 
         """
-        plot_two_axes(ax, fig, x_list, y_list, xlabel, ylabel, colors, markers, labels, legend, save, common, mode) -> ax, fig, plt
+        plot_two_axes(ax, fig, x_list, y_list, xlabel, ylabel, colors, markers, labels, style,
+                    legend, save, common, mode) -> AxesSubplot, Figure
         main function for plotting two axes
         Args:
             ax (AxesSubplot): axes object
@@ -279,6 +280,7 @@ class PlotFns:
             colors (list): List of color values
             markers (list): List of markers
             labels (list): List of labels
+            style (list): List of line styles
             legend (bool): if true makes legend
             save (bool): if true saves figure
             common (bool): if true shares legend
@@ -286,8 +288,8 @@ class PlotFns:
         """
 
         for i, l in enumerate(labels):
-            ax.plot(x_list, y_list[i], marker=markers[i], markersize=16, color=colors[i], linewidth=3,
-                    label=l)
+            ax.plot(x_list, y_list[i], marker=markers[i], markersize=16, color=colors[i], linestyle=style[i],
+                    linewidth=3, label=l)
 
         if mode == "hidden":
             tick_list = [4, 16, 40, 80, 130]
@@ -334,19 +336,20 @@ class PlotFns:
         markers = ['o', 'D', '^', 's', 'p']
         labels = ['Hi-C-LSTM', 'Hi-C-LSTM, No.Layers: 2', 'Hi-C-LSTM, w/o Layer Norm', 'Hi-C-LSTM, w Dropout',
                   'Hi-C-LSTM, Bidirectional Lstm']
+        style = ["dashed", "dotted", "dashdot", "dashed", "dotted"]
 
         fig, (ax1, ax2) = plt.subplots(1, 2, sharey=True, figsize=(12, 6))
 
         y_list = [lstm_ablation_lists[0], lstm_ablation_lists[1], lstm_ablation_lists[2], lstm_ablation_lists[3],
                   lstm_ablation_lists[4]]
         ylabel = "Avg mAP Across Tasks"
-        ax, fig = self.plot_two_axes(ax1, fig, hidden_list, y_list, xlabel, ylabel, colors, markers, labels,
+        ax, fig = self.plot_two_axes(ax1, fig, hidden_list, y_list, xlabel, ylabel, colors, markers, labels, style,
                                      legend=False, save=False, common=True, mode="hidden")
 
         y_list = [lstm_ablation_lists[5], lstm_ablation_lists[6], lstm_ablation_lists[7], lstm_ablation_lists[8],
                   lstm_ablation_lists[9]]
         ylabel = "Avg Hi-C R-squared"
-        _, _ = self.plot_two_axes(ax2, fig, hidden_list, y_list, xlabel, ylabel, colors, markers, labels,
+        _, _ = self.plot_two_axes(ax2, fig, hidden_list, y_list, xlabel, ylabel, colors, markers, labels, style,
                                   legend=True, save=False, common=True, mode="hidden")
 
     def plot_xgb(self):
@@ -366,19 +369,20 @@ class PlotFns:
         ylabel = "Avg mAP Across Tasks"
         colors = ["C0", "C1", "C2", "C4", "C5"]
         markers = ['o', 's', '^', 'D', 'p']
+        style = ["dashed", "dotted", "dashdot", "dashed", "dotted"]
 
         y_list = [xgb_lists[0], xgb_lists[1], xgb_lists[2], xgb_lists[3], xgb_lists[4]]
         labels = ['Max Estimators: 2000', 'Max Estimators: 4000', 'Max Estimators: 5000', 'Max Estimators: 6000',
                   'Max Estimators: 10000']
         xlabel = "Max Depth"
-        ax, fig = self.plot_two_axes(ax1, fig, depth_list, y_list, xlabel, ylabel, colors, markers, labels,
+        ax, fig = self.plot_two_axes(ax1, fig, depth_list, y_list, xlabel, ylabel, colors, markers, labels, style,
                                      legend=False, save=False, common=False, mode="xgb")
 
         y_list = [xgb_lists[5], xgb_lists[6], xgb_lists[7], xgb_lists[8], xgb_lists[9]]
         labels = ['Max Depth: 2', 'Max Depth: 4', 'Max Depth: 6', 'Max Depth: 12',
                   'Max Depth: 20']
         xlabel = "Max Estimators"
-        _, _ = self.plot_two_axes(ax2, fig, estimators_list, y_list, xlabel, ylabel, colors, markers, labels,
+        _, _ = self.plot_two_axes(ax2, fig, estimators_list, y_list, xlabel, ylabel, colors, markers, labels, style,
                                   legend=True, save=False, common=False, mode="xgb")
 
     def plot_violin(self):
@@ -433,15 +437,16 @@ class PlotFns:
         xlabel = "Distance between positions in Mbp"
         colors = ["C0", "C1", "C2", "C4", "C3", "C5"]
         markers = ['o', 'D', '^', 'v', 's', '*']
+        style = ["dashed", "dotted", "dashdot", "dashed", "dotted", "dashdot"]
 
         y_list = [r1_hiclstm_gm, r1_hiclstm_h1, r1_hiclstm_wtc, r1_hiclstm_hff, r1_hiclstm_gmlow, r1_hiclstm_gmlow2]
         ylabel = "R-squared for Replicate-1"
-        ax, fig = self.plot_two_axes(ax1, fig, pos, y_list, xlabel, ylabel, colors, markers, labels,
+        ax, fig = self.plot_two_axes(ax1, fig, pos, y_list, xlabel, ylabel, colors, markers, labels, style,
                                      legend=False, save=False, common=True, mode="r2")
 
         y_list = [r2_hiclstm_gm, r2_hiclstm_h1, r2_hiclstm_wtc, r2_hiclstm_hff, r2_hiclstm_gmlow, r2_hiclstm_gmlow2]
         ylabel = "R-squared for Replicate-2"
-        _, _ = self.plot_two_axes(ax2, fig, pos, y_list, xlabel, ylabel, colors, markers, labels,
+        _, _ = self.plot_two_axes(ax2, fig, pos, y_list, xlabel, ylabel, colors, markers, labels, style,
                                   legend=True, save=False, common=True, mode="r2")
 
     def plot_r2(self, cell):
@@ -451,90 +456,13 @@ class PlotFns:
         Args:
             NA
         """
-        if cell == "GM12878":
-            r1_hiclstm_full = np.load(self.path + "r1_hiclstm_full.npy")
-            r1_hiclstm_lstm = np.load(self.path + "r1_hiclstm_lstm.npy")
-            r1_hiclstm_cnn = np.load(self.path + "r1_hiclstm_cnn.npy")
-            r1_sci_lstm = np.load(self.path + "r1_sci_lstm.npy")
-            r1_sniper_lstm = np.load(self.path + "r1_sniper_lstm.npy")
-            r1_sci_cnn = np.load(self.path + "r1_sci_cnn.npy")
-            r1_sniper_cnn = np.load(self.path + "r1_sniper_cnn.npy")
-            r1_hiclstm_fc = np.load(self.path + "r1_hiclstm_fc.npy")
-            r1_sci_fc = np.load(self.path + "r1_sci_fc.npy")
-            r1_sniper_fc = np.load(self.path + "r1_sniper_fc.npy")
 
-            r2_hiclstm_lstm = np.load(self.path + "r2_hiclstm_lstm.npy")
-            r2_hiclstm_cnn = np.load(self.path + "r2_hiclstm_cnn.npy")
-            r2_sci_lstm = np.load(self.path + "r2_sci_lstm.npy")
-            r2_sniper_lstm = np.load(self.path + "r2_sniper_lstm.npy")
-            r2_sci_cnn = np.load(self.path + "r2_sci_cnn.npy")
-            r2_sniper_cnn = np.load(self.path + "r2_sniper_cnn.npy")
-            r2_hiclstm_fc = np.load(self.path + "r2_hiclstm_fc.npy")
-            r2_sci_fc = np.load(self.path + "r2_sci_fc.npy")
-            r2_sniper_fc = np.load(self.path + "r2_sniper_fc.npy")
-        elif cell == "H1hESC":
-            r1_hiclstm_full = np.load(self.path + "r1_hiclstm_h1.npy")
-            r1_hiclstm_lstm = np.load(self.path + "r1_hiclstm_lstm_h1.npy")
-            r1_hiclstm_cnn = np.load(self.path + "r1_hiclstm_cnn_h1.npy")
-            r1_sci_lstm = np.load(self.path + "r1_sci_lstm_h1.npy")
-            r1_sniper_lstm = np.load(self.path + "r1_sniper_lstm_h1.npy")
-            r1_sci_cnn = np.load(self.path + "r1_sci_cnn_h1.npy")
-            r1_sniper_cnn = np.load(self.path + "r1_sniper_cnn_h1.npy")
-            r1_hiclstm_fc = np.load(self.path + "r1_hiclstm_fc_h1.npy")
-            r1_sci_fc = np.load(self.path + "r1_sci_fc_h1.npy")
-            r1_sniper_fc = np.load(self.path + "r1_sniper_fc_h1.npy")
-
-            r2_hiclstm_lstm = np.load(self.path + "r2_hiclstm_h1.npy")
-            r2_hiclstm_cnn = np.load(self.path + "r2_hiclstm_cnn_h1.npy")
-            r2_sci_lstm = np.load(self.path + "r2_sci_lstm_h1.npy")
-            r2_sniper_lstm = np.load(self.path + "r2_sniper_lstm_h1.npy")
-            r2_sci_cnn = np.load(self.path + "r2_sci_cnn_h1.npy")
-            r2_sniper_cnn = np.load(self.path + "r2_sniper_cnn_h1.npy")
-            r2_hiclstm_fc = np.load(self.path + "r2_hiclstm_fc_h1.npy")
-            r2_sci_fc = np.load(self.path + "r2_sci_fc_h1.npy")
-            r2_sniper_fc = np.load(self.path + "r2_sniper_fc_h1.npy")
-        elif cell == "WTC11":
-            r1_hiclstm_full = np.load(self.path + "r1_hiclstm_wtc.npy")
-            r1_hiclstm_lstm = np.load(self.path + "r1_hiclstm_lstm_wtc.npy")
-            r1_hiclstm_cnn = np.load(self.path + "r1_hiclstm_cnn_wtc.npy")
-            r1_sci_lstm = np.load(self.path + "r1_sci_lstm_wtc.npy")
-            r1_sniper_lstm = np.load(self.path + "r1_sniper_lstm_wtc.npy")
-            r1_sci_cnn = np.load(self.path + "r1_sci_cnn_wtc.npy")
-            r1_sniper_cnn = np.load(self.path + "r1_sniper_cnn_wtc.npy")
-            r1_hiclstm_fc = np.load(self.path + "r1_hiclstm_fc_wtc.npy")
-            r1_sci_fc = np.load(self.path + "r1_sci_fc_wtc.npy")
-            r1_sniper_fc = np.load(self.path + "r1_sniper_fc_wtc.npy")
-
-            r2_hiclstm_lstm = np.load(self.path + "r2_hiclstm_wtc.npy")
-            r2_hiclstm_cnn = np.load(self.path + "r2_hiclstm_cnn_wtc.npy")
-            r2_sci_lstm = np.load(self.path + "r2_sci_lstm_wtc.npy")
-            r2_sniper_lstm = np.load(self.path + "r2_sniper_lstm_wtc.npy")
-            r2_sci_cnn = np.load(self.path + "r2_sci_cnn_wtc.npy")
-            r2_sniper_cnn = np.load(self.path + "r2_sniper_cnn_wtc.npy")
-            r2_hiclstm_fc = np.load(self.path + "r2_hiclstm_fc_wtc.npy")
-            r2_sci_fc = np.load(self.path + "r2_sci_fc_wtc.npy")
-            r2_sniper_fc = np.load(self.path + "r2_sniper_fc_wtc.npy")
-        elif cell == "HFFhTERT":
-            r1_hiclstm_full = np.load(self.path + "r1_hiclstm_hff.npy")
-            r1_hiclstm_lstm = np.load(self.path + "r1_hiclstm_lstm_hff.npy")
-            r1_hiclstm_cnn = np.load(self.path + "r1_hiclstm_cnn_hff.npy")
-            r1_sci_lstm = np.load(self.path + "r1_sci_lstm_hff.npy")
-            r1_sniper_lstm = np.load(self.path + "r1_sniper_lstm_hff.npy")
-            r1_sci_cnn = np.load(self.path + "r1_sci_cnn_hff.npy")
-            r1_sniper_cnn = np.load(self.path + "r1_sniper_cnn_hff.npy")
-            r1_hiclstm_fc = np.load(self.path + "r1_hiclstm_fc_hff.npy")
-            r1_sci_fc = np.load(self.path + "r1_sci_fc_hff.npy")
-            r1_sniper_fc = np.load(self.path + "r1_sniper_fc_hff.npy")
-
-            r2_hiclstm_lstm = np.load(self.path + "r2_hiclstm_hff.npy")
-            r2_hiclstm_cnn = np.load(self.path + "r2_hiclstm_cnn_hff.npy")
-            r2_sci_lstm = np.load(self.path + "r2_sci_lstm_hff.npy")
-            r2_sniper_lstm = np.load(self.path + "r2_sniper_lstm_hff.npy")
-            r2_sci_cnn = np.load(self.path + "r2_sci_cnn_hff.npy")
-            r2_sniper_cnn = np.load(self.path + "r2_sniper_cnn_hff.npy")
-            r2_hiclstm_fc = np.load(self.path + "r2_hiclstm_fc_hff.npy")
-            r2_sci_fc = np.load(self.path + "r2_sci_fc_hff.npy")
-            r2_sniper_fc = np.load(self.path + "r2_sniper_fc_hff.npy")
+        r1_hiclstm_gm = np.load(self.path + "r1_hiclstm_full.npy")
+        r1_hiclstm_h1 = np.load(self.path + "r1_hiclstm_h1.npy")
+        r1_hiclstm_wtc = np.load(self.path + "r1_hiclstm_wtc.npy")
+        r1_hiclstm_full = np.load(self.path + "r1_hiclstm_hff.npy")
+        df_main_r1 = pd.read_csv(self.path + "%s_r1.csv" % (cell), sep="\t")
+        df_main_r2 = pd.read_csv(self.path + "%s_r2.csv" % (cell), sep="\t")
 
         pos = [10, 20, 30, 40, 50]
 
@@ -546,16 +474,14 @@ class PlotFns:
         markers = ['D', '^', 's', 'D', '^', 's', 'D', '^', 's']
         style = ["dashed", "dotted", "dashdot", "dashed", "dotted", "dashdot", "dashed", "dotted", "dashdot"]
 
-        y_list = [r1_hiclstm_lstm, r1_hiclstm_cnn, r1_hiclstm_fc, r1_sci_lstm, r1_sci_cnn, r1_sci_fc, r1_sniper_lstm,
-                  r1_sniper_cnn, r1_sniper_fc]
+        y_list = [list(df_main_r1.loc[:, col]) for col in range(df_main_r1.shape[1])]
         ylabel = "R-squared for Replicate-1"
-        ax, fig = self.plot_two_axes(ax1, fig, pos, y_list, xlabel, ylabel, colors, markers, labels,
+        ax, fig = self.plot_two_axes(ax1, fig, pos, y_list, xlabel, ylabel, colors, markers, labels, style,
                                      legend=False, save=False, common=True, mode="r2")
 
-        y_list = [r2_hiclstm_lstm, r2_hiclstm_cnn, r2_hiclstm_fc, r2_sci_lstm, r2_sci_cnn, r2_sci_fc, r2_sniper_lstm,
-                  r2_sniper_cnn, r2_sniper_fc]
+        y_list = [list(df_main_r2.loc[:, col]) for col in range(df_main_r2.shape[1])]
         xlabel = "R-squared for Replicate-2"
-        _, _ = self.plot_two_axes(ax2, fig, pos, y_list, xlabel, ylabel, colors, markers, labels,
+        _, _ = self.plot_two_axes(ax2, fig, pos, y_list, xlabel, ylabel, colors, markers, labels, style,
                                   legend=True, save=False, common=True, mode="r2")
 
     def plot_knockout_tfs(self):
@@ -797,7 +723,7 @@ if __name__ == "__main__":
     # plot_ob.plot_hidden()
     # plot_ob.plot_xgb()
     # plot_ob.plot_violin()
-    #plot_ob.plot_r2_celltypes()
+    # plot_ob.plot_r2_celltypes()
     plot_ob.plot_r2(cell="GM12878")
     # plot_ob.plot_symmetry()
     # plot_ob.plot_knockout_results()
