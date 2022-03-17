@@ -61,10 +61,10 @@ class PlotFns:
         plt.savefig("/home/kevindsouza/Downloads/H1hESC_metrics.png")
 
     def plot_main(self, cell, metric, df_columns, df_lists, xlabel, ylabel, colors, markers, labels, form_df=True,
-                  adjust=False,
-                  save=True):
+                  adjust=False, save=True, mode="all"):
         """
-        plot_main(cell, metric, df_columns, df_lists, adjust=False, save=True) -> No return object
+        plot_main(cell, metric, df_columns, df_lists,  xlabel, ylabel, colors, markers,
+                    labels, form_df, adjust, save, mode) -> No return object
         Main plotting function
         Args:
             cell (string): one of GM12878, HFFhTERT, H1hESC, WTC11
@@ -78,6 +78,7 @@ class PlotFns:
             labels (List): list of labels
             adjust (bool): If true adjusts bottom
             save (bool): if true saves figure
+            mode (string): one of tf_only or all
         """
 
         if form_df:
@@ -89,8 +90,12 @@ class PlotFns:
                 df_main = pd.read_csv(self.path + "%s_%s_df.csv" % (cell, metric), sep="\t")
                 df_main = df_main.drop(['Unnamed: 0'], axis=1)
             else:
-                df_main = pd.read_csv(self.path + "tfbs_kodiff.csv", sep="\t")
-                df_main = df_main.drop(['Unnamed: 0'], axis=1)
+                if mode == "tf_only":
+                    df_main = pd.read_csv(self.path + "tfbs_kodiff.csv", sep="\t")
+                    df_main = df_main.drop(['Unnamed: 0'], axis=1)
+                else:
+                    df_main = pd.read_csv(self.path + "ko_all.csv", sep="\t")
+                    df_main = df_main.drop(['Unnamed: 0'], axis=1)
 
         plt.figure(figsize=(12, 10))
         # plt.figure(figsize=(10, 8))
@@ -509,7 +514,7 @@ class PlotFns:
 
         "plot"
         self.plot_main(None, None, df_columns, None, xlabel, ylabel, colors, markers, labels, form_df=False,
-                       adjust=True, save=False)
+                       adjust=True, save=False, mode="tf_only")
 
     def plot_knockout_results(self):
         """
@@ -518,71 +523,18 @@ class PlotFns:
         Args:
             NA
         """
-        pos = np.linspace(0, 1, 11)
-        predicted_probs = np.load(self.path + "predicted_probs.npy")
 
-        ctcfko_probs = np.load(self.path + "ctcfko_probs.npy")
-        convctcf_probs = np.load(self.path + "convctcf_probs.npy")
-        divctcf_probs = np.load(self.path + "divctcf_probs.npy")
-        ctcfko_probs_nl = np.load(self.path + "ctcfko_probs_nl.npy")
-        znfko_probs = np.load(self.path + "znfko_probs.npy")
-        foxgko_probs = np.load(self.path + "foxgko_probs.npy")
-        soxko_probs = np.load(self.path + "soxko_probs.npy")
-        xbpko_probs = np.load(self.path + "xbpko_probs.npy")
+        xlabel = "Distance between positions in Mbp"
+        ylabel = "Average Difference in Contact Strength \n (KO - No KO)"
+        labels = ["CTCF+Cohesin KO (Loop)", "CTCF+Cohesin KO (Non-loop)", "Div->Conv CTCF", "Conv->Div CTCF",
+                  "ZNF143 KO", "FOXG1 KO", "SOX2 KO", "XBP1 KO"]
+        df_columns = ["pos"] + labels
+        markers = ['o', 's', '*', 'D', '^', 'v', 'x', '+']
+        colors = ["C0", "C2", "C5", "C1", "C3", "C4", "C6", "C7"]
 
-        # control - KO
-        ctcfko_diff = ctcfko_probs - predicted_probs
-        convctcf_diff = convctcf_probs - predicted_probs
-        divctcf_diff = divctcf_probs - predicted_probs
-
-        ctcfnl_diff = ctcfko_probs_nl - predicted_probs
-        znfko_diff = znfko_probs - predicted_probs
-        foxgko_diff = foxgko_probs - predicted_probs
-        soxko_diff = soxko_probs - predicted_probs
-        xbpko_diff = xbpko_probs - predicted_probs
-
-        df_main = pd.DataFrame(columns=["pos", "CTCF_Cohesin_KO_Loop", "CTCF_Cohesin_KO_nl", "Convergent_CTCF",
-                                        "Divergent_CTCF", "ZNF143_KO", "FOXG1_KO", "SOX2_KO", "XBP1_KO"])
-        df_main["pos"] = pos
-        df_main["CTCF_Cohesin_KO_Loop"] = ctcfko_diff
-        df_main["CTCF_Cohesin_KO_nl"] = ctcfnl_diff
-        df_main["Convergent_CTCF"] = convctcf_diff
-        df_main["Divergent_CTCF"] = divctcf_diff
-        df_main["ZNF143_KO"] = znfko_diff
-        df_main["FOXG1_KO"] = foxgko_diff
-        df_main["SOX2_KO"] = soxko_diff
-        df_main["XBP1_KO"] = xbpko_diff
-
-        df_main = pd.read_csv(self.path + "ko_all.csv", sep="\t")
-        df_main = df_main.drop(['Unnamed: 0'], axis=1)
-        
-        plt.figure(figsize=(12, 10))
-        plt.xticks(rotation=90, fontsize=20)
-        plt.yticks(fontsize=20)
-        plt.xlabel("Distance between positions in Mbp", fontsize=20)
-        plt.ylabel("Average Difference in Contact Strength \n (KO - No KO)", fontsize=20)
-        # plt.plot('pos', 'No KO', data=df_main, marker='o', markersize=14, color="C3", linewidth=2, label="No KO")
-        plt.plot('pos', 'CTCF_Cohesin_KO_Loop', data=df_main, marker='o', markersize=16, color="C0", linewidth=3,
-                 label="CTCF+Cohesin KO (Loop)")
-        plt.plot('pos', 'CTCF_Cohesin_KO_nl', data=df_main, marker='s', markersize=16, color="C2", linewidth=3,
-                 linestyle='dotted', label="CTCF+Cohesin KO (Non-loop)")
-        plt.plot('pos', 'Convergent_CTCF', data=df_main, marker='*', markersize=16, color="C5", linewidth=3,
-                 linestyle='dotted', label="Div->Conv CTCF")
-        plt.plot('pos', 'Divergent_CTCF', data=df_main, marker='D', markersize=16, color="C1", linewidth=3,
-                 linestyle='dashed', label="Conv->Div CTCF")
-        plt.plot('pos', 'ZNF143_KO', data=df_main, marker='^', markersize=16, color="C3", linewidth=3,
-                 linestyle='dashed', label="ZNF143 KO")
-        plt.plot('pos', 'FOXG1_KO', data=df_main, marker='v', markersize=16, color="C4", linewidth=3,
-                 linestyle='dashdot', label="FOXG1 KO")
-        plt.plot('pos', 'SOX2_KO', data=df_main, marker='x', markersize=16, color="C6", linewidth=3, label="SOX2 KO")
-        plt.plot('pos', 'XBP1_KO', data=df_main, marker='+', markersize=16, color="C7", linewidth=3, label="XBP1 KO")
-
-        plt.legend(fontsize=18)
-        plt.subplots_adjust(left=0.2)
-        plt.savefig("/home/kevindsouza/Downloads/ko_average.png")
-        # plt.show()
-
-        pass
+        "plot"
+        self.plot_main(None, None, df_columns, None, xlabel, ylabel, colors, markers, labels, form_df=False,
+                       adjust=True, save=False, mode="all")
 
     def pr_curves(self):
         path = "/data2/hic_lstm/downstream/"
