@@ -1,20 +1,18 @@
 # HiCLSTM
 
+<p align="center">
+    <a href="https://www.biorxiv.org/content/10.1101/2021.08.26.457856v1.abstract">
+        <img alt="Paper" src="https://github.com/kevinbdsouza/Hi-C-LSTM//blob/main/data2/penguin.svg">
+    </a>
+    <a href="https://github.com/kevinbdsouza/Hi-C-LSTM/releases">
+        <img alt="Release" src="https://github.com/kevinbdsouza/Hi-C-LSTM//blob/main/data2/crow.svg">
+    </a>
+</p>
+
 ## Hi-C-LSTM Model 
 <p align="center">
 <img align="center" src="https://github.com/kevinbdsouza/Hi-C-LSTM//blob/main/data2/HiC_model.png?raw=true">
 </p>
-
-<p align="center">
-    <a href="https://www.biorxiv.org/content/10.1101/2021.08.26.457856v1.abstract">
-        <img alt="Paper" src="https://img.shields.io/circleci/build/github/huggingface/transformers/master">
-    </a>
-    <a href="https://github.com/huggingface/transformers/blob/master/LICENSE">
-        <img alt="GitHub" src="https://img.shields.io/github/license/huggingface/transformers.svg?color=blue">
-    </a>
-    <a href="https://zenodo.org/badge/latestdoi/155220641"><img src="https://zenodo.org/badge/155220641.svg" alt="DOI"></a>
-</p>
-
 
 ## Requirements 
 The following software was installed on Ubuntu 16.04
