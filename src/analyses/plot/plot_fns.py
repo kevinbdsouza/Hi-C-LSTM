@@ -89,6 +89,7 @@ class PlotFns:
             df_main = df_main.drop(['Unnamed: 0'], axis=1)
 
         plt.figure(figsize=(12, 10))
+        # plt.figure(figsize=(10, 8))
         plt.xticks(rotation=90, fontsize=20)
         plt.yticks(fontsize=20)
         plt.xlabel(xlabel, fontsize=20)
@@ -487,6 +488,13 @@ class PlotFns:
                                   legend=True, save=False, common=True, mode="r2")
 
     def plot_knockout_tfs(self):
+        """
+        plot_knockout_tfs() -> No return object
+        Plots difference between contacts after and before knockout of TFBS.
+        Args:
+            NA
+        """
+
         pos = np.linspace(0, 1, 11)
         predicted_probs = np.load(self.path + "predicted_probs.npy")
 
@@ -516,14 +524,10 @@ class PlotFns:
         df_main["SOX2 KO"] = soxko_diff
         df_main["XBP1 KO"] = xbpko_diff
 
-        palette = {"CTCF KO": "C0", "Convergent CTCF": "C5", "Divergent CTCF": "C1", "RAD21 KO": "C2",
-                   "SMC3 KO": "C4"}
-        plt.figure(figsize=(10, 8))
-        plt.xticks(rotation=90, fontsize=20)
-        plt.yticks(fontsize=20)
-        plt.xlabel("Distance between positions in Mbp", fontsize=20)
-        plt.ylabel("Average Difference in Contact Strength \n (KO - No KO)", fontsize=20)
-        # plt.plot('pos', 'No KO', data=df_main, marker='o', markersize=14, color="C3", linewidth=2, label="No KO")
+
+        xlabel = "Distance between positions in Mbp"
+        ylabel = "Average Difference in Contact Strength \n (KO - No KO)"
+
         plt.plot('pos', 'CTCF KO (Loop)', data=df_main, marker='o', markersize=16, color="C0", linewidth=3,
                  label="CTCF KO (Loop)")
         plt.plot('pos', 'CTCF KO (Non-loop)', data=df_main, marker='*', markersize=16, color="C5", linewidth=3,
@@ -726,10 +730,10 @@ if __name__ == "__main__":
     # plot_ob.plot_xgb()
     # plot_ob.plot_violin()
     # plot_ob.plot_r2_celltypes()
-    plot_ob.plot_r2(cell="GM12878")
+    # plot_ob.plot_r2(cell="GM12878")
     # plot_ob.plot_symmetry()
     # plot_ob.plot_knockout_results()
-    # plot_ob.plot_knockout_tfs()
+    plot_ob.plot_knockout_tfs()
     # plot_ob.pr_curves()
     # plot_ob.plot_feature_signal()
     # plot_ob.plot_pred_range()
