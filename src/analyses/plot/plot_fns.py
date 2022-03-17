@@ -500,15 +500,15 @@ class PlotFns:
         """
 
         predicted_probs = np.load(self.path + "predicted_probs.npy")
-
         xlabel = "Distance between positions in Mbp"
         ylabel = "Average Difference in Contact Strength \n (KO - No KO)"
         colors = ["C0", "C5", "C1", "C2", "C4", "C6"]
         labels = ["CTCF KO (Loop)", "CTCF KO (Non-loop)", "ZNF143 KO", "FOXG1 KO", "SOX2 KO", "XBP1 KO"]
+        df_columns = ["pos"] + labels
         markers = ['o', '*', 'D', 's', '^', 'X']
 
         "plot"
-        self.plot_main(None, None, None, None, xlabel, ylabel, colors, markers, labels, form_df=False,
+        self.plot_main(None, None, df_columns, None, xlabel, ylabel, colors, markers, labels, form_df=False,
                        adjust=True, save=False)
 
     def plot_knockout_results(self):
