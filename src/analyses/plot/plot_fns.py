@@ -642,7 +642,7 @@ class PlotFns:
             NA
         """
 
-        diff_list = [0.12, 0.114, 0.105, 0.0714, 0.048, 0.002, -0.021, -0.043, -0.067, -0.082, -0.096]
+        diff_list = np.load(self.path + "pred_range_diffs.npy")
         og_list = np.arange(0, 1.1, 0.1)
 
         plt.plot(og_list, diff_list, linewidth=3, marker='o', markersize=16)
