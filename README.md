@@ -1,7 +1,9 @@
 # HiCLSTM
 
 ## Hi-C-LSTM Model 
-<img align="right" src="https://github.com/kevinbdsouza/Hi-C-LSTM//blob/main/data2/HiC_model.png?raw=true">
+<p align="center">
+<img align="center" src="https://github.com/kevinbdsouza/Hi-C-LSTM//blob/main/data2/HiC_model.png?raw=true">
+</p>
 
 ## Requirements 
 The following software was installed on Ubuntu 16.04
