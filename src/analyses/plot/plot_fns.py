@@ -512,14 +512,18 @@ class PlotFns:
                        adjust=True, save=False)
 
     def plot_knockout_results(self):
+        """
+        plot_knockout_results() -> No return object
+        Plots TF knockout plus convergent and divergent
+        Args:
+            NA
+        """
         pos = np.linspace(0, 1, 11)
         predicted_probs = np.load(self.path + "predicted_probs.npy")
 
         ctcfko_probs = np.load(self.path + "ctcfko_probs.npy")
         convctcf_probs = np.load(self.path + "convctcf_probs.npy")
         divctcf_probs = np.load(self.path + "divctcf_probs.npy")
-        radko_probs = np.load(self.path + "radko_probs.npy")
-
         ctcfko_probs_nl = np.load(self.path + "ctcfko_probs_nl.npy")
         znfko_probs = np.load(self.path + "znfko_probs.npy")
         foxgko_probs = np.load(self.path + "foxgko_probs.npy")
@@ -541,9 +545,9 @@ class PlotFns:
                                         "CTCF_Cohesin_KO_nl", "ZNF143_KO", "FOXG1_KO", "SOX2_KO", "XBP1_KO"])
         df_main["pos"] = pos
         df_main["CTCF_Cohesin_KO_Loop"] = ctcfko_diff
+        df_main["CTCF_Cohesin_KO_nl"] = ctcfnl_diff
         df_main["Convergent_CTCF"] = convctcf_diff
         df_main["Divergent_CTCF"] = divctcf_diff
-        df_main["CTCF_Cohesin_KO_nl"] = ctcfnl_diff
         df_main["ZNF143_KO"] = znfko_diff
         df_main["FOXG1_KO"] = foxgko_diff
         df_main["SOX2_KO"] = soxko_diff
@@ -700,8 +704,8 @@ if __name__ == "__main__":
     # plot_ob.plot_r2_celltypes()
     # plot_ob.plot_r2(cell="GM12878")
     # plot_ob.plot_symmetry()
-    # plot_ob.plot_knockout_results()
-    plot_ob.plot_knockout_tfs()
+    plot_ob.plot_knockout_results()
+    # plot_ob.plot_knockout_tfs()
     # plot_ob.pr_curves()
     # plot_ob.plot_feature_signal()
     # plot_ob.plot_pred_range()
