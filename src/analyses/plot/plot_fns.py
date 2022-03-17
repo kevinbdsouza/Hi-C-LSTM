@@ -528,7 +528,8 @@ class PlotFns:
         ylabel = "Average Difference in Contact Strength \n (KO - No KO)"
         labels = ["CTCF+Cohesin KO (Loop)", "CTCF+Cohesin KO (Non-loop)", "Div->Conv CTCF", "Conv->Div CTCF",
                   "ZNF143 KO", "FOXG1 KO", "SOX2 KO", "XBP1 KO"]
-        df_columns = ["pos"] + labels
+        df_columns = ["pos", "CTCF_Cohesin_KO_Loop", "CTCF_Cohesin_KO_nl", "Convergent_CTCF", "Divergent_CTCF",
+                  "ZNF143_KO", "FOXG1_KO", "SOX2_KO", "XBP1_KO"]
         markers = ['o', 's', '*', 'D', '^', 'v', 'x', '+']
         colors = ["C0", "C2", "C5", "C1", "C3", "C4", "C6", "C7"]
 
