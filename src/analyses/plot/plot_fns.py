@@ -225,7 +225,8 @@ class PlotFns:
                     gmlow_auroc_all_tasks, gmlow2_auroc_all_tasks]
 
         "plot"
-        self.plot_main(df_columns, df_lists, xlabel, ylabel, colors, markers, labels, adjust=False, save=False)
+        self.plot_main(None, None, df_columns, df_lists, xlabel, ylabel, colors, markers, labels, form_df=True,
+                       adjust=False, save=False)
 
     def plot_auroc(self):
         """
