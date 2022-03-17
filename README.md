@@ -1,4 +1,5 @@
 # HiCLSTM
+Hi-C-LSTM is a framework to build Hi-C intrachromosomal representations which are useful for element identification and in-silico alterations. 
 
 <p align="center">
     <a href="https://www.biorxiv.org/content/10.1101/2021.08.26.457856v1.abstract">
