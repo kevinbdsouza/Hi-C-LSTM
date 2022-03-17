@@ -553,6 +553,9 @@ class PlotFns:
         df_main["SOX2_KO"] = soxko_diff
         df_main["XBP1_KO"] = xbpko_diff
 
+        df_main = pd.read_csv(self.path + "ko_all.csv", sep="\t")
+        df_main = df_main.drop(['Unnamed: 0'], axis=1)
+        
         plt.figure(figsize=(12, 10))
         plt.xticks(rotation=90, fontsize=20)
         plt.yticks(fontsize=20)
