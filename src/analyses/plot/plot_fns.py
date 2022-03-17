@@ -125,7 +125,8 @@ class PlotFns:
         df_columns = ["Tasks"] + labels
 
         "plot"
-        self.plot_main(cell, metric, df_columns, None, xlabel, ylabel, colors, markers, labels, form_df=False, adjust=True,
+        self.plot_main(cell, metric, df_columns, None, xlabel, ylabel, colors, markers, labels, form_df=False,
+                       adjust=True,
                        save=False)
 
     def plot_map_celltypes(self):
@@ -189,7 +190,8 @@ class PlotFns:
         df_lists = [tasks, lstm_2kbp, lstm_10kbp, lstm_100kbp, lstm_500kbp]
 
         "plot"
-        self.plot_main(df_columns, df_lists, xlabel, ylabel, colors, markers, labels, adjust=True, save=False)
+        self.plot_main(None, None, df_columns, df_lists, xlabel, ylabel, colors, markers, labels, form_df=True,
+                       adjust=True, save=False)
 
     def plot_auroc_celltypes(self):
         """
