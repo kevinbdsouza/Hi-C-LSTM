@@ -784,8 +784,8 @@ if __name__ == "__main__":
 
     # plot_ob.plot_combined(cell="GM12878", metric="accuracy", ylabel="Accuracy")
     # plot_ob.plot_map_celltypes()
-    plot_ob.plot_map_resolutions()
-    # plot_ob.plot_auroc_celltypes()
+    # plot_ob.plot_map_resolutions()
+    plot_ob.plot_auroc_celltypes()
     # plot_ob.plot_auroc()
     # plot_ob.plot_hidden()
     # plot_ob.plot_xgb()
