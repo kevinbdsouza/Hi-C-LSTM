@@ -476,12 +476,12 @@ class PlotFns:
         markers = ['D', '^', 's', 'D', '^', 's', 'D', '^', 's']
         style = ["dashed", "dotted", "dashdot", "dashed", "dotted", "dashdot", "dashed", "dotted", "dashdot"]
 
-        y_list = [list(df_main_r1.loc[:, col]) for col in range(df_main_r1.shape[1])]
+        y_list = [list(df_main_r1.loc[:, col]) for col in df_main_r1.columns]
         ylabel = "R-squared for Replicate-1"
         ax, fig = self.plot_two_axes(ax1, fig, pos, y_list, xlabel, ylabel, colors, markers, labels, style,
                                      legend=False, save=False, common=True, mode="r2")
 
-        y_list = [list(df_main_r2.loc[:, col]) for col in range(df_main_r2.shape[1])]
+        y_list = [list(df_main_r2.loc[:, col]) for col in df_main_r2.columns]
         xlabel = "R-squared for Replicate-2"
         _, _ = self.plot_two_axes(ax2, fig, pos, y_list, xlabel, ylabel, colors, markers, labels, style,
                                   legend=True, save=False, common=True, mode="r2")
