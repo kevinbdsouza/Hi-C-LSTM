@@ -462,7 +462,9 @@ class PlotFns:
         r1_hiclstm_wtc = np.load(self.path + "r1_hiclstm_wtc.npy")
         r1_hiclstm_full = np.load(self.path + "r1_hiclstm_hff.npy")
         df_main_r1 = pd.read_csv(self.path + "%s_r1.csv" % (cell), sep="\t")
+        df_main_r1 = df_main_r1.drop(['Unnamed: 0'], axis=1)
         df_main_r2 = pd.read_csv(self.path + "%s_r2.csv" % (cell), sep="\t")
+        df_main_r2 = df_main_r2.drop(['Unnamed: 0'], axis=1)
 
         pos = [10, 20, 30, 40, 50]
 
