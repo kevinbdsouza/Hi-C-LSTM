@@ -524,7 +524,7 @@ class PlotFns:
         df_main["SOX2 KO"] = soxko_diff
         df_main["XBP1 KO"] = xbpko_diff
 
-        df_main.to_csv(self.path + "tfbs_kodiff.csv", sep="\t")
+        df_main = pd.read_csv(self.path + "tfbs_kodiff.csv", sep="\t")
         df_main = df_main.drop(['Unnamed: 0'], axis=1)
 
         xlabel = "Distance between positions in Mbp"
