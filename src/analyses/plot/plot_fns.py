@@ -207,7 +207,7 @@ class PlotFns:
                       "GM12878_low2"]
         xlabel = "Prediction Target"
         ylabel = "AuROC"
-        colors = ["C1", "C0", "C2", "C3"]
+        colors = ["C1", "C0", "C2", "C3", "C4", "C5"]
         markers = ['o', 'D', '^', 'v', 's', '*']
         labels = ["GM12878 (Rao 2014, 3B)", "H1hESC (Dekker 4DN, 2.5B)", "WTC11 (Dekker 4DN, 1.3B)",
                   "HFFhTERT (Dekker 4DN, 354M)", "GM12878 (Aiden 4DN, 300M)", "GM12878 (Aiden 4DN, 216M)"]
