@@ -264,10 +264,10 @@ class PlotFns:
                        adjust=False, save=False)
 
     def plot_two_axes(self, ax, fig, x_list, y_list, xlabel, ylabel, colors, markers, labels, legend=False,
-                      save=False, common=False):
+                      save=False, common=False, mode="hidden"):
 
         """
-        plot_two_axes(ax, fig, x_list, y_list, xlabel, ylabel, colors, markers, labels, legend, save, common) -> ax, fig, plt
+        plot_two_axes(ax, fig, x_list, y_list, xlabel, ylabel, colors, markers, labels, legend, save, common, mode) -> ax, fig, plt
         main function for plotting two axes
         Args:
             ax (AxesSubplot): axes object
@@ -282,13 +282,18 @@ class PlotFns:
             legend (bool): if true makes legend
             save (bool): if true saves figure
             common (bool): if true shares legend
+            mode (string): one of hidden, xgb, r2
         """
 
         for i, l in enumerate(labels):
             ax.plot(x_list, y_list[i], marker=markers[i], markersize=16, color=colors[i], linewidth=3,
                     label=l)
 
-        tick_list = [4, 16, 40, 80, 130]
+        if mode == "hidden":
+            tick_list = [4, 16, 40, 80, 130]
+        else:
+            tick_list = x_list
+
         ax.tick_params(axis="x", labelrotation=90, labelsize=20)
         if not legend:
             ax.tick_params(axis="y", labelsize=20)
@@ -336,13 +341,13 @@ class PlotFns:
                   lstm_ablation_lists[4]]
         ylabel = "Avg mAP Across Tasks"
         ax, fig = self.plot_two_axes(ax1, fig, hidden_list, y_list, xlabel, ylabel, colors, markers, labels,
-                                     legend=False, save=False, common=True)
+                                     legend=False, save=False, common=True, mode="hidden")
 
         y_list = [lstm_ablation_lists[5], lstm_ablation_lists[6], lstm_ablation_lists[7], lstm_ablation_lists[8],
                   lstm_ablation_lists[9]]
         ylabel = "Avg Hi-C R-squared"
         _, _ = self.plot_two_axes(ax2, fig, hidden_list, y_list, xlabel, ylabel, colors, markers, labels,
-                                  legend=True, save=False, common=True)
+                                  legend=True, save=False, common=True, mode="hidden")
 
     def plot_xgb(self):
         """
@@ -367,14 +372,14 @@ class PlotFns:
                   'Max Estimators: 10000']
         xlabel = "Max Depth"
         ax, fig = self.plot_two_axes(ax1, fig, depth_list, y_list, xlabel, ylabel, colors, markers, labels,
-                                     legend=False, save=False, common=False)
+                                     legend=False, save=False, common=False, mode="xgb")
 
         y_list = [xgb_lists[5], xgb_lists[6], xgb_lists[7], xgb_lists[8], xgb_lists[9]]
         labels = ['Max Depth: 2', 'Max Depth: 4', 'Max Depth: 6', 'Max Depth: 12',
                   'Max Depth: 20']
         xlabel = "Max Estimators"
         _, _ = self.plot_two_axes(ax2, fig, estimators_list, y_list, xlabel, ylabel, colors, markers, labels,
-                                  legend=True, save=False, common=False)
+                                  legend=True, save=False, common=False, mode="xgb")
 
     def plot_violin(self):
         """
@@ -432,12 +437,12 @@ class PlotFns:
         y_list = [r1_hiclstm_gm, r1_hiclstm_h1, r1_hiclstm_wtc, r1_hiclstm_hff, r1_hiclstm_gmlow, r1_hiclstm_gmlow2]
         ylabel = "R-squared for Replicate-1"
         ax, fig = self.plot_two_axes(ax1, fig, pos, y_list, xlabel, ylabel, colors, markers, labels,
-                                     legend=False, save=False, common=True)
+                                     legend=False, save=False, common=True, mode="r2")
 
         y_list = [r2_hiclstm_gm, r2_hiclstm_h1, r2_hiclstm_wtc, r2_hiclstm_hff, r2_hiclstm_gmlow, r2_hiclstm_gmlow2]
-        xlabel = "R-squared for Replicate-2"
+        ylabel = "R-squared for Replicate-2"
         _, _ = self.plot_two_axes(ax2, fig, pos, y_list, xlabel, ylabel, colors, markers, labels,
-                                  legend=True, save=False, common=True)
+                                  legend=True, save=False, common=True, mode="r2")
 
     def plot_r2(self, cell):
         """
