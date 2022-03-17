@@ -122,9 +122,10 @@ class PlotFns:
         colors = ["C3", "C0", "C1", "C2", "C4", "C5"]
         markers = ['o', '*', 'X', '^', 'D', 's']
         labels = ["Hi-C-LSTM", "SNIPER-INTRA", "SNIPER-INTER", "SCI", "PCA", "SBCID"]
+        df_columns = ["Tasks"] + labels
 
         "plot"
-        self.plot_main(cell, metric, None, None, xlabel, ylabel, colors, markers, labels, form_df=False, adjust=True,
+        self.plot_main(cell, metric, df_columns, None, xlabel, ylabel, colors, markers, labels, form_df=False, adjust=True,
                        save=False)
 
     def plot_map_celltypes(self):
