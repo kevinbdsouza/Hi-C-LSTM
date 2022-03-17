@@ -541,8 +541,8 @@ class PlotFns:
         soxko_diff = soxko_probs - predicted_probs
         xbpko_diff = xbpko_probs - predicted_probs
 
-        df_main = pd.DataFrame(columns=["pos", "CTCF_Cohesin_KO_Loop", "Convergent_CTCF", "Divergent_CTCF",
-                                        "CTCF_Cohesin_KO_nl", "ZNF143_KO", "FOXG1_KO", "SOX2_KO", "XBP1_KO"])
+        df_main = pd.DataFrame(columns=["pos", "CTCF_Cohesin_KO_Loop", "CTCF_Cohesin_KO_nl", "Convergent_CTCF",
+                                        "Divergent_CTCF", "ZNF143_KO", "FOXG1_KO", "SOX2_KO", "XBP1_KO"])
         df_main["pos"] = pos
         df_main["CTCF_Cohesin_KO_Loop"] = ctcfko_diff
         df_main["CTCF_Cohesin_KO_nl"] = ctcfnl_diff
