@@ -201,8 +201,8 @@ class PlotFns:
             NA
         """
 
-        tasks = ["Gene Expression", "Replication Timing", "Enhancers", "TSS", "PE-Interactions", "FIREs",
-                 "Non-loop Domains", "Loop Domains", "Subcompartments"]
+        tasks = ["Gene Expression", "Enhancers", "TSS", "TADs", "subTADs", "Loop Domains",
+                 "TAD Boundaries", "subTAD Boundaries", "Subcompartments"]
         df_columns = ["Tasks", "GM12878_Rao", "H1hESC_Dekker", "WTC11_Dekker", "HFFhTERT_Dekker", "GM12878_low",
                       "GM12878_low2"]
         xlabel = "Prediction Target"
@@ -237,7 +237,7 @@ class PlotFns:
         """
 
         tasks = ["Gene Expression", "Replication Timing", "Enhancers", "TSS", "PE-Interactions", "FIREs",
-                 "Non-loop Domains", "Loop Domains", "Subcompartments"]
+                 "TADs", "subTADs", "Loop Domains", "TAD Boundaries", "subTAD Boundaries", "Subcompartments"]
         df_columns = ["Tasks", "Hi-C-LSTM", "SNIPER-INTRA", "SNIPER-INTER", "SCI", "PCA",
                       "SBCID"]
         xlabel = "Prediction Target"
