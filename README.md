@@ -2,10 +2,10 @@
 
 <p align="center">
     <a href="https://www.biorxiv.org/content/10.1101/2021.08.26.457856v1.abstract">
-        <img alt="Paper" width=2 height=1 src="https://github.com/kevinbdsouza/Hi-C-LSTM//blob/main/data2/penguin.svg?raw=true">
+        <img alt="Paper" width="2" height="1" src="https://github.com/kevinbdsouza/Hi-C-LSTM//blob/main/data2/penguin.svg?raw=true">
     </a>
     <a href="https://github.com/kevinbdsouza/Hi-C-LSTM/releases">
-        <img alt="Release" width=2 height=1 src="https://github.com/kevinbdsouza/Hi-C-LSTM//blob/main/data2/crow.svg?raw=true">
+        <img alt="Release" width="2" height="1" src="https://github.com/kevinbdsouza/Hi-C-LSTM//blob/main/data2/crow.svg?raw=true">
     </a>
 </p>
 
