@@ -213,7 +213,7 @@ class PlotFns:
                   "HFFhTERT (Dekker 4DN, 354M)", "GM12878 (Aiden 4DN, 300M)", "GM12878 (Aiden 4DN, 216M)"]
 
         "load lists"
-        gm_auroc_all_tasks = np.load(self.path + "gm_auroc_all_tasks.npy")
+        gm_auroc_all_tasks = np.load(self.path + "gm_auroc_reduced.npy")
         h1_auroc_all_tasks = np.load(self.path + "h1_auroc_all_tasks.npy")
         wtc_auroc_all_tasks = np.load(self.path + "wtc_auroc_all_tasks.npy")
         hff_auroc_all_tasks = np.load(self.path + "hff_auroc_all_tasks.npy")
