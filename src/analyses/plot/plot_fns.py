@@ -60,43 +60,15 @@ class PlotFns:
         plt.ylabel("Cumulative Prediction Score", fontsize=20)
         plt.savefig("/home/kevindsouza/Downloads/H1hESC_metrics.png")
 
-    def plot_combined(self, cell, metric):
+    def plot_main(self, cell, metric, df_columns, df_lists, xlabel, ylabel, colors, markers, labels, form_df=True,
+                  adjust=False,
+                  save=True):
         """
-        plot_combined(cell) -> No return object
-        Plots given metrics in the given cell
-        Args:
-            cell (string): One of GM12878, H1hESC, HFFhTERT
-            metric (string): One of map, auroc, accuracy, fscore
-        """
-
-        df_main = pd.read_csv(self.path + "%s_%s_df.csv" % (cell, metric), sep="\t")
-        df_main = df_main.drop(['Unnamed: 0'], axis=1)
-
-        plt.figure(figsize=(12, 10))
-        plt.xticks(rotation=90, fontsize=20)
-        plt.yticks(fontsize=20)
-        plt.xlabel("Prediction Target", fontsize=20)
-        plt.ylabel("Accuracy", fontsize=20)
-        plt.plot('Tasks', 'Hi-C-LSTM', data=df_main, marker='o', markersize=16, color="C3", linewidth=3,
-                 label="Hi-C-LSTM")
-        plt.plot('Tasks', 'SNIPER-INTRA', data=df_main, marker='*', markersize=16, color="C0", linewidth=3,
-                 linestyle='dashed', label="SNIPER-INTRA")
-        plt.plot('Tasks', 'SNIPER-INTER', data=df_main, marker='X', markersize=16, color="C1", linewidth=3,
-                 linestyle='dotted', label="SNIPER-INTER")
-        plt.plot('Tasks', 'SCI', data=df_main, marker='^', markersize=16, color="C2", linewidth=3, linestyle='dashdot',
-                 label="SCI")
-        plt.plot('Tasks', 'PCA', data=df_main, marker='D', markersize=16, color="C4", linewidth=3, label="PCA")
-        plt.plot('Tasks', 'SBCID', data=df_main, marker='s', markersize=16, color="C5", linewidth=3, linestyle='dashed',
-                 label="SBCID")
-        plt.legend(fontsize=18)
-        plt.subplots_adjust(bottom=0.35)
-        plt.savefig("/home/kevindsouza/Downloads/map.png")
-
-    def plot_main(self, df_columns, df_lists, xlabel, ylabel, colors, markers, labels, adjust=False, save=True):
-        """
-        plot_main(df_columns, df_lists, adjust=False, save=True) -> No return object
+        plot_main(cell, metric, df_columns, df_lists, adjust=False, save=True) -> No return object
         Main plotting function
         Args:
+            cell (string): one of GM12878, HFFhTERT, H1hESC, WTC11
+            metric (string): one of map, auroc, accuracy or fscore
             df_columns (List): list of df columns
             df_lists (List): list containing data for columns
             xlabel (string): xlabel
@@ -108,10 +80,13 @@ class PlotFns:
             save (bool): if true saves figure
         """
 
-        df_main = pd.DataFrame(columns=df_columns)
-
-        for i, v in enumerate(df_columns):
-            df_main[v] = df_lists[i]
+        if form_df:
+            df_main = pd.DataFrame(columns=df_columns)
+            for i, v in enumerate(df_columns):
+                df_main[v] = df_lists[i]
+        else:
+            df_main = pd.read_csv(self.path + "%s_%s_df.csv" % (cell, metric), sep="\t")
+            df_main = df_main.drop(['Unnamed: 0'], axis=1)
 
         plt.figure(figsize=(12, 10))
         plt.xticks(rotation=90, fontsize=20)
@@ -133,7 +108,26 @@ class PlotFns:
         if save:
             plt.savefig("/home/kevindsouza/Downloads/x.png")
 
-    def plot_mAP_celltypes(self):
+    def plot_combined(self, cell, metric, ylabel):
+        """
+        plot_combined(cell, metric, ylabel) -> No return object
+        Plots given metrics in the given cell
+        Args:
+            cell (string): One of GM12878, H1hESC, HFFhTERT
+            metric (string): One of map, auroc, accuracy, fscore
+        """
+
+        xlabel = "Prediction Target"
+        ylabel = ylabel
+        colors = ["C3", "C0", "C1", "C2", "C4", "C5"]
+        markers = ['o', '*', 'X', '^', 'D', 's']
+        labels = ["Hi-C-LSTM", "SNIPER-INTRA", "SNIPER-INTER", "SCI", "PCA", "SBCID"]
+
+        "plot"
+        self.plot_main(cell, metric, None, None, xlabel, ylabel, colors, markers, labels, form_df=False, adjust=True,
+                       save=False)
+
+    def plot_map_celltypes(self):
         """
         plot_mAP_celltypes() -> No return object
         Plots mAP in all celltypes
@@ -164,9 +158,10 @@ class PlotFns:
                     hff_values_all_tasks]
 
         "plot"
-        self.plot_main(df_columns, df_lists, xlabel, ylabel, colors, markers, labels, adjust=True, save=False)
+        self.plot_main(None, None, df_columns, df_lists, xlabel, ylabel, colors, markers, labels, form_df=True,
+                       adjust=True, save=False)
 
-    def plot_mAP_resolutions(self):
+    def plot_map_resolutions(self):
         """
         plot_mAP_resolutions() -> No return object
         Plots mAP across different resolutions
@@ -322,17 +317,7 @@ class PlotFns:
 
         hidden_list = [4, 8, 16, 32, 64, 128]
 
-        map_hidden = np.load(self.path + "lstm/" + "hiclstm_ablation.npy")
-        map_2_layer = np.load(self.path + "lstm/" + "hiclstm_2_layer_ablation.npy")
-        map_no_ln = np.load(self.path + "lstm/" + "hiclstm_no_ln_ablation.npy")
-        map_dropout = np.load(self.path + "lstm/" + "hiclstm_dropout_ablation.npy")
-        map_bidir = np.load(self.path + "lstm/" + "hiclstm_bidir_ablation.npy")
-
-        r2_hidden = np.load(self.path + "lstm/" + "hiclstm_ablation_r2.npy")
-        r2_2_layer = np.load(self.path + "lstm/" + "hiclstm_2_layer_ablation_r2.npy")
-        r2_no_ln = np.load(self.path + "lstm/" + "hiclstm_no_ln_ablation_r2.npy")
-        r2_dropout = np.load(self.path + "lstm/" + "hiclstm_dropout_ablation_r2.npy")
-        r2_bidir = np.load(self.path + "lstm/" + "hiclstm_bidir_ablation_r2.npy")
+        lstm_ablation_lists = pd.read_csv(self.path + "lstm_ablation_lists.npy", sep="\t")
 
         xlabel = "Representation Size"
         colors = ["C0", "C1", "C2", "C4", "C5"]
@@ -342,14 +327,16 @@ class PlotFns:
 
         fig, (ax1, ax2) = plt.subplots(1, 2, sharey=True, figsize=(12, 6))
 
-        y_list = [map_hidden, map_2_layer, map_no_ln, map_dropout, map_bidir]
+        y_list = [lstm_ablation_lists[0], lstm_ablation_lists[1], lstm_ablation_lists[2], lstm_ablation_lists[3],
+                  lstm_ablation_lists[4]]
         ylabel = "Avg mAP Across Tasks"
         ax, fig = self.plot_two_axes(ax1, fig, hidden_list, y_list, xlabel, ylabel, colors, markers, labels,
                                      legend=False, save=False, common=True)
 
-        y_list = [r2_hidden, r2_2_layer, r2_no_ln, r2_dropout, r2_bidir]
+        y_list = [lstm_ablation_lists[5], lstm_ablation_lists[6], lstm_ablation_lists[7], lstm_ablation_lists[8],
+                  lstm_ablation_lists[9]]
         ylabel = "Avg Hi-C R-squared"
-        _, _ = self.plot_two_axes(ax1, fig, hidden_list, y_list, xlabel, ylabel, colors, markers, labels,
+        _, _ = self.plot_two_axes(ax2, fig, hidden_list, y_list, xlabel, ylabel, colors, markers, labels,
                                   legend=True, save=False, common=True)
 
     def plot_xgb(self):
@@ -363,35 +350,25 @@ class PlotFns:
         depth_list = [2, 4, 6, 8, 12, 20]
         estimators_list = [2000, 4000, 5000, 6000, 8000, 10000]
 
-        map_depth_2000 = np.load(self.path + "xgb_map_depth_2000.npy")
-        map_depth_4000 = np.load(self.path + "xgb_map_depth_4000.npy")
-        map_depth_5000 = np.load(self.path + "xgb_map_depth_5000.npy")
-        map_depth_6000 = np.load(self.path + "xgb_map_depth_6000.npy")
-        map_depth_10000 = np.load(self.path + "xgb_map_depth_10000.npy")
-
-        map_est_2 = np.load(self.path + "xgb_map_est_2.npy")
-        map_est_4 = np.load(self.path + "xgb_map_est_4.npy")
-        map_est_6 = np.load(self.path + "xgb_map_est_6.npy")
-        map_est_12 = np.load(self.path + "xgb_map_est_12.npy")
-        map_est_20 = np.load(self.path + "xgb_map_est_20.npy")
+        xgb_lists = pd.read_csv(self.path + "estimators_depth.npy", sep="\t")
 
         fig, (ax1, ax2) = plt.subplots(1, 2, sharey=True, figsize=(12, 6))
         ylabel = "Avg mAP Across Tasks"
         colors = ["C0", "C1", "C2", "C4", "C5"]
         markers = ['o', 's', '^', 'D', 'p']
 
-        y_list = [map_depth_2000, map_depth_4000, map_depth_5000, map_depth_6000, map_depth_10000]
+        y_list = [xgb_lists[0], xgb_lists[1], xgb_lists[2], xgb_lists[3], xgb_lists[4]]
         labels = ['Max Estimators: 2000', 'Max Estimators: 4000', 'Max Estimators: 5000', 'Max Estimators: 6000',
                   'Max Estimators: 10000']
         xlabel = "Max Depth"
         ax, fig = self.plot_two_axes(ax1, fig, depth_list, y_list, xlabel, ylabel, colors, markers, labels,
                                      legend=False, save=False, common=False)
 
-        y_list = [map_est_2, map_est_4, map_est_6, map_est_12, map_est_20]
+        y_list = [xgb_lists[5], xgb_lists[6], xgb_lists[7], xgb_lists[8], xgb_lists[9]]
         labels = ['Max Depth: 2', 'Max Depth: 4', 'Max Depth: 6', 'Max Depth: 12',
                   'Max Depth: 20']
         xlabel = "Max Estimators"
-        _, _ = self.plot_two_axes(ax1, fig, estimators_list, y_list, xlabel, ylabel, colors, markers, labels,
+        _, _ = self.plot_two_axes(ax2, fig, estimators_list, y_list, xlabel, ylabel, colors, markers, labels,
                                   legend=True, save=False, common=False)
 
     def plot_violin(self):
@@ -454,7 +431,7 @@ class PlotFns:
 
         y_list = [r2_hiclstm_gm, r2_hiclstm_h1, r2_hiclstm_wtc, r2_hiclstm_hff, r2_hiclstm_gmlow, r2_hiclstm_gmlow2]
         xlabel = "R-squared for Replicate-2"
-        _, _ = self.plot_two_axes(ax1, fig, pos, y_list, xlabel, ylabel, colors, markers, labels,
+        _, _ = self.plot_two_axes(ax2, fig, pos, y_list, xlabel, ylabel, colors, markers, labels,
                                   legend=True, save=False, common=True)
 
     def plot_r2(self, cell):
@@ -568,7 +545,7 @@ class PlotFns:
         y_list = [r2_hiclstm_lstm, r2_hiclstm_cnn, r2_hiclstm_fc, r2_sci_lstm, r2_sci_cnn, r2_sci_fc, r2_sniper_lstm,
                   r2_sniper_cnn, r2_sniper_fc]
         xlabel = "R-squared for Replicate-2"
-        _, _ = self.plot_two_axes(ax1, fig, pos, y_list, xlabel, ylabel, colors, markers, labels,
+        _, _ = self.plot_two_axes(ax2, fig, pos, y_list, xlabel, ylabel, colors, markers, labels,
                                   legend=True, save=False, common=True)
 
     def plot_knockout_tfs(self):
@@ -802,7 +779,7 @@ if __name__ == "__main__":
     cfg = Config()
     plot_ob = PlotFns(cfg)
 
-    # plot_ob.plot_combined(cell="HFFhTERT")
+    plot_ob.plot_combined(cell="HFFhTERT", metric="map", ylabel="mAP")
     # plot_ob.plot_mAP_celltypes()
     # plot_ob.plot_mAP_resolutions()
     # plot_ob.plot_auroc_celltypes()
@@ -811,7 +788,7 @@ if __name__ == "__main__":
     # plot_ob.plot_xgb()
     # plot_ob.plot_violin()
     # plot_ob.plot_r2_celltypes()
-    plot_ob.plot_r2(cell="GM12878")
+    # plot_ob.plot_r2(cell="GM12878")
     # plot_ob.plot_symmetry()
     # plot_ob.plot_knockout_results()
     # plot_ob.plot_knockout_tfs()
