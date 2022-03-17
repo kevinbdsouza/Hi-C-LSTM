@@ -550,13 +550,13 @@ class PlotFns:
                   r1_sniper_cnn, r1_sniper_fc]
         ylabel = "R-squared for Replicate-1"
         ax, fig = self.plot_two_axes(ax1, fig, pos, y_list, xlabel, ylabel, colors, markers, labels,
-                                     legend=False, save=False, common=True)
+                                     legend=False, save=False, common=True, mode="r2")
 
         y_list = [r2_hiclstm_lstm, r2_hiclstm_cnn, r2_hiclstm_fc, r2_sci_lstm, r2_sci_cnn, r2_sci_fc, r2_sniper_lstm,
                   r2_sniper_cnn, r2_sniper_fc]
         xlabel = "R-squared for Replicate-2"
         _, _ = self.plot_two_axes(ax2, fig, pos, y_list, xlabel, ylabel, colors, markers, labels,
-                                  legend=True, save=False, common=True)
+                                  legend=True, save=False, common=True, mode="r2")
 
     def plot_knockout_tfs(self):
         pos = np.linspace(0, 1, 11)
@@ -797,8 +797,8 @@ if __name__ == "__main__":
     # plot_ob.plot_hidden()
     # plot_ob.plot_xgb()
     # plot_ob.plot_violin()
-    plot_ob.plot_r2_celltypes()
-    # plot_ob.plot_r2(cell="GM12878")
+    #plot_ob.plot_r2_celltypes()
+    plot_ob.plot_r2(cell="GM12878")
     # plot_ob.plot_symmetry()
     # plot_ob.plot_knockout_results()
     # plot_ob.plot_knockout_tfs()
