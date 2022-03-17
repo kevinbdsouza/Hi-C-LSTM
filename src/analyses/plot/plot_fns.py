@@ -525,7 +525,7 @@ class PlotFns:
         df_main["XBP1 KO"] = xbpko_diff
 
         df_main.to_csv(self.path + "tfbs_kodiff.csv", sep="\t")
-        df_main_r2 = df_main_r2.drop(['Unnamed: 0'], axis=1)
+        df_main = df_main.drop(['Unnamed: 0'], axis=1)
 
         xlabel = "Distance between positions in Mbp"
         ylabel = "Average Difference in Contact Strength \n (KO - No KO)"
