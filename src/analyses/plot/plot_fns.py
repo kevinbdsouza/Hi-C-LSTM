@@ -657,6 +657,7 @@ if __name__ == "__main__":
     cfg = Config()
     plot_ob = PlotFns(cfg)
 
+    "Chose among plotting functions"
     # plot_ob.plot_combined(cell="GM12878", metric="accuracy", ylabel="Accuracy")
     # plot_ob.plot_map_celltypes()
     # plot_ob.plot_map_resolutions()
@@ -672,6 +673,4 @@ if __name__ == "__main__":
     # plot_ob.pr_curves()
     # plot_ob.plot_symmetry()
     # plot_ob.plot_feature_signal(mode="tad)
-    plot_ob.plot_pred_range()
-
-    print("done")
+    # plot_ob.plot_pred_range()
