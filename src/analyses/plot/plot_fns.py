@@ -85,8 +85,12 @@ class PlotFns:
             for i, v in enumerate(df_columns):
                 df_main[v] = df_lists[i]
         else:
-            df_main = pd.read_csv(self.path + "%s_%s_df.csv" % (cell, metric), sep="\t")
-            df_main = df_main.drop(['Unnamed: 0'], axis=1)
+            if cell is not None:
+                df_main = pd.read_csv(self.path + "%s_%s_df.csv" % (cell, metric), sep="\t")
+                df_main = df_main.drop(['Unnamed: 0'], axis=1)
+            else:
+                df_main = pd.read_csv(self.path + "tfbs_kodiff.csv", sep="\t")
+                df_main = df_main.drop(['Unnamed: 0'], axis=1)
 
         plt.figure(figsize=(12, 10))
         # plt.figure(figsize=(10, 8))
@@ -495,55 +499,17 @@ class PlotFns:
             NA
         """
 
-        pos = np.linspace(0, 1, 11)
         predicted_probs = np.load(self.path + "predicted_probs.npy")
-
-        ctcfko_probs = np.load(self.path + "ctcfko_probs.npy")
-        ctcfko_probs_nl = np.load(self.path + "ctcfko_probs_nl.npy")
-        znfko_probs = np.load(self.path + "znfko_probs.npy")
-        foxgko_probs = np.load(self.path + "foxgko_probs.npy")
-        soxko_probs = np.load(self.path + "soxko_probs.npy")
-        xbpko_probs = np.load(self.path + "xbpko_probs.npy")
-
-        # control - KO
-        ctcfko_diff = ctcfko_probs - predicted_probs
-        ctcfnl_diff = ctcfko_probs_nl - predicted_probs
-        znfko_diff = znfko_probs - predicted_probs
-        foxgko_diff = foxgko_probs - predicted_probs
-        soxko_diff = soxko_probs - predicted_probs
-        xbpko_diff = xbpko_probs - predicted_probs
-
-        df_main = pd.DataFrame(
-            columns=["pos", "CTCF KO (Loop)", "CTCF KO (Non-loop)", "ZNF143 KO", "FOXG1 KO", "SOX2 KO", "XBP1 KO"])
-        df_main["pos"] = pos
-        # df_main["No KO"] = predicted_probs
-        df_main["CTCF KO (Loop)"] = ctcfko_diff
-        df_main["CTCF KO (Non-loop)"] = ctcfnl_diff
-        df_main["ZNF143 KO"] = znfko_diff
-        df_main["FOXG1 KO"] = foxgko_diff
-        df_main["SOX2 KO"] = soxko_diff
-        df_main["XBP1 KO"] = xbpko_diff
-
-        df_main = pd.read_csv(self.path + "tfbs_kodiff.csv", sep="\t")
-        df_main = df_main.drop(['Unnamed: 0'], axis=1)
 
         xlabel = "Distance between positions in Mbp"
         ylabel = "Average Difference in Contact Strength \n (KO - No KO)"
+        colors = ["C0", "C5", "C1", "C2", "C4", "C6"]
+        labels = ["CTCF KO (Loop)", "CTCF KO (Non-loop)", "ZNF143 KO", "FOXG1 KO", "SOX2 KO", "XBP1 KO"]
+        markers = ['o', '*', 'D', 's', '^', 'X']
 
-        plt.plot('pos', 'CTCF KO (Loop)', data=df_main, marker='o', markersize=16, color="C0", linewidth=3,
-                 label="CTCF KO (Loop)")
-        plt.plot('pos', 'CTCF KO (Non-loop)', data=df_main, marker='*', markersize=16, color="C5", linewidth=3,
-                 linestyle='dotted', label="CTCF KO (Non-loop)")
-        plt.plot('pos', 'ZNF143 KO', data=df_main, marker='D', markersize=16, color="C1", linewidth=3,
-                 linestyle='dashed', label="ZNF143 KO")
-        plt.plot('pos', 'FOXG1 KO', data=df_main, marker='s', markersize=16, color="C2", linewidth=3,
-                 linestyle='dashdot', label="FOXG1 KO")
-        plt.plot('pos', 'SOX2 KO', data=df_main, marker='^', markersize=16, color="C4", linewidth=3, label="SOX2 KO")
-        plt.plot('pos', 'XBP1 KO', data=df_main, marker='x', markersize=16, color="C6", linewidth=3, label="XBP1 KO")
-        plt.legend(fontsize=18)
-        plt.show()
-
-        pass
+        "plot"
+        self.plot_main(None, None, None, None, xlabel, ylabel, colors, markers, labels, form_df=False,
+                       adjust=True, save=False)
 
     def plot_knockout_results(self):
         pos = np.linspace(0, 1, 11)
