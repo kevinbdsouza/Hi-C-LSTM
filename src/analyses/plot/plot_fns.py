@@ -538,6 +538,13 @@ class PlotFns:
                        adjust=True, save=False, mode="all")
 
     def pr_curves(self):
+        """
+        pr_curves() -> No return object
+        Plots PR curved for Hi-C-LSTM
+        Args:
+            NA
+        """
+
         path = "/data2/hic_lstm/downstream/"
         precision_file = "precision.npy"
         recall_file = "recall.npy"
@@ -659,10 +666,10 @@ if __name__ == "__main__":
     # plot_ob.plot_violin()
     # plot_ob.plot_r2_celltypes()
     # plot_ob.plot_r2(cell="GM12878")
-    # plot_ob.plot_symmetry()
-    plot_ob.plot_knockout_results()
+    # plot_ob.plot_knockout_results()
     # plot_ob.plot_knockout_tfs()
-    # plot_ob.pr_curves()
+    plot_ob.pr_curves()
+    # plot_ob.plot_symmetry()
     # plot_ob.plot_feature_signal()
     # plot_ob.plot_pred_range()
 
