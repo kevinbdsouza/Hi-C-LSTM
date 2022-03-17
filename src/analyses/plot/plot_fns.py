@@ -260,7 +260,8 @@ class PlotFns:
                     pca_auroc_all_tasks, sbcid_auroc_all_tasks]
 
         "plot"
-        self.plot_main(df_columns, df_lists, xlabel, ylabel, colors, markers, labels, adjust=False, save=False)
+        self.plot_main(None, None, df_columns, df_lists, xlabel, ylabel, colors, markers, labels, form_df=True,
+                       adjust=False, save=False)
 
     def plot_two_axes(self, ax, fig, x_list, y_list, xlabel, ylabel, colors, markers, labels, legend=False,
                       save=False, common=False):
