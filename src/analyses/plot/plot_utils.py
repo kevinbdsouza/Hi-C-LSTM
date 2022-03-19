@@ -366,16 +366,17 @@ def scatter_tal_lm(ko, wt):
         return a * x
 
     diff_mat = ko - wt
+    diff_mat[0,0] = 0
     og = np.triu(diff_mat)
     og = og.flatten(order='C')
     pred = np.triu(diff_mat.T)
     pred = pred.flatten(order='C')
 
     plt.figure(figsize=(10, 8))
-    res = sm.OLS(pred, og).fit()
-    #m, _ = curve_fit(func, og, pred)
+    #res = sm.OLS(pred, og).fit()
+    m, _ = curve_fit(func, og, pred)
     plt.scatter(og, pred, marker='o', alpha=0.5)
-    plt.plot(og, res.params[0]*og, "g")
+    plt.plot(og, m*og, "g")
     # sns.regplot(og, pred)
     plt.tick_params(axis="x", labelsize=20, length=0)
     plt.tick_params(axis="y", labelsize=20)
