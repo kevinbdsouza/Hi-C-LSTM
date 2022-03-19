@@ -6,6 +6,7 @@ from training.config import Config
 import matplotlib.pyplot as plt
 from sklearn.metrics import confusion_matrix
 from scipy.optimize import curve_fit
+import statsmodels.api as sm
 
 
 def get_heatmaps(data, no_pred=False):
@@ -371,9 +372,10 @@ def scatter_tal_lm(ko, wt):
     pred = pred.flatten(order='C')
 
     plt.figure(figsize=(10, 8))
-    m, _ = curve_fit(func, og, pred)
+    res = sm.OLS(pred, og).fit()
+    #m, _ = curve_fit(func, og, pred)
     plt.scatter(og, pred, marker='o', alpha=0.5)
-    plt.plot(og, func(og, m), "g")
+    plt.plot(og, res.params[0]*og, "g")
     # sns.regplot(og, pred)
     plt.tick_params(axis="x", labelsize=20, length=0)
     plt.tick_params(axis="y", labelsize=20)
