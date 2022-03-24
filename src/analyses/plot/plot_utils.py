@@ -439,3 +439,7 @@ if __name__ == '__main__':
         foxg1_data = pd.read_csv(cfg.output_directory + "shuffle_%s_afko_chr%s.csv" % (cell, str(chr)), sep="\t")
         plot_foxg1(foxg1_data)
         '''
+
+        shift_pad = np.load(cfg.output_directory + "ctcf_diff_shift_padding.npy")
+        simple_plot(shift_pad, mode="diff")
+        print("done")
