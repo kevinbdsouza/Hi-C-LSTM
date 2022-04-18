@@ -6,7 +6,6 @@ from training.config import Config
 import matplotlib.pyplot as plt
 from sklearn.metrics import confusion_matrix
 from scipy.optimize import curve_fit
-import statsmodels.api as sm
 
 
 def get_heatmaps(data, no_pred=False):
