@@ -341,9 +341,15 @@ def plot_r2(comb_r2_df):
         r2_list.append(r2_mean)
 
     num_windows = int(np.ceil(len(r2_list)/max_mb))
-    r2_list_pos = np.zeros((num_windows, max_mb))
+    if num_windows == 1:
+        r2_list_pos = np.zeros((num_windows, len(r2_list)))
+    else:
+        r2_list_pos = np.zeros((num_windows, max_mb))
     for k in range(num_windows):
-        r2_list_pos[k] = r2_list[k * max_mb: (k + 1) * max_mb]
+        if k == num_windows - 1:
+            r2_list_pos[k] = r2_list[k * max_mb: ]
+        else:
+            r2_list_pos[k] = r2_list[k * max_mb: (k + 1) * max_mb]
 
     r2_list_pos = np.mean(r2_list_pos, axis=0)
 
