@@ -46,8 +46,8 @@ class Config:
         self.model_name = "shuffle_" + self.cell
 
         "decoder parameters"
-        self.decoder_name = "hiclstm_fc"
-        self.decoder = "fc"
+        self.decoder_name = "hiclstm"
+        self.decoder = "full"
         self.compute_pca = False
         self.get_zero_pred = False
         self.full_test = True
