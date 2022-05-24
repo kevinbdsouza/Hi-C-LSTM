@@ -47,9 +47,10 @@ class HiC_R2():
 
         r2_frame = pd.DataFrame(columns=["diff", "r2"])
 
-        start = self.start_ends["chr" + str(self.chr)]["start"] + self.get_cumpos()
-        stop = self.start_ends["chr" + str(self.chr)]["stop"] + self.get_cumpos()
-        for d in range(0, stop - start):
+        #start = self.start_ends["chr" + str(self.chr)]["start"] + self.get_cumpos()
+        #stop = self.start_ends["chr" + str(self.chr)]["stop"] + self.get_cumpos()
+        max_diff = int(hic_predictions["diff"].max())
+        for d in range(0, max_diff):
 
             try:
                 subset_hic = hic_data.loc[hic_data["diff"] == d]

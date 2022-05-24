@@ -321,8 +321,9 @@ def plot_r2(comb_r2_df):
     """
 
     max_diff = int(comb_r2_df['diff'].max())
-    max_mb = 50
-    pos = [10, 20, 30, 40, 50]
+    max_mb = 100
+    num_bins_1mb = 100
+    pos = np.arange(0, max_mb)
     avg_diff = pd.DataFrame(columns=["diff", "r2"])
     r2_list = []
     r2_list_pos = []
@@ -334,12 +335,17 @@ def plot_r2(comb_r2_df):
         avg_diff = avg_diff.append({"diff": diff, "r2": r2_mean}, ignore_index=True)
 
     "mean in window"
-    for i in range(max_mb):
-        r2_sub = avg_diff.loc[i:(i + 1) * 100, :]
+    for i in range(int(np.ceil(max_diff/num_bins_1mb))):
+        r2_sub = avg_diff.loc[(avg_diff["diff"] > i*num_bins_1mb) and (avg_diff["diff"] < (i+1)*num_bins_1mb)]
         r2_mean = r2_sub["r2"].mean(skipna=True)
         r2_list.append(r2_mean)
-    for k in range(5):
-        r2_list_pos.append(np.mean(r2_list[k * 10: (k + 1) * 10]))
+
+    num_windows = int(np.ceil(len(r2_list)/max_mb))
+    r2_list_pos = np.zeros((num_windows, max_mb))
+    for k in range(num_windows):
+        r2_list_pos[k] = r2_list[k * max_mb: (k + 1) * max_mb]
+
+    r2_list_pos = np.mean(r2_list_pos, axis=0)
 
     "plot"
     plt.figure(figsize=(12, 10))
