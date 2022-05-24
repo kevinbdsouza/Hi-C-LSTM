@@ -116,12 +116,12 @@ class HiC_R2():
 
         if decoder == "full":
             pred_data = pd.read_csv(
-                cfg.output_directory + "hiclstm_%s_predictions_chr%s.csv" % (self.cfg.cell, str(self.chr)),
+                self.cfg.output_directory + "hiclstm_%s_predictions_chr%s.csv" % (self.cfg.cell, str(self.chr)),
                 sep="\t")
             pred_data = pred_data.drop(['Unnamed: 0'], axis=1)
         else:
             pred_data = pd.read_csv(
-                cfg.output_directory + "%s_%s_%s_chr%s.csv" % (self.cfg.cell, method, decoder, str(self.chr)),
+                self.cfg.output_directory + "%s_%s_%s_chr%s.csv" % (self.cfg.cell, method, decoder, str(self.chr)),
                 sep="\t")
             pred_data = pred_data.drop(['Unnamed: 0'], axis=1)
 
