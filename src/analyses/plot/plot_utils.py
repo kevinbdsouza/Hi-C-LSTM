@@ -338,7 +338,10 @@ def plot_r2(comb_r2_df):
     for i in range(int(np.ceil(max_diff/num_bins_1mb))):
         r2_sub = avg_diff.loc[(avg_diff["diff"] >= i*num_bins_1mb) & (avg_diff["diff"] < (i+1)*num_bins_1mb)]
         r2_mean = r2_sub["r2"].mean(skipna=True)
-        r2_list.append(r2_mean)
+        if r2_mean < -1:
+            r2_list.append(0)
+        else:
+            r2_list.append(r2_mean)
 
     num_windows = int(np.ceil(len(r2_list)/max_mb))
     if num_windows == 1:
