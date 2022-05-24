@@ -356,7 +356,7 @@ def plot_r2(comb_r2_df):
 
     "plot"
     plt.figure(figsize=(12, 10))
-    plt.plot(pos, r2_list_pos, marker='', markersize=14, color='C0', label='Hi-C-LSTM')
+    plt.plot(pos, final_r2, marker='', markersize=14, color='C0', label='Hi-C-LSTM')
     plt.tick_params(axis="x", labelsize=20, length=0)
     plt.tick_params(axis="y", labelsize=20)
     plt.xlabel('Distance between positions in Mbp', fontsize=20)
