@@ -322,7 +322,7 @@ def plot_r2(comb_r2_df):
 
     max_diff = int(comb_r2_df['diff'].max())
     max_mb = 100
-    num_bins_1mb = 100
+    num_bins_1mb = 5
     pos = np.arange(0, max_mb)
     avg_diff = pd.DataFrame(columns=["diff", "r2"])
     r2_list = []
@@ -350,7 +350,7 @@ def plot_r2(comb_r2_df):
         r2_list_pos = np.zeros((num_windows, max_mb))
     for k in range(num_windows):
         if k == num_windows - 1:
-            r2_list_pos[k] = r2_list[k * max_mb: ]
+            r2_list_pos[k, :len(r2_list[k * max_mb: ])] = r2_list[k * max_mb: ]
         else:
             r2_list_pos[k] = r2_list[k * max_mb: (k + 1) * max_mb]
 

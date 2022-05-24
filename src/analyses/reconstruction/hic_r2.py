@@ -50,6 +50,7 @@ class HiC_R2():
         #start = self.start_ends["chr" + str(self.chr)]["start"] + self.get_cumpos()
         #stop = self.start_ends["chr" + str(self.chr)]["stop"] + self.get_cumpos()
         max_diff = int(hic_predictions["diff"].max())
+        mean_og = []
         for d in range(0, max_diff):
 
             try:
@@ -58,10 +59,23 @@ class HiC_R2():
                     continue
 
                 og_hic = subset_hic["v"]
+                mean_og.append(og_hic.mean())
+            except Exception as e:
+                print(traceback.format_exc())
+                continue
+
+        mean_og = np.array(mean_og)
+        for d in range(0, max_diff):
+
+            try:
+                subset_hic = hic_data.loc[hic_data["diff"] == d]
+                if len(subset_hic) == 0:
+                    continue
                 predicted_hic = subset_hic["pred"]
+                og_hic = subset_hic["v"]
 
                 "compute r2"
-                r2 = self.find_r2(og_hic, predicted_hic)
+                r2 = self.find_r2(mean_og, og_hic, predicted_hic)
 
                 if not np.isfinite(r2):
                     continue
@@ -73,7 +87,7 @@ class HiC_R2():
 
         return r2_frame
 
-    def find_r2(self, og_hic, predicted_hic):
+    def find_r2(self, mean_og_hic, og_hic, predicted_hic):
         """
         find_r2(og_hic, predicted_hic) -> Series
         Computes R2 according to observed and predicted arguments
@@ -82,7 +96,7 @@ class HiC_R2():
             predicted_hic (Series): Series with predicted Hi-C at a particular difference distance
         """
 
-        mean_og = og_hic.mean()
+        mean_og = np.random.choice(mean_og_hic)
         ss_tot = ((og_hic.sub(mean_og)) ** 2).sum()
         ss_res = ((og_hic - predicted_hic) ** 2).sum()
         r2 = 1 - (ss_res / ss_tot)
