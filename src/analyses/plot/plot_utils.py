@@ -326,7 +326,7 @@ def plot_r2(comb_r2_df):
     pos = np.arange(0, max_mb)
     avg_diff = pd.DataFrame(columns=["diff", "r2"])
     r2_list = []
-    r2_list_pos = []
+    final_r2 = np.zeros((max_mb, ))
 
     "get average r2"
     for diff in range(max_diff):
@@ -352,6 +352,7 @@ def plot_r2(comb_r2_df):
             r2_list_pos[k] = r2_list[k * max_mb: (k + 1) * max_mb]
 
     r2_list_pos = np.mean(r2_list_pos, axis=0)
+    final_r2[:len(r2_list_pos)] = r2_list_pos
 
     "plot"
     plt.figure(figsize=(12, 10))
@@ -362,6 +363,7 @@ def plot_r2(comb_r2_df):
     plt.ylabel('R-squared for Replicate-1', fontsize=20)
     plt.legend(loc='upper right', fontsize=20)
     plt.show()
+    print("done")
 
 
 def scatter_tal_lm(ko, wt):
