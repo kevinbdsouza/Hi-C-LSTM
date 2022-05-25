@@ -87,8 +87,7 @@ if __name__ == '__main__':
 
             "compute R2 and save R2"
             r2_frame = hic_r2_ob.hic_r2(hic_predictions)
-            plot_utils.plot_r2(r2_frame)
-            #comb_r2_df = comb_r2_df.append(r2_frame, ignore_index=True)
+            comb_r2_df = comb_r2_df.append(r2_frame, ignore_index=True)
 
         "plot r2"
         comb_r2_df.to_csv(cfg.output_directory + "combr2df_%s_%s_%s.csv" % (cell, cfg.method, cfg.decoder), sep="\t")

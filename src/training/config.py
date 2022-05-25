@@ -115,6 +115,8 @@ class Config:
         self.compute_metrics = True
         self.n_folds = 3
         self.regression_mode = "mlp"
+        self.class_model_dir = ""
+        self.class_model_name = "test"
 
         "knockout"
         self.ko_compute_test = False
