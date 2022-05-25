@@ -12,6 +12,7 @@ from analyses.classification.fires import Fires
 from analyses.classification.loops import Loops
 from analyses.classification.domains import Domains
 from training.data_utils import get_cumpos
+from analyses.plot.plot_utils import plot_gbr
 
 device = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
 
@@ -245,6 +246,9 @@ def run_experiment(cfg, model):
             "attribute elements"
             ig_elements = attribute_elements(cfg, chr, ig_df, element=cfg.ig_element)
             main_df = pd.concat([main_df, ig_elements], axis=0)
+
+    "plot"
+    plot_gbr(main_df)
 
     "sort TFs by IG values"
     if cfg.ig_run_tfs:

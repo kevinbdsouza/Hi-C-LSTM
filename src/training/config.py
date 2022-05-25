@@ -43,7 +43,7 @@ class Config:
         self.schic_pairs_file = "/GSM2254215_ML1.validPairs.txt"
         self.start_end_file = 'starts.npy'
         self.downstream_dir = "/data2/hic_lstm/downstream"
-        self.model_name = "shuffle_" + self.cell
+        self.model_name = "shuffle_" + self.cell + "_bck"
 
         "decoder parameters"
         self.decoder_name = "hiclstm"
