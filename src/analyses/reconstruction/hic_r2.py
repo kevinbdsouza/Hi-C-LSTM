@@ -96,7 +96,10 @@ class HiC_R2():
             predicted_hic (Series): Series with predicted Hi-C at a particular difference distance
         """
 
+        og_hic = og_hic.round(decimals=3)
+        predicted_hic = predicted_hic.round(decimals=3)
         mean_og = np.random.choice(mean_og_hic)
+        mean_og = round(mean_og, 3)
         ss_tot = ((og_hic.sub(mean_og)) ** 2).sum()
         ss_res = ((og_hic - predicted_hic) ** 2).sum()
         r2 = 1 - (ss_res / ss_tot)
