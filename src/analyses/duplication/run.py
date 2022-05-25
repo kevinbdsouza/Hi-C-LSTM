@@ -7,6 +7,7 @@ from training.data_utils import get_data_loader_chr
 from analyses.knockout.run import Knockout
 from training.test_model import test_model
 from analyses.plot.plot_utils import get_heatmaps, simple_plot
+from analyses.reconstruction.hic_r2 import HiC_R2
 
 device = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
 
@@ -25,6 +26,7 @@ class Duplicate():
         self.sizes_path = self.cfg.hic_path + self.cfg.sizes_file
         self.sizes = np.load(self.sizes_path, allow_pickle=True).item()
         self.ko_ob = Knockout(cfg, chr)
+        self.r2_ob = HiC_R2(cfg, chr)
 
     def duplicate(self, representations):
         """
@@ -117,7 +119,7 @@ if __name__ == '__main__':
 
         if cfg.compare_dup:
             "plot comparison"
-            _, _, _, pred_data = dup_ob.ko_ob.get_trained_representations(method="hiclstm")
+            pred_data = dup_ob.r2_ob.get_prediction_df(method="hiclstm", decoder="full")
 
             if melo_pred_df is None:
                 if cfg.dupl_mode == "fusion":
@@ -133,4 +135,5 @@ if __name__ == '__main__':
             pred_data = pred_data.rename(columns={"ko_pred": "v"})
 
             hic_mat, st = get_heatmaps(pred_data, no_pred=False)
-            simple_plot(hic_mat[cfg.plt_start:cfg.plt_end, cfg.plt_start:cfg.plt_end])
+            simple_plot(hic_mat[cfg.plt_start:cfg.plt_end, cfg.plt_start:cfg.plt_end], mode="reds")
+            print("done")
