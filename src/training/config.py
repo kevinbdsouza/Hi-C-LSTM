@@ -43,7 +43,7 @@ class Config:
         self.schic_pairs_file = "/GSM2254215_ML1.validPairs.txt"
         self.start_end_file = 'starts.npy'
         self.downstream_dir = "/data2/hic_lstm/downstream"
-        self.model_name = "shuffle_" + self.cell + "_bck"
+        self.model_name = "shuffle_" + self.cell
 
         "decoder parameters"
         self.decoder_name = "hiclstm"
@@ -86,10 +86,10 @@ class Config:
         self.run_captum = False
         self.tf_file_path = self.output_directory + "tf_db.csv"
         self.tf_columns = ["HGNC symbol", "chromosome", "start"]
-        self.ig_run_tfs = True
-        self.ig_run_chip = True
-        self.ig_run_elements = False
-        self.ig_element = "Segway"
+        self.ig_run_tfs = False
+        self.ig_run_chip = False
+        self.ig_run_elements = True
+        self.ig_element = "CTCF"
         self.ig_run_all_elements = False
         self.ig_elements_list = ["CTCF", "RAD21", "SMC3", "GBR", "TADs", "FIREs", "Domains", "Loop_Domains",
                                  "Merge_Domains", "TADBs", "TADBsCTCF+", "TADBsCTCF-", "Loop_CTCFCohesin",
@@ -129,7 +129,7 @@ class Config:
         self.ko_window = 10
         self.ko_increment = 10
         self.ko_mode = "shift"
-        self.perform_ko = True
+        self.perform_ko = False
         self.load_ko = False
         self.compare_ko = False
         self.save_kopred = False

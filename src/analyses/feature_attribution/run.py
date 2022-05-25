@@ -269,7 +269,7 @@ def run_all_elements(cfg, model):
     cfg.run_elements = True
     cfg.run_tfs = False
     for element in cfg.ig_elements_list:
-        cfg.element = element
+        cfg.ig_element = element
         run_experiment(cfg, model)
 
 
