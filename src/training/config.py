@@ -15,7 +15,7 @@ class Config:
         self.resolution = 10000
         self.cell = "GM12878"
         self.chr_train_list = list(range(2, 23))
-        self.chr_test_list = list(range(22, 23))
+        self.chr_test_list = list(range(21, 22))
         self.save_processed_data = False
 
         "Model Paramters"
@@ -60,7 +60,7 @@ class Config:
         self.dec_max_norm = 10
         self.decoder_epochs = 20
         self.decoder_train_list = [21, 19]
-        self.decoder_test_list = list(range(22, 23))
+        self.decoder_test_list = list(range(21, 22))
 
         "Output Directories"
         self.proj_dir = "/home/kevindsouza/Documents/projects/PhD/Hi-C-LSTM/"
