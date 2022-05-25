@@ -126,7 +126,7 @@ def attribute_elements(cfg, chr, ig_df, element="ctcf"):
     """
 
     "use downstream obejct to access helper"
-    downstream_ob = DownstreamTasks(cfg, chr)
+    downstream_ob = DownstreamTasks(cfg)
     cumpos = get_cumpos(cfg, chr)
 
     ig_df = ig_df.astype({"pos": int})
