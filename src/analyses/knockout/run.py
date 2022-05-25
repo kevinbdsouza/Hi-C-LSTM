@@ -177,7 +177,7 @@ class Knockout():
         window = self.cfg.ko_window
         size = len(representations)
 
-        if isinstance(indices, int):
+        if isinstance(indices, (int, np.integer)):
             indices = [indices]
 
         "alter according to mode in config"
