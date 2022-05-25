@@ -289,7 +289,7 @@ class Knockout():
             if cfg.ko_experiment == "ctcf":
                 if cfg.ctcf_indices == "all":
                     indices = ko_ob.get_ctcf_indices()
-                    indices = sample(list(indices), 100)
+                    indices = sample(list(indices), 10)
                 else:
                     indices = ko_ob.cfg.ctcf_indices_22
             elif cfg.ko_experiment == "foxg1":
