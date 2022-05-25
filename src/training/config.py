@@ -120,7 +120,7 @@ class Config:
 
         "knockout"
         self.ko_compute_test = False
-        self.ko_experiment = "ctcf"
+        self.ko_experiment = "tadbs"
         self.ctcf_indices = "all"
         self.foxg1_chr = [14]
         self.ctcf_indices_21 = [279219, 279229]
