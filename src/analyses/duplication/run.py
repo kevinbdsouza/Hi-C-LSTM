@@ -75,7 +75,11 @@ class Duplicate():
 
         "load duplicated"
         if self.cfg.dupl_load_data:
-            melo_pred_df = pd.read_csv(cfg.output_directory + "hiclstm_%s_meloafko_chr%s.csv" % (cell, str(chr)),
+            if self.cfg.dupl_mode == "fusion":
+                melo_pred_df = pd.read_csv(cfg.output_directory + "hiclstm_%s_meloafkofusion_chr%s.csv" % (cell, str(chr)),
+                                           sep="\t")
+            else:
+                melo_pred_df = pd.read_csv(cfg.output_directory + "hiclstm_%s_meloafko_chr%s.csv" % (cell, str(chr)),
                                        sep="\t")
         else:
             "perform duplication"
