@@ -120,7 +120,7 @@ class Config:
 
         "knockout"
         self.ko_compute_test = False
-        self.ko_experiment = "tadbs"
+        self.ko_experiment = "ctcf"
         self.ctcf_indices = "all"
         self.foxg1_chr = [14]
         self.ctcf_indices_21 = [279219, 279229]
@@ -129,7 +129,7 @@ class Config:
         self.ko_window = 10
         self.ko_increment = 10
         self.ko_mode = "shift"
-        self.perform_ko = False
+        self.perform_ko = True
         self.load_ko = False
         self.compare_ko = False
         self.save_kopred = False
@@ -156,7 +156,6 @@ class Config:
         "duplication"
         self.melo_insert = False
         self.compare_dup = True
-        self.dupl_load_data = True
         self.dupl_compute_test = False
         self.chunk_start = 256803
         self.chunk_end = 257017

@@ -329,7 +329,7 @@ class Knockout():
             pred_data = pd.merge(pred_data, ko_pred_df, on=["i", "j"])
             pred_data = pred_data.rename(columns={"ko_pred": "v"})
             hic_mat, st = get_heatmaps(pred_data, no_pred=False)
-            simple_plot(hic_mat, mode="reds")
+            # simple_plot(hic_mat, mode="reds")
 
             "get diff mat"
             hic_win = indices_diff_mat(indice, st, hic_mat, mode=cfg.ko_experiment)
