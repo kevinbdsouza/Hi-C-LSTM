@@ -69,7 +69,8 @@ def get_top_tfs_chip(cfg, ig_df, chr):
         end = chip_data.loc[i, "end"]
 
         for j in range(start, end + 1):
-            pos_chip_data = pos_chip_data.append({'pos': j, 'target': chip_data.loc[i, "target"], 'start': chip_data.loc[i, "start_full"],
+            pos_chip_data = pos_chip_data.append(
+                {'pos': j, 'target': chip_data.loc[i, "target"], 'start': chip_data.loc[i, "start_full"],
                  'end': chip_data.loc[i, "end_full"], 'chr': chip_data.loc[i, "chr"]}, ignore_index=True)
 
     pos_chip_data["pos"] = pos_chip_data["pos"] + cumpos
@@ -247,9 +248,6 @@ def run_experiment(cfg, model):
             ig_elements = attribute_elements(cfg, chr, ig_df, element=cfg.ig_element)
             main_df = pd.concat([main_df, ig_elements], axis=0)
 
-    "plot"
-    plot_gbr(main_df)
-
     "sort TFs by IG values"
     if cfg.ig_run_tfs:
         if not cfg.ig_run_chip:
@@ -259,6 +257,7 @@ def run_experiment(cfg, model):
     elif cfg.ig_run_elements:
         "save element IG"
         main_df.to_csv(cfg.output_directory + "ig_%s.csv" % cfg.ig_element, sep="\t")
+    return main_df
 
 
 def run_all_elements(cfg, model):
@@ -272,9 +271,16 @@ def run_all_elements(cfg, model):
 
     cfg.run_elements = True
     cfg.run_tfs = False
+    main_df_tasks = pd.DataFrame()
     for element in cfg.ig_elements_list:
         cfg.ig_element = element
-        run_experiment(cfg, model)
+        main_df = run_experiment(cfg, model)
+        main_df_tasks = pd.concat([main_df_tasks, main_df], axis=0)
+
+    main_df_tasks = model.compute_rowwise_ig(main_df_tasks)
+
+    "plot"
+    plot_gbr(main_df_tasks)
 
 
 if __name__ == '__main__':

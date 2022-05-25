@@ -432,7 +432,6 @@ class SeqLSTM(nn.Module):
 
         "normalize computed IG values"
         main_pred_df = main_pred_df.reset_index(drop=True)
-        main_pred_df = self.compute_rowwise_ig(main_pred_df)
         return main_pred_df
 
     def contactProb(self, values, delta=1e-10):
