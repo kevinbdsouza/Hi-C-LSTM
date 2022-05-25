@@ -73,24 +73,15 @@ class Duplicate():
         "duplicate"
         representations = self.duplicate(representations)
 
-        "load duplicated"
-        if self.cfg.dupl_load_data:
-            if self.cfg.dupl_mode == "fusion":
-                melo_pred_df = pd.read_csv(cfg.output_directory + "hiclstm_%s_meloafkofusion_chr%s.csv" % (cell, str(chr)),
-                                           sep="\t")
-            else:
-                melo_pred_df = pd.read_csv(cfg.output_directory + "hiclstm_%s_meloafko_chr%s.csv" % (cell, str(chr)),
-                                       sep="\t")
+        "perform duplication"
+        if self.cfg.dupl_mode == "fusion":
+            _, melo_pred_df = model.perform_ko(data_loader, representations, start, zero_embed, mode="fusion")
+            melo_pred_df.to_csv(
+                cfg.output_directory + "hiclstm_%s_meloafkofusion_chr%s.csv" % (cell, str(chr)), sep="\t")
         else:
-            "perform duplication"
-            if self.cfg.dupl_mode == "fusion":
-                _, melo_pred_df = model.perform_ko(data_loader, representations, start, zero_embed, mode="fusion")
-                melo_pred_df.to_csv(
-                    cfg.output_directory + "hiclstm_%s_meloafkofusion_chr%s.csv" % (cell, str(chr)), sep="\t")
-            else:
-                _, melo_pred_df = model.perform_ko(data_loader, representations, start, zero_embed, mode="dup")
-                melo_pred_df.to_csv(
-                    cfg.output_directory + "hiclstm_%s_meloafko_chr%s.csv" % (cell, str(chr)), sep="\t")
+            _, melo_pred_df = model.perform_ko(data_loader, representations, start, zero_embed, mode="dup")
+            melo_pred_df.to_csv(
+                cfg.output_directory + "hiclstm_%s_meloafko_chr%s.csv" % (cell, str(chr)), sep="\t")
 
         return melo_pred_df
 

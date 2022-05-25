@@ -154,7 +154,7 @@ class Config:
         self.get_lmo2_only = False
 
         "duplication"
-        self.melo_insert = True
+        self.melo_insert = False
         self.compare_dup = True
         self.dupl_load_data = True
         self.dupl_compute_test = False
