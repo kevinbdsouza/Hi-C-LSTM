@@ -325,7 +325,7 @@ class PlotFns:
             plt.show()
 
             if save:
-                plt.savefig("/home/kevindsouza/Downloads/y.png")
+                plt.savefig("/home/kevindsouza/Downloads/r2_gm.svg", format="svg")
 
         return ax, fig
 
@@ -494,7 +494,7 @@ class PlotFns:
         y_list = [list(df_main_r2.loc[:, col]) for col in df_main_r2.columns]
         xlabel = "R-squared for Replicate-2"
         _, _ = self.plot_two_axes(ax2, fig, pos, y_list, xlabel, ylabel, colors, markers, labels, style,
-                                  legend=True, save=False, common=True, mode="r2")
+                                  legend=True, save=True, common=True, mode="r2")
 
     def plot_knockout_tfs(self):
         """
@@ -667,7 +667,7 @@ if __name__ == "__main__":
     # plot_ob.plot_xgb()
     # plot_ob.plot_violin()
     # plot_ob.plot_r2_celltypes()
-    # plot_ob.plot_r2(cell="GM12878")
+    plot_ob.plot_r2(cell="GM12878")
     # plot_ob.plot_knockout_results()
     # plot_ob.plot_knockout_tfs()
     # plot_ob.pr_curves()
