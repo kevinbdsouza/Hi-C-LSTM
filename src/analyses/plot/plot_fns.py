@@ -457,7 +457,7 @@ class PlotFns:
         y_list = [r2_hiclstm_gm, r2_hiclstm_h1, r2_hiclstm_wtc, r2_hiclstm_hff, r2_hiclstm_gmlow, r2_hiclstm_gmlow2]
         ylabel = "R-squared for Replicate-2"
         _, _ = self.plot_two_axes(ax2, fig, pos, y_list, xlabel, ylabel, colors, markers, labels, style,
-                                  legend=True, save=False, common=True, mode="r2")
+                                  legend=True, save=True, common=True, mode="r2")
 
     def plot_r2(self, cell):
         """
