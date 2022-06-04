@@ -322,11 +322,10 @@ class PlotFns:
                 handles, labels = ax.get_legend_handles_labels()
                 fig.legend(handles, labels, fontsize=18, bbox_to_anchor=(0.98, 0.98))
 
-            plt.show()
-
             if save:
                 plt.savefig("/home/kevindsouza/Downloads/r2_cells.svg", format="svg")
 
+            plt.show()
         return ax, fig
 
     def plot_hidden(self):
