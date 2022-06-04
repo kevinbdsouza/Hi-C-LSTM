@@ -91,7 +91,7 @@ def simple_plot(hic_win, mode):
         ax = sns.heatmap(hic_win, cmap="Reds", vmin=0, vmax=1)
         ax.set_yticks([])
         ax.set_xticks([])
-        plt.savefig("/home/kevindsouza/Downloads/heatmap.pdf", format="pdf")
+        plt.savefig("/home/kevindsouza/Downloads/heatmap.pdf", format="pdf", dpi=300)
         plt.show()
 
     if mode == "diff":
