@@ -325,7 +325,7 @@ class PlotFns:
             plt.show()
 
             if save:
-                plt.savefig("/home/kevindsouza/Downloads/r2_h1.svg", format="svg")
+                plt.savefig("/home/kevindsouza/Downloads/r2_gm.svg", format="svg")
 
         return ax, fig
 
