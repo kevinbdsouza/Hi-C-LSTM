@@ -323,7 +323,7 @@ class PlotFns:
                 fig.legend(handles, labels, fontsize=18, bbox_to_anchor=(0.98, 0.98))
 
             if save:
-                plt.savefig("/home/kevindsouza/Downloads/r2_cells.svg", format="svg")
+                plt.savefig("/home/kevindsouza/Downloads/r2_gm.svg", format="svg")
 
             plt.show()
         return ax, fig
@@ -665,8 +665,8 @@ if __name__ == "__main__":
     # plot_ob.plot_hidden()
     # plot_ob.plot_xgb()
     # plot_ob.plot_violin()
-    plot_ob.plot_r2_celltypes()
-    # plot_ob.plot_r2(cell="WTC11")
+    # plot_ob.plot_r2_celltypes()
+    plot_ob.plot_r2(cell="GM12878")
     # plot_ob.plot_knockout_results()
     # plot_ob.plot_knockout_tfs()
     # plot_ob.pr_curves()
