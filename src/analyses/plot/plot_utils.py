@@ -91,7 +91,7 @@ def simple_plot(hic_win, mode):
         ax = sns.heatmap(hic_win, cmap="Reds", vmin=0, vmax=1)
         ax.set_yticks([])
         ax.set_xticks([])
-        # plt.savefig("/home/kevindsouza/Downloads/ctcf_ko.png")
+        plt.savefig("/home/kevindsouza/Downloads/heatmap.pdf", format="pdf")
         plt.show()
 
     if mode == "diff":
@@ -447,7 +447,7 @@ if __name__ == '__main__':
 
         pred_data = pd.read_csv(cfg.output_directory + "hiclstm_%s_predictions_chr%s.csv" % (cell, str(chr)), sep="\t")
         hic_mat, st = get_heatmaps(pred_data, no_pred=False)
-        simple_plot(hic_mat, mode="reds")
+        simple_plot(hic_mat[900:1500, 900:1500], mode="reds")
 
         '''
         foxg1_data = pd.read_csv(cfg.output_directory + "shuffle_%s_afko_chr%s.csv" % (cell, str(chr)), sep="\t")
