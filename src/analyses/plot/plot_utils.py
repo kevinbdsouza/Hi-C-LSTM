@@ -447,7 +447,7 @@ if __name__ == '__main__':
 
         pred_data = pd.read_csv(cfg.output_directory + "hiclstm_%s_predictions_chr%s.csv" % (cell, str(chr)), sep="\t")
         hic_mat, st = get_heatmaps(pred_data, no_pred=False)
-        simple_plot(hic_mat[900:1500, 900:1500], mode="reds")
+        simple_plot(hic_mat[1400:1500, 1400:1500], mode="reds")
 
         '''
         foxg1_data = pd.read_csv(cfg.output_directory + "shuffle_%s_afko_chr%s.csv" % (cell, str(chr)), sep="\t")
