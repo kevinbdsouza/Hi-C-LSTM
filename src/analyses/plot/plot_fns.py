@@ -113,10 +113,10 @@ class PlotFns:
         if adjust:
             plt.subplots_adjust(bottom=0.35)
 
-        plt.show()
-
         if save:
-            plt.savefig("/home/kevindsouza/Downloads/x.png")
+            plt.savefig("/home/kevindsouza/Downloads/map_gm.svg", format="svg")
+
+        plt.show()
 
     def plot_combined(self, cell, metric, ylabel):
         """
@@ -137,7 +137,7 @@ class PlotFns:
         "plot"
         self.plot_main(cell, metric, df_columns, None, xlabel, ylabel, colors, markers, labels, form_df=False,
                        adjust=True,
-                       save=False)
+                       save=True)
 
     def plot_map_celltypes(self):
         """
@@ -657,7 +657,7 @@ if __name__ == "__main__":
     plot_ob = PlotFns(cfg)
 
     "Chose among plotting functions"
-    # plot_ob.plot_combined(cell="GM12878", metric="accuracy", ylabel="Accuracy")
+    plot_ob.plot_combined(cell="GM12878", metric="map", ylabel="mAP")
     # plot_ob.plot_map_celltypes()
     # plot_ob.plot_map_resolutions()
     # plot_ob.plot_auroc_celltypes()
@@ -666,7 +666,7 @@ if __name__ == "__main__":
     # plot_ob.plot_xgb()
     # plot_ob.plot_violin()
     # plot_ob.plot_r2_celltypes()
-    plot_ob.plot_r2(cell="WTC11")
+    # plot_ob.plot_r2(cell="WTC11")
     # plot_ob.plot_knockout_results()
     # plot_ob.plot_knockout_tfs()
     # plot_ob.pr_curves()
