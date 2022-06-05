@@ -675,5 +675,5 @@ if __name__ == "__main__":
     # plot_ob.plot_knockout_tfs()
     # plot_ob.pr_curves()
     # plot_ob.plot_symmetry()
-    plot_ob.plot_feature_signal(mode="tad)
+    plot_ob.plot_feature_signal(mode="tad")
     # plot_ob.plot_pred_range()
