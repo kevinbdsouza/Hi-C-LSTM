@@ -114,7 +114,7 @@ class PlotFns:
             plt.subplots_adjust(bottom=0.35)
 
         if save:
-            plt.savefig("/home/kevindsouza/Downloads/auroc_gm.svg", format="svg")
+            plt.savefig("/home/kevindsouza/Downloads/auroc_h1.svg", format="svg")
 
         plt.show()
 
@@ -657,7 +657,7 @@ if __name__ == "__main__":
     plot_ob = PlotFns(cfg)
 
     "Chose among plotting functions"
-    plot_ob.plot_combined(cell="GM12878", metric="auroc", ylabel="AuROC")
+    plot_ob.plot_combined(cell="H1hESC", metric="auroc", ylabel="AuROC")
     # plot_ob.plot_map_celltypes()
     # plot_ob.plot_map_resolutions()
     # plot_ob.plot_auroc_celltypes()
