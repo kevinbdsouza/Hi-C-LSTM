@@ -407,7 +407,7 @@ class PlotFns:
         ig_log_df = ig_log_df.rename(columns={0: "ig_val", 1: "label"})
         ig_log_df["ig_val"] = ig_log_df["ig_val"].astype(float)
 
-        plt.figure(figsize=(16, 10))
+        plt.figure(figsize=(16, 7))
         sns.set(font_scale=1.8)
         sns.set_style(style='white')
         plt.xticks(rotation=90, fontsize=20)
