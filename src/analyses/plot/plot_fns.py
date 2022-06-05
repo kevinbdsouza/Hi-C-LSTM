@@ -114,7 +114,7 @@ class PlotFns:
             plt.subplots_adjust(bottom=0.35)
 
         if save:
-            plt.savefig("/home/kevindsouza/Downloads/fscore_gm.svg", format="svg")
+            plt.savefig("/home/kevindsouza/Downloads/fscore_h1.svg", format="svg")
 
         plt.show()
 
@@ -657,7 +657,7 @@ if __name__ == "__main__":
     plot_ob = PlotFns(cfg)
 
     "Chose among plotting functions"
-    plot_ob.plot_combined(cell="GM12878", metric="fscore", ylabel="F-score")
+    plot_ob.plot_combined(cell="H1hESC", metric="fscore", ylabel="F-score")
     # plot_ob.plot_map_celltypes()
     # plot_ob.plot_map_resolutions()
     # plot_ob.plot_auroc_celltypes()
