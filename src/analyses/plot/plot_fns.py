@@ -403,7 +403,7 @@ class PlotFns:
         """
 
         ig_log_df = pd.DataFrame(np.load(self.path + "ig_log_df_all.npy", allow_pickle=True))
-        #ig_log_df = pd.DataFrame(np.load(self.path + "ig_tf_df_plus_ctcf.npy", allow_pickle=True))
+        # ig_log_df = pd.DataFrame(np.load(self.path + "ig_tf_df_plus_ctcf.npy", allow_pickle=True))
         ig_log_df = ig_log_df.rename(columns={0: "ig_val", 1: "label"})
         ig_log_df["ig_val"] = ig_log_df["ig_val"].astype(float)
 
@@ -624,6 +624,7 @@ class PlotFns:
             plt.yticks(fontsize=14)
             plt.xlabel("Distance in Kbp", fontsize=14)
             plt.ylabel("IG Importance", fontsize=14)
+            plt.savefig("/home/kevindsouza/Downloads/tad_signal.svg", format="svg")
             plt.show()
         elif mode == "chr21":
             pos = np.arange(28, 29.2, 0.025)
@@ -667,12 +668,12 @@ if __name__ == "__main__":
     # plot_ob.plot_auroc()
     # plot_ob.plot_hidden()
     # plot_ob.plot_xgb()
-    plot_ob.plot_violin()
+    # plot_ob.plot_violin()
     # plot_ob.plot_r2_celltypes()
     # plot_ob.plot_r2(cell="WTC11")
     # plot_ob.plot_knockout_results()
     # plot_ob.plot_knockout_tfs()
     # plot_ob.pr_curves()
     # plot_ob.plot_symmetry()
-    # plot_ob.plot_feature_signal(mode="tad)
+    plot_ob.plot_feature_signal(mode="tad)
     # plot_ob.plot_pred_range()
