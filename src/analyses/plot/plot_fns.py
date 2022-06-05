@@ -114,7 +114,7 @@ class PlotFns:
             plt.subplots_adjust(bottom=0.35)
 
         if save:
-            plt.savefig("/home/kevindsouza/Downloads/fscore_hff.svg", format="svg")
+            plt.savefig("/home/kevindsouza/Downloads/map_cells.svg", format="svg")
 
         plt.show()
 
@@ -171,7 +171,7 @@ class PlotFns:
 
         "plot"
         self.plot_main(None, None, df_columns, df_lists, xlabel, ylabel, colors, markers, labels, form_df=True,
-                       adjust=True, save=False)
+                       adjust=True, save=True)
 
     def plot_map_resolutions(self):
         """
@@ -657,8 +657,8 @@ if __name__ == "__main__":
     plot_ob = PlotFns(cfg)
 
     "Chose among plotting functions"
-    plot_ob.plot_combined(cell="HFFhTERT", metric="fscore", ylabel="F-score")
-    # plot_ob.plot_map_celltypes()
+    # plot_ob.plot_combined(cell="HFFhTERT", metric="fscore", ylabel="F-score")
+    plot_ob.plot_map_celltypes()
     # plot_ob.plot_map_resolutions()
     # plot_ob.plot_auroc_celltypes()
     # plot_ob.plot_auroc()
