@@ -402,8 +402,8 @@ class PlotFns:
             NA
         """
 
-        # ig_log_df = pd.DataFrame(np.load(self.path + "ig_log_df_all.npy", allow_pickle=True))
-        ig_log_df = pd.DataFrame(np.load(self.path + "ig_tf_df_plus_ctcf.npy", allow_pickle=True))
+        ig_log_df = pd.DataFrame(np.load(self.path + "ig_log_df_all.npy", allow_pickle=True))
+        #ig_log_df = pd.DataFrame(np.load(self.path + "ig_tf_df_plus_ctcf.npy", allow_pickle=True))
         ig_log_df = ig_log_df.rename(columns={0: "ig_val", 1: "label"})
         ig_log_df["ig_val"] = ig_log_df["ig_val"].astype(float)
 
@@ -415,7 +415,7 @@ class PlotFns:
         ax = sns.violinplot(x="label", y="ig_val", data=ig_log_df)
         ax.set(xlabel='', ylabel='IG Importance')
         plt.tight_layout()
-        plt.savefig("/home/kevindsouza/Downloads/tfs_ig.svg", format="svg")
+        plt.savefig("/home/kevindsouza/Downloads/elements_ig.svg", format="svg")
         plt.show()
 
     def plot_r2_celltypes(self):
