@@ -587,6 +587,7 @@ class PlotFns:
         plt.ylim([0.0, 1.05])
         plt.xlim([0.0, 1])
         plt.legend(fontsize=14)
+        plt.savefig("/home/kevindsouza/Downloads/pr_curves.svg", format="svg")
         plt.show()
 
     def plot_symmetry(self):
@@ -658,7 +659,7 @@ if __name__ == "__main__":
 
     "Chose among plotting functions"
     # plot_ob.plot_combined(cell="HFFhTERT", metric="fscore", ylabel="F-score")
-    plot_ob.plot_map_celltypes()
+    # plot_ob.plot_map_celltypes()
     # plot_ob.plot_map_resolutions()
     # plot_ob.plot_auroc_celltypes()
     # plot_ob.plot_auroc()
@@ -669,7 +670,7 @@ if __name__ == "__main__":
     # plot_ob.plot_r2(cell="WTC11")
     # plot_ob.plot_knockout_results()
     # plot_ob.plot_knockout_tfs()
-    # plot_ob.pr_curves()
+    plot_ob.pr_curves()
     # plot_ob.plot_symmetry()
     # plot_ob.plot_feature_signal(mode="tad)
     # plot_ob.plot_pred_range()
