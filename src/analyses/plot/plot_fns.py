@@ -624,6 +624,7 @@ class PlotFns:
             plt.yticks(fontsize=14)
             plt.xlabel("Distance in Kbp", fontsize=14)
             plt.ylabel("IG Importance", fontsize=14)
+            plt.tight_layout()
             plt.savefig("/home/kevindsouza/Downloads/tad_signal.svg", format="svg")
             plt.show()
         elif mode == "chr21":
