@@ -414,6 +414,7 @@ class PlotFns:
         plt.ylim(-1, 1)
         ax = sns.violinplot(x="label", y="ig_val", data=ig_log_df)
         ax.set(xlabel='', ylabel='IG Importance')
+        plt.tight_layout()
         plt.show()
 
     def plot_r2_celltypes(self):
