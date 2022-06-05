@@ -114,7 +114,7 @@ class PlotFns:
             plt.subplots_adjust(bottom=0.35)
 
         if save:
-            plt.savefig("/home/kevindsouza/Downloads/map_cells.svg", format="svg")
+            plt.savefig("/home/kevindsouza/Downloads/map_res.svg", format="svg")
 
         plt.show()
 
@@ -201,7 +201,7 @@ class PlotFns:
 
         "plot"
         self.plot_main(None, None, df_columns, df_lists, xlabel, ylabel, colors, markers, labels, form_df=True,
-                       adjust=True, save=False)
+                       adjust=True, save=True)
 
     def plot_auroc_celltypes(self):
         """
@@ -660,7 +660,7 @@ if __name__ == "__main__":
     "Chose among plotting functions"
     # plot_ob.plot_combined(cell="HFFhTERT", metric="fscore", ylabel="F-score")
     # plot_ob.plot_map_celltypes()
-    # plot_ob.plot_map_resolutions()
+    plot_ob.plot_map_resolutions()
     # plot_ob.plot_auroc_celltypes()
     # plot_ob.plot_auroc()
     # plot_ob.plot_hidden()
@@ -670,7 +670,7 @@ if __name__ == "__main__":
     # plot_ob.plot_r2(cell="WTC11")
     # plot_ob.plot_knockout_results()
     # plot_ob.plot_knockout_tfs()
-    plot_ob.pr_curves()
+    # plot_ob.pr_curves()
     # plot_ob.plot_symmetry()
     # plot_ob.plot_feature_signal(mode="tad)
     # plot_ob.plot_pred_range()
