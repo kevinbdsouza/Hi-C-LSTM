@@ -406,7 +406,7 @@ class PlotFns:
         mode = "gbr"
 
         if mode == "gbr":
-            ig_log_df = pd.read_csv(self.path + "ig_Domains.csv", sep="\t")
+            ig_log_df = pd.read_csv(self.path + "ig_GBR.csv", sep="\t")
             ig_log_df = ig_log_df.rename(columns={"0": "ig_val", "1": "label"})
         elif mode == "segway":
             ig_log_df = pd.DataFrame(np.load(self.path + "ig_log_df_all.npy", allow_pickle=True))
@@ -677,9 +677,9 @@ if __name__ == "__main__":
     # plot_ob.plot_map_resolutions()
     # plot_ob.plot_auroc_celltypes()
     # plot_ob.plot_auroc()
-    # plot_ob.plot_hidden()
+    plot_ob.plot_hidden()
     # plot_ob.plot_xgb()
-    plot_ob.plot_violin()
+    # plot_ob.plot_violin()
     # plot_ob.plot_r2_celltypes()
     # plot_ob.plot_r2(cell="WTC11")
     # plot_ob.plot_knockout_results()
