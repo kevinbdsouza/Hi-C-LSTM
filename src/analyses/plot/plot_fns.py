@@ -403,10 +403,18 @@ class PlotFns:
             NA
         """
 
-        ig_log_df = pd.read_csv(self.path + "ig_GBR.csv", sep="\t")
-        #ig_log_df = pd.DataFrame(np.load(self.path + "ig_log_df_all.npy", allow_pickle=True))
-        # ig_log_df = pd.DataFrame(np.load(self.path + "ig_tf_df_plus_ctcf.npy", allow_pickle=True))
-        ig_log_df = ig_log_df.rename(columns={0: "ig_val", 1: "label"})
+        mode = "gbr"
+
+        if mode == "gbr":
+            ig_log_df = pd.read_csv(self.path + "ig_GBR.csv", sep="\t")
+            ig_log_df = ig_log_df.rename(columns={"0": "ig_val", "1": "label"})
+        elif mode == "segway":
+            ig_log_df = pd.DataFrame(np.load(self.path + "ig_log_df_all.npy", allow_pickle=True))
+            ig_log_df = ig_log_df.rename(columns={0: "ig_val", 1: "label"})
+        elif mode == "tfs":
+            ig_log_df = pd.DataFrame(np.load(self.path + "ig_tf_df_plus_ctcf.npy", allow_pickle=True))
+            ig_log_df = ig_log_df.rename(columns={0: "ig_val", 1: "label"})
+
         ig_log_df["ig_val"] = ig_log_df["ig_val"].astype(float)
 
         plt.figure(figsize=(16, 7))
