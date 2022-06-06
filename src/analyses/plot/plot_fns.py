@@ -536,7 +536,7 @@ class PlotFns:
 
         "plot"
         self.plot_main(None, None, df_columns, None, xlabel, ylabel, colors, markers, labels, form_df=False,
-                       adjust=True, save=True, mode="all")
+                       adjust=False, save=True, mode="all")
 
     def pr_curves(self):
         """
