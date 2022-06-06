@@ -403,7 +403,8 @@ class PlotFns:
             NA
         """
 
-        ig_log_df = pd.DataFrame(np.load(self.path + "ig_log_df_all.npy", allow_pickle=True))
+        ig_log_df = pd.read_csv(self.path + "ig_GBR.csv", sep="\t")
+        #ig_log_df = pd.DataFrame(np.load(self.path + "ig_log_df_all.npy", allow_pickle=True))
         # ig_log_df = pd.DataFrame(np.load(self.path + "ig_tf_df_plus_ctcf.npy", allow_pickle=True))
         ig_log_df = ig_log_df.rename(columns={0: "ig_val", 1: "label"})
         ig_log_df["ig_val"] = ig_log_df["ig_val"].astype(float)
@@ -670,7 +671,7 @@ if __name__ == "__main__":
     # plot_ob.plot_auroc()
     # plot_ob.plot_hidden()
     # plot_ob.plot_xgb()
-    # plot_ob.plot_violin()
+    plot_ob.plot_violin()
     # plot_ob.plot_r2_celltypes()
     # plot_ob.plot_r2(cell="WTC11")
     # plot_ob.plot_knockout_results()
