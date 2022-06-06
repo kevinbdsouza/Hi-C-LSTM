@@ -114,7 +114,7 @@ class PlotFns:
             plt.subplots_adjust(bottom=0.35)
 
         if save:
-            plt.savefig("/home/kevindsouza/Downloads/map_res.svg", format="svg")
+            plt.savefig("/home/kevindsouza/Downloads/ko.svg", format="svg")
 
         plt.show()
 
@@ -536,7 +536,7 @@ class PlotFns:
 
         "plot"
         self.plot_main(None, None, df_columns, None, xlabel, ylabel, colors, markers, labels, form_df=False,
-                       adjust=True, save=False, mode="all")
+                       adjust=True, save=True, mode="all")
 
     def pr_curves(self):
         """
@@ -672,9 +672,9 @@ if __name__ == "__main__":
     # plot_ob.plot_violin()
     # plot_ob.plot_r2_celltypes()
     # plot_ob.plot_r2(cell="WTC11")
-    # plot_ob.plot_knockout_results()
+    plot_ob.plot_knockout_results()
     # plot_ob.plot_knockout_tfs()
     # plot_ob.pr_curves()
     # plot_ob.plot_symmetry()
-    plot_ob.plot_feature_signal(mode="tad")
+    # plot_ob.plot_feature_signal(mode="tad")
     # plot_ob.plot_pred_range()
