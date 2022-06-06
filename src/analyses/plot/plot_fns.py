@@ -114,6 +114,7 @@ class PlotFns:
             plt.subplots_adjust(bottom=0.35)
 
         if save:
+            plt.tight_layout()
             plt.savefig("/home/kevindsouza/Downloads/ko.svg", format="svg")
 
         plt.show()
