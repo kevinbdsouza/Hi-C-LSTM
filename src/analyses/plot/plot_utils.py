@@ -401,7 +401,8 @@ def scatter_tal_lm(ko, wt):
     plt.xlabel('TAL1 KO - WT (Observed)', fontsize=20)
     plt.ylabel('TAL1 KO - WT (Predicted)', fontsize=20)
     plt.tight_layout()
-    plt.savefig("/home/kevindsouza/Downloads/tal1_scatter.png")
+    plt.savefig("/home/kevindsouza/Downloads/tal1_scatter.svg", format="svg")
+    plt.show()
 
 
 def hist_2d(og, pred):

@@ -673,7 +673,7 @@ if __name__ == "__main__":
     # plot_ob.plot_violin()
     # plot_ob.plot_r2_celltypes()
     # plot_ob.plot_r2(cell="WTC11")
-    plot_ob.plot_knockout_results()
+    # plot_ob.plot_knockout_results()
     # plot_ob.plot_knockout_tfs()
     # plot_ob.pr_curves()
     # plot_ob.plot_symmetry()
