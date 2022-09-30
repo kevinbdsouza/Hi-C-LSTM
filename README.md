@@ -15,6 +15,9 @@ Hi-C-LSTM is a framework to build Hi-C intrachromosomal representations which ar
 <img align="center" src="https://github.com/kevinbdsouza/Hi-C-LSTM//blob/main/data2/HiC_model.png?raw=true">
 </p>
 
+### Note: 
+This might not be SOTA for Hi-C representation learning anymore. Refer to [Akita](https://github.com/calico/basenji), [Orca](https://github.com/jzhoulab/orca), and [Origami](https://www.biorxiv.org/content/10.1101/2022.03.05.483136v1). Researchers interested in a preliminary hierachical version of Hi-C-LSTM can check [HirarChy](https://github.com/kevinbdsouza/HirarChy) and those looking to apply contastive learning to Hi-C data can get started with [HiCClip](https://github.com/kevinbdsouza/HiCClip).
+
 ## Requirements 
 The following software was installed on Ubuntu 16.04
 * Python 3.7.10
