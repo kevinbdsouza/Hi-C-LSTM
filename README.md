@@ -31,7 +31,7 @@ The following software was installed on Ubuntu 16.04
 Install the above dependencies using installers like pip. The typical install time is about 1 hour. No non-standard hardware is required. 
 
 ## To prepare data:
-1. get HiC data: run ./download_data.sh then ./hic2txt.sh
+1. get HiC data: Download Juicer Tools and run ./extract_chromosomes.sh. Specify right path for juicer tools jar. 
 2. run compute_genome_length.py to create file with rounded, cumulative chromosome lengths
 
 ## Demo 

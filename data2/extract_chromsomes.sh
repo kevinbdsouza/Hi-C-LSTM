@@ -1,16 +1,21 @@
 #!/usr/bin/env bash
 
-folder_path="/data2/hic_lstm/data/GM12878_100kb"
-hic_path="/data2/hic_lstm/data/GM12878_low/4DNFI9ZWZ5BS.hic"
-slash="/"
+# download juicer tools first and specify right location of juicer_tools.jar in the last command 
+# cd to desired folder 
+
+wget -m https://ftp.ncbi.nlm.nih.gov/geo/series/GSE63nnn/GSE63525/suppl/GSE63525%5FGM12878%5Finsitu%5Fprimary%2Breplicate%5Fcombined%2Ehic
+mv ftp.ncbi.nlm.nih.gov/geo/series/GSE63nnn/GSE63525/suppl/GSE63525_GM12878_insitu_primary+replicate_combined.hic GM12878.hic
+rm -r ftp.ncbi.nlm.nih.gov
+
+hic_file_name="GM12878.hic"
 extension=".txt"
-filename="hic_chr"
+output_filename="hic_chr"
 
 chr_list=(1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22)
 
 for chr in "${chr_list[@]}"; do
-  mkdir $folder_path$slash$chr
-  txt_path="$folder_path$slash$chr$slash$filename$chr$extension"
+  mkdir $chr
+  txt_path="$chr"/"$output_filename$chr$extension"
 
-  java -jar juicer_tools.jar dump observed KR $hic_path $chr $chr BP 100000 $txt_path
+  java -jar juicer_tools.jar dump observed KR $hic_file_name $chr $chr BP 100000 $txt_path
 done
