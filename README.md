@@ -2,7 +2,7 @@
 Hi-C-LSTM is a framework to build Hi-C intrachromosomal representations which are useful for element identification and in-silico alterations. 
 
 <p align="center">
-    <a href="https://www.biorxiv.org/content/10.1101/2021.08.26.457856v1.abstract">
+    <a href="https://www.nature.com/articles/s41467-022-31337-w">
         <img alt="Paper" width="80" height="40" src="https://github.com/kevinbdsouza/Hi-C-LSTM//blob/main/data2/penguin.svg?raw=true">
     </a>
     <a href="https://github.com/kevinbdsouza/Hi-C-LSTM/releases">
